@@ -1,0 +1,138 @@
+{% extends "admin_panel/base2.html" %}
+{% load static %}
+
+{% block content %}
+
+<div class="container mt-4">
+    {% if data %}
+    <div class="col-xs-12">
+        <div class="box">
+            <div class="box-header with-border">
+                <h3 class="box-title"></h3>
+                <div class="box-tools">
+                    <a href="#" class="btn btn-default btn-sm">
+                        <span class="hidden-xs">Очистить</span><i class="fa fa-eraser visible-xs" aria-hidden="true"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div id="w0" class="grid-view">
+                <div class="box-body table-responsive no-padding">
+                    <table id="myTable" class="table table-bordered table-hover table-striped linkedRow">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th><a href="?sort=name">ФИО</a></th>
+                                <th>Телефон</th>
+                                <th>Email</th>
+                                <th>Дом</th>
+                                <th>Квартира</th>
+                                <th><a href="?sort=name">Добавлен</a></th>
+                                <th>Статус</th>
+                                <th>Есть долг</th>
+                                <th></th>
+                                <th style="width: 114px; min-width: 114px">&nbsp;</th>
+                            </tr>
+                            <tr id="w0-filters" class="filters">
+                                <form method="GET">
+                                    <td><input type="number" class="form-control" name="name" value="{{ request.GET.id }}"></td>
+                                    <td><input type="text" class="form-control" name="name" value="{{ request.GET.name }}"></td>
+                                    <td><input type="text" class="form-control" name="phone" value="{{ request.GET.phone }}"></td>
+                                    <td><input type="text" class="form-control" name="email" value="{{ request.GET.email }}"></td>
+                                    <td> </td>
+                                    <td> </td>
+                                    <td><input type="text" class="form-control" name="flat" value="{{ request.GET.flat }}"></td>
+                                    <td><input type="date" class="form-control" name="date_joined" value="{{ request.GET.date_joined }}"></td>
+                                    <td>
+                                        <select class="form-control" name="status">
+                                            <option value=""></option>
+                                            <option value="active" {% if request.GET.status == 'active' %}selected{% endif %}>Активен</option>
+                                            <option value="new" {% if request.GET.status == 'new' %}selected{% endif %}>Новый</option>
+                                            <option value="disabled" {% if request.GET.status == 'disabled' %}selected{% endif %}>Отключен</option>
+                                        </select>
+                                    </td>
+                                    <td>&nbsp;</td>
+                                </form>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for user in data %}
+                                <tr data-href="#" data-key="{{ user.id }}">
+                                    <td>{{ user.external_id }}</td>
+                                    <td>{{ user.first_name|default:"-" }} {{ user.last_name|default:"-" }} {{ user.patronimic_name|default:"-" }}</td>
+                                    <td>{{ user.phone_number|default:"-" }}</td>
+                                    <td>{{ user.email }}</td>
+                                    <td>{{ user.houses|default:"-" }}</td>
+                                    <td>{{ user.flats|default:"-" }}</td>
+                                    <td>{{ user.date_joined|default:"-" }}</td>
+                                    <td>
+                                        {% if user.status == 'active' %}
+                                            <small class="label label-success">Активен</small>
+                                        {% elif user.status == 'new' %}
+                                            <small class="label label-warning">Новый</small>
+                                        {% else %}
+                                            <small class="label label-danger">Отключен</small>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ user.has_dept|default:"-" }}</td>
+
+                                    <td>
+                                        <a href="#" class="btn btn-default btn-sm"><i class="fa fa-envelope"></i></a>
+                                        <a href="#" class="btn btn-default btn-sm"><i class="fa fa-pen"></i></a>
+                                        <form method="POST" action="#" style="display: inline;">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-default btn-sm"
+                                                    onclick="return confirm('Вы уверены, что хотите удалить этот элемент?');">
+                                                <i class="fa fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <p>No users yet.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>
+jQuery(function () {
+    jQuery('#myTable').DataTable({
+        order: [[1, 'desc']],
+        pageLength: 50,
+        lengthChange: false,
+        searching: true,
+        paging: true,
+        info: false,
+        autoWidth: false
+    });
+});
+</script>
+<script>
+    jQuery(function ($) {
+        if (jQuery('#usersearch-searchhouse').data('select2')) { jQuery('#usersearch-searchhouse').select2('destroy'); }
+        jQuery.when(jQuery('#usersearch-searchhouse').select2(select2_0d896465)).done(initS2Loading('usersearch-searchhouse','s2options_7ebc6538'));
+
+        jQuery.fn.kvDatepicker.dates={};
+        if (jQuery('#usersearch-searchcreateddate').data('kvDatepicker')) { jQuery('#usersearch-searchcreateddate').kvDatepicker('destroy'); }
+        jQuery('#usersearch-searchcreateddate').kvDatepicker(kvDatepicker_1643d6f1);
+
+        if (jQuery('#usersearch-status').data('select2')) { jQuery('#usersearch-status').select2('destroy'); }
+        jQuery.when(jQuery('#usersearch-status').select2(select2_0d896465)).done(initS2Loading('usersearch-status','s2options_7ebc6538'));
+
+        if (jQuery('#usersearch-searchhasdebt').data('select2')) { jQuery('#usersearch-searchhasdebt').select2('destroy'); }
+        jQuery.when(jQuery('#usersearch-searchhasdebt').select2(select2_0d896465)).done(initS2Loading('usersearch-searchhasdebt','s2options_7ebc6538'));
+
+        jQuery('#w0').yiiGridView({"filterUrl":"\/admin\/user\/index","filterSelector":"#w0-filters input, #w0-filters select"});
+    });
+</script>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"
+        integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+{% endblock %}
+

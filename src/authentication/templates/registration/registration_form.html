@@ -1,0 +1,164 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru-RU">
+<head>
+    <meta charset="UTF-8"/>
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <link rel="icon" type="image/png" href="https://myhouse24.demodev.cc/favicon.png">
+    <title>Вход</title>
+    <link href="{% static 'bower_components/bootstrap/dist/css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css' %}" rel="stylesheet">
+    <link href="{% static 'bower_components/font-awesome/css/font-awesome.min.css' %}" rel="stylesheet">
+    <link href="{% static 'bower_components/Ionicons/css/ionicons.min.css' %}" rel="stylesheet">
+    <link href="{% static 'bower_components/jvectormap/jquery-jvectormap.css' %}" rel="stylesheet">
+    <link href="{% static 'dist/css/AdminLTE.min.css' %}" rel="stylesheet">
+    <link href="{% static 'plugins/iCheck/flat/blue.css' %}" rel="stylesheet">
+    <link href="{% static 'plugins/bootstrap-wysihtml5/bootstrap3-wysihtml5.min.css' %}" rel="stylesheet">
+    <link href="{% static 'dist/css/skins/_all-skins.min.css' %}" rel="stylesheet">
+    <link href="{% static 'dist/css/style.css' %}" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic" rel="stylesheet">
+    <link href="{% static 'dist/css/custom.css' %}" rel="stylesheet">
+    <script src="https://www.google.com/recaptcha/api.js?onload=onloadCallback&render=explicit"
+        async defer>
+    </script>
+</head>
+<body class="hold-transition login-page">
+    <div class="login-box">
+        <div class="login-logo">
+            <a href="#">
+                <img src="https://myhouse24.demodev.cc/logo.svg" alt="logo">
+            </a>
+        </div>
+        <div class="nav-tabs-custom">
+            <div class="tab-content">
+                <div class="tab-pane active">
+                    <div class="login-box-body">
+                        <p class="login-box-msg">Регистрация</p>
+
+                        <form id="registration-form" method="post">
+                            {% csrf_token %}
+<!--                            {{ form.as_p }}-->
+                            <div class="form-group has-feedback field-loginform-first-name required">
+                                {{ form.first_name }}<span class='fa fa-user-circle form-control-feedback'></span>
+                                {% for error in form.first_name.errors %}
+                                    <p style="color: red">{{ error }}</p>
+                                 {% endfor %}
+                            </div>
+                            <div class="form-group has-feedback field-loginform-last-name required">
+                                {{ form.last_name }}<span class='fa fa-user-circle form-control-feedback'></span>
+                                {% for error in form.last_name.errors %}
+                                    <p style="color: red">{{ error }}</p>
+                                 {% endfor %}
+                            </div>
+                            <div class="form-group has-feedback field-loginform-email required">
+                                {{ form.email }}<span class='fa fa-envelope form-control-feedback'></span>
+                                {% for error in form.email.errors %}
+                                    <p style="color: red">{{ error }}</p>
+                                 {% endfor %}
+                            </div>
+                            <div class="form-group has-feedback field-loginform-password required">
+                                {{ form.password1 }}<span class='fa fa-lock form-control-feedback'></span>
+                                {% for error in form.password1.errors %}
+                                    <p style="color: red">{{ error }}</p>
+                                 {% endfor %}
+                            </div>
+                            <div class="form-group has-feedback field-loginform-password required">
+                                {{ form.password2 }}<span class='bi bi-box-arrow-in-right form-control-feedback'></span>
+                                {% for error in form.password2.errors %}
+                                    <p style="color: red">{{ error }}</p>
+                                 {% endfor %}
+                            </div>
+                            <div class="row" style="flex-wrap: wrap">
+                                <div class="col-xs-12">
+                                    <label><input type="checkbox" name="accept_terms_and_conditions" value="0">Принять <a href="#">Политику конфиденциальности</a></label>
+                                    <div id="g-recaptcha"></div>
+                                    <button type="submit" class="btn btn-primary btn-block">Зарегистророваться</button>
+                                    <a href="{% url 'authentication:login' %}" type="button" class="btn btn-secondary btn-block">Войти аккаунт</a>
+                                    <a href="{% url 'authentication:password_reset' %}" type="button" class="btn btn-secondary btn-block">Забыли пароль?</a>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="{% static 'assets/137cc266/jquery.js' %}"></script>
+    <script src="{% static 'bower_components/bootstrap/dist/js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js' %}"></script>
+    <script src="{% static 'bower_components/fastclick/lib/fastclick.js' %}"></script>
+    <script src="{% static 'dist/js/adminlte.min.js' %}"></script>
+    <script src="{% static 'plugins/iCheck/icheck.min.js' %}"></script>
+    <script src="{% static 'plugins/bootstrap-wysihtml5/bootstrap3-wysihtml5.all.js' %}"></script>
+    <script src="{% static 'plugins/bootstrap-wysihtml5/bootstrap-wysihtml5.ru-RU.js' %}"></script>
+    <script src="{% static 'bower_components/jquery-sparkline/dist/jquery.sparkline.min.js' %}"></script>
+    <script src="{% static 'plugins/jvectormap/jquery-jvectormap-1.2.2.min.js' %}"></script>
+    <script src="{% static 'plugins/jvectormap/jquery-jvectormap-world-mill-en.js' %}"></script>
+    <script src="{% static 'bower_components/jquery-slimscroll/jquery.slimscroll.min.js' %}"></script>
+    <script src="{% static 'bower_components/chart.js/Chart.js' %}"></script>
+    <script src="{% static 'dist/js/main.js' %}"></script>
+    <script src="{% static 'dist/js/custom.js' %}"></script>
+    <script>
+        let widget = null;
+        let recaptchaReady = false;
+
+        function onloadCallback() {
+            recaptchaReady = true;
+            widget = grecaptcha.render('g-recaptcha', { sitekey: '{{ site_key }}' });
+        }
+        let submit = false;
+
+        document.getElementById("registration-form").addEventListener("submit", function(e){
+            e.preventDefault();
+            if (submit) return;
+
+            const resp = grecaptcha.getResponse(widget);
+            if (!resp) { alert("Подтвердите что вы не робот"); return; }
+
+            submit = true;
+            this.submit();
+        });
+    </script>
+<!--    <script>-->
+<!--        let widgetUser = null;-->
+<!--        let widgetAdmin = null;-->
+<!--        let recaptchaReady = false;-->
+
+<!--        function onloadCallback() {-->
+<!--            recaptchaReady = true;-->
+<!--            // user tab visible by default-->
+<!--            widgetUser = grecaptcha.render('g-recaptcha-user', { sitekey: '{{ site_key }}' });-->
+<!--        // admin tab may be hidden; render lazily when tab opened-->
+<!--            $('a[href="#tab_2"]').one('shown.bs.tab', function () {-->
+<!--                widgetAdmin = grecaptcha.render('g-recaptcha-admin', { sitekey: '{{ site_key }}' });-->
+<!--            });-->
+<!--        }-->
+<!--        let submittingUser = false;-->
+<!--        let submittingAdmin = false;-->
+
+<!--        document.getElementById("login-form-user").addEventListener("submit", function(e){-->
+<!--            e.preventDefault();-->
+<!--            if (submittingUser) return;-->
+
+<!--            const resp = grecaptcha.getResponse(widgetUser);-->
+<!--            if (!resp) { alert("Подтвердите что вы не робот"); return; }-->
+
+<!--            submittingUser = true;-->
+<!--            this.querySelector('button[type="submit"]').disabled = true;-->
+<!--            this.submit();-->
+<!--        });-->
+
+<!--        document.getElementById("login-form-admin").addEventListener("submit", function(e){-->
+<!--            e.preventDefault();-->
+<!--            if (submittingAdmin) return;-->
+
+<!--            const resp = grecaptcha.getResponse(widgetAdmin);-->
+<!--            if (!resp) { alert("Подтвердите что вы не робот"); return; }-->
+
+<!--            submittingAdmin = true;-->
+<!--            this.querySelector('button[type="submit"]').disabled = true;-->
+<!--            this.submit();-->
+<!--        });-->
+<!--    </script>-->
+</body>
+</html>

@@ -1,0 +1,320 @@
+{% load static %}
+
+<!doctype html>
+<html lang="ru">
+
+<head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes"/>
+    <meta name="color-scheme" content="light dark"/>
+
+
+    <!-- Fonts -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/source-sans-3@5.0.12/index.css"
+          crossorigin="anonymous"/>
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"
+          crossorigin="anonymous"/>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+          crossorigin="anonymous"/>
+
+    <!-- OverlayScrollbars -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.11.0/styles/overlayscrollbars.min.css"
+          crossorigin="anonymous"/>
+
+    <!-- AdminLTE -->
+    <link rel="stylesheet" href="{% static 'dist/css/adminlte.css' %}"/>
+
+    <style>
+        .sidebar-brand .brand-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.8125rem 0.5rem;
+        }
+
+        .sidebar-brand .logo-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+        }
+
+        .sidebar-brand .brand-image {
+            max-height: 33px;
+            width: auto;
+        }
+
+        .sidebar-brand .logo-xs {
+            display: none;
+        }
+
+        .sidebar-brand .logo-xl {
+            display: inline-block;
+        }
+
+        .sidebar-collapse .sidebar-brand .logo-xs {
+            display: inline-block;
+        }
+
+        .sidebar-collapse .sidebar-brand .logo-xl {
+            display: none;
+        }
+    </style>
+
+    {% block extra_css %}{% endblock %}
+</head>
+
+<body class="layout-fixed sidebar-expand-lg bg-body-tertiary sidebar-mini">
+<div class="app-wrapper">
+
+    <!-- Header -->
+    <nav class="app-header navbar navbar-expand bg-body">
+        <div class="container-fluid">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" data-lte-toggle="sidebar" href="#" role="button">
+                        <i class="bi bi-list"></i>
+                    </a>
+                </li>
+                <li class="nav-item d-none d-md-block">
+                    <span class="nav-link fw-bold">Панель администратора</span>
+                </li>
+            </ul>
+
+            <!-- Right navbar -->
+            <ul class="navbar-nav ms-auto align-items-center">
+                <!-- Notifications -->
+                {% if new_users_total_count is not None %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link d-flex align-items-center" data-bs-toggle="dropdown" href="#">
+                            <i class="bi bi-bell-fill"></i>
+                            {% if new_users_total_count > 0 %}
+                                <span class="navbar-badge badge text-bg-warning">{{ new_users_total_count }}</span>
+                            {% endif %}
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-end dropdown-menu-lg">
+                            <span class="dropdown-item dropdown-header">Новых пользователей:
+                                {{ new_users_total_count }}</span>
+                            <div class="dropdown-divider"></div>
+
+                            {# Новые владельцы #}
+                            {% if new_owners_count is not None %}
+                                {% if new_owners_list %}
+                                    <span class="dropdown-item text-muted small fw-bold">Владельцы:</span>
+                                    {% for owner in new_owners_list %}
+                                        <a href="{% url 'users:owner_detail' owner.pk %}" class="dropdown-item text-truncate"
+                                           title="{{ owner.get_full_name }}">
+                                            <i class="bi bi-person me-1"></i>{{ owner.get_full_name }}
+                                        </a>
+                                    {% endfor %}
+                                {% endif %}
+                            {% endif %}
+
+                            {# Новые сотрудники #}
+                            {% if new_staff_count is not None %}
+                                {% if new_staff_list %}
+                                    {% if new_owners_list %}<div class="dropdown-divider"></div>{% endif %}
+                                    <span class="dropdown-item text-muted small fw-bold">Сотрудники:</span>
+                                    {% for staff in new_staff_list %}
+                                        <a href="{% url 'users:user_detail' staff.pk %}" class="dropdown-item text-truncate"
+                                           title="{{ staff.get_full_name }}">
+                                            <i class="bi bi-person-badge me-1"></i>{{ staff.get_full_name }}
+                                        </a>
+                                    {% endfor %}
+                                {% endif %}
+                            {% endif %}
+
+                            {% if not new_owners_list and not new_staff_list %}
+                                <span class="dropdown-item text-center text-muted small">Новых заявок пока нет</span>
+                            {% endif %}
+
+                            <div class="dropdown-divider"></div>
+                            {% if new_owners_count is not None %}
+                                <a href="{% url 'users:owners_list' %}"
+                                   class="dropdown-item dropdown-footer text-center">Перейти в раздел владельцев</a>
+                            {% elif new_staff_count is not None %}
+                                <a href="{% url 'users:users_list' %}"
+                                   class="dropdown-item dropdown-footer text-center">Перейти в раздел сотрудников</a>
+                            {% endif %}
+                        </div>
+                    </li>
+                {% endif %}
+
+                <!-- User -->
+                <li class="nav-item dropdown user-menu">
+                    <a href="#" class="nav-link dropdown-toggle d-flex align-items-center gap-2"
+                       data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-person-circle fs-4 lh-1"></i>
+                        {% if request.user.is_authenticated %}
+                        <span class="d-none d-md-inline text-truncate">
+                            {{ request.user.get_full_name|default:request.user.email }}
+                        </span>
+                        {% endif %}
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-lg dropdown-menu-end">
+                        <li class="user-header text-bg-primary text-center">
+                            <i class="bi bi-person-circle fs-1 mb-2"></i>
+                            {% if request.user.is_authenticated %}
+                            <p class="mb-0">
+                                {{ request.user.get_full_name|default:request.user.email }}
+                                <small class="d-block"></small>
+                            </p>
+                            {% endif %}
+                        </li>
+                        <li class="user-footer d-flex justify-content-between">
+                            <a href="#"
+                               class="btn btn-default btn-flat">Профиль</a>
+                            <form method="post" action="#" class="m-0">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-default btn-flat">Выход</button>
+                            </form>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Sidebar -->
+    <aside class="app-sidebar bg-body shadow" data-bs-theme="light">
+        <div class="sidebar-brand">
+            <a href="#" class="brand-link">
+                    <span class="logo-wrapper">
+                        <img src="{% static 'dist/img/logo-mini.svg' %}" alt="Logo Mini" class="brand-image logo-xs"/>
+                        <img src="{% static 'dist/img/logo.svg' %}" alt="Logo XL" class="brand-image logo-xl"/>
+                    </span>
+            </a>
+        </div>
+
+        <div class="sidebar-wrapper">
+            <nav class="mt-2">
+                <ul class="nav sidebar-menu flex-column" data-lte-toggle="treeview" role="navigation">
+
+                    <li class="active"><a href="#"><i class="fa fa-line-chart"></i>  <span>Статистика</span></a></li>
+                    <li><a href="#"><i class="fa fa-dollar"></i>  <span>Касса</span></a></li>
+                    <li><a href="#"><i class="fa fa-files-o"></i>  <span>Квитанции на оплату</span></a></li>
+                    <li><a href="#"><i class="fa fa-credit-card"></i>  <span>Лицевые счета</span></a></li>
+                    <li><a href="#"><i class="fa fa-key"></i>  <span>Квартиры</span></a></li>
+                    <li><a href="{% url 'users:owners' %}"><i class="fa fa-users"></i>  <span>Владельцы квартир</span></a></li>
+                    <li><a href="#"><i class="fa fa-building"></i>  <span>Дома</span></a></li>
+                    <li><a href="#"><i class="fa fa-envelope-o"></i>  <span>Сообщения</span></a></li>
+                    <li><a href="#"><i class="fa fa-wrench"></i>  <span>Заявки вызова мастера</span></a></li>
+                    <li><a href="#"><i class="fa fa-dashboard"></i>  <span>Показания счетчиков</span></a></li>
+                    <li class="treeview"><a href="#!"><i class="fa fa-desktop"></i>  <span>Управление сайтом</span> <span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span></a>
+                        <ul class="treeview-menu">
+                            <li><a href="#"><i class="fa fa-circle-o"></i>  <span>Главная страница</span></a></li>
+                            <li><a href="#"><i class="fa fa-circle-o"></i>  <span>О нас</span></a></li>
+                            <li><a href="#"><i class="fa fa-circle-o"></i>  <span>Услуги</span></a></li>
+                            <li><a href="#"><i class="fa fa-circle-o"></i>  <span>Контакты</span></a></li>
+                        </ul>
+                    </li>
+                    <li class="treeview"><a href="#!"><i class="fa fa-cogs"></i>  <span>Настройки системы</span> <span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span></a>
+                        <ul class="treeview-menu">
+                            <li><a href="#"><i class="fa fa-briefcase"></i>  <span>Услуги</span></a></li>
+                            <li><a href="#"><i class="fa fa-money"></i>  <span>Тарифы</span></a></li>
+                            <li><a href="#"><i class="fa fa-user"></i>  <span>Роли</span></a></li>
+                            <li><a href="#"><i class="fa fa-user-plus"></i>  <span>Пользователи</span></a></li>
+                            <li><a href="#"><i class="fa fa-credit-card"></i>  <span>Платежные реквизиты</span></a></li>
+                            <li><a href="#"><i class="fa fa-list-ol"></i>  <span>Статьи платежей</span></a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="app-main">
+        <!-- Breadcrumbs -->
+        <div class="app-content-header border-bottom mb-3 py-1">
+            <div class="container-fluid p-0">
+                <div class="row m-0 align-items-center">
+                    <div class="col-sm-6 p-0">
+                        <h3 class="m-1 fs-4">
+                            {% block page_title %}{{ page_title|default:"Панель администратора" }}{% endblock %}
+                        </h3>
+                    </div>
+                    <div class="col-sm-6 p-0 text-end">
+                        <nav aria-label="breadcrumb">
+                            <ol class="breadcrumb m-1 justify-content-end">
+                                {% block breadcrumbs %}
+                                    <li class="breadcrumb-item"><a href="#">Главная</a></li>
+                                    {% if breadcrumbs %}
+                                        {% for crumb in breadcrumbs %}
+                                            {% if not forloop.last %}
+                                                <li class="breadcrumb-item"><a
+                                                        href="{{ crumb.url }}">{{ crumb.title }}</a>
+                                                </li>
+                                            {% else %}
+                                                <li class="breadcrumb-item active"
+                                                    aria-current="page">{{ crumb.title }}</li>
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% endif %}
+                                {% endblock %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Page Content -->
+        <div class="app-content">
+            <div class="container-fluid">
+                {% if messages %}
+                    <div class="mb-3">
+                        {% for message in messages %}
+                            <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show"
+                                 role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                        aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                {% block content %}{% endblock %}
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="app-footer text-center">
+        Разработано AVADA-MEDIA
+    </footer>
+
+</div>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"
+        integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+
+<!-- Popper.js -->
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+        crossorigin="anonymous"></script>
+
+<!-- Bootstrap -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.min.js"
+        crossorigin="anonymous"></script>
+
+<!-- OverlayScrollbars -->
+<script src="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.11.0/browser/overlayscrollbars.browser.es6.min.js"
+        crossorigin="anonymous"></script>
+
+<!-- AdminLTE -->
+<script src="{% static 'dist/js/adminlte.js' %}"></script>
+<script>
+    // Автоматическое скрытие сообщений через 5 секунд
+    $(function () {
+        setTimeout(function () {
+            $('.alert-dismissible').alert('close');
+        }, 5000);
+    });
+</script>
+{% block extra_js %}{% endblock %}
+</body>
+
+</html>
