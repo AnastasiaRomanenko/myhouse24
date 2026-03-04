@@ -212,3 +212,5 @@ __marimo__/
 # static/media
 static/
 gallery/
+
+**/migrations
