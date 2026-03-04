@@ -6,53 +6,53 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('users', '0001_initial'),
+        ("users", "0001_initial"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='roles',
-            name='has_meter_readings',
+            model_name="roles",
+            name="has_meter_readings",
             field=models.BooleanField(default=False),
         ),
         migrations.AddField(
-            model_name='roles',
-            name='has_payment_details',
+            model_name="roles",
+            name="has_payment_details",
             field=models.BooleanField(default=False),
         ),
         migrations.AddField(
-            model_name='roles',
-            name='has_requests',
+            model_name="roles",
+            name="has_requests",
             field=models.BooleanField(default=False),
         ),
         migrations.AddField(
-            model_name='roles',
-            name='has_roles',
+            model_name="roles",
+            name="has_roles",
             field=models.BooleanField(default=False),
         ),
         migrations.AddField(
-            model_name='roles',
-            name='has_services',
+            model_name="roles",
+            name="has_services",
             field=models.BooleanField(default=False),
         ),
         migrations.AddField(
-            model_name='roles',
-            name='has_site_management',
+            model_name="roles",
+            name="has_site_management",
             field=models.BooleanField(default=False),
         ),
         migrations.AddField(
-            model_name='roles',
-            name='has_tariffs',
+            model_name="roles",
+            name="has_tariffs",
             field=models.BooleanField(default=False),
         ),
         migrations.AddField(
-            model_name='roles',
-            name='has_users',
+            model_name="roles",
+            name="has_users",
             field=models.BooleanField(default=False),
         ),
         migrations.AlterField(
-            model_name='users',
-            name='external_id',
+            model_name="users",
+            name="external_id",
             field=models.PositiveIntegerField(blank=True, null=True),
         ),
     ]

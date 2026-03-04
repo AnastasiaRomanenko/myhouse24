@@ -1,6 +1,7 @@
 from celery import shared_task
 from django.core.mail import EmailMessage
 
+
 @shared_task(bind=True)
 def send_bulk_emails(self, subject, body, user_email):
     try:
@@ -10,9 +11,8 @@ def send_bulk_emails(self, subject, body, user_email):
             from_email="myhouse24@gmail.com",
             to=[user_email],
         )
-        email.content_subtype = 'html'
+        email.content_subtype = "html"
         email.send()
 
     except Exception as e:
         print(f"Failed to send to {user_email}: {str(e)}")
-

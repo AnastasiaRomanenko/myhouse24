@@ -10,50 +10,80 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('buildings', '0001_initial'),
-        ('settings', '0001_initial'),
+        ("buildings", "0001_initial"),
+        ("settings", "0001_initial"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='flats',
-            name='owner',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='owned_flats', to=settings.AUTH_USER_MODEL),
+            model_name="flats",
+            name="owner",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="owned_flats",
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
         migrations.AddField(
-            model_name='flats',
-            name='tariff',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='flats', to='settings.tariffs'),
+            model_name="flats",
+            name="tariff",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="flats",
+                to="settings.tariffs",
+            ),
         ),
         migrations.AddField(
-            model_name='flats',
-            name='floor',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='flats', to='buildings.floors'),
+            model_name="flats",
+            name="floor",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="flats",
+                to="buildings.floors",
+            ),
         ),
         migrations.AddField(
-            model_name='houses',
-            name='workers',
-            field=models.ManyToManyField(blank=True, related_name='houses', to=settings.AUTH_USER_MODEL),
+            model_name="houses",
+            name="workers",
+            field=models.ManyToManyField(
+                blank=True, related_name="houses", to=settings.AUTH_USER_MODEL
+            ),
         ),
         migrations.AddField(
-            model_name='floors',
-            name='house',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='floors', to='buildings.houses'),
+            model_name="floors",
+            name="house",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="floors",
+                to="buildings.houses",
+            ),
         ),
         migrations.AddField(
-            model_name='flats',
-            name='house',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='flats', to='buildings.houses'),
+            model_name="flats",
+            name="house",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="flats",
+                to="buildings.houses",
+            ),
         ),
         migrations.AddField(
-            model_name='sections',
-            name='house',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='sections', to='buildings.houses'),
+            model_name="sections",
+            name="house",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="sections",
+                to="buildings.houses",
+            ),
         ),
         migrations.AddField(
-            model_name='flats',
-            name='section',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='flats', to='buildings.sections'),
+            model_name="flats",
+            name="section",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="flats",
+                to="buildings.sections",
+            ),
         ),
     ]

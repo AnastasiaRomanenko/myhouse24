@@ -9,102 +9,239 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='Blocks',
+            name="Blocks",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('image', models.ImageField(upload_to='blocks/')),
-                ('title', models.CharField(max_length=50)),
-                ('description', models.TextField()),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("image", models.ImageField(upload_to="blocks/")),
+                ("title", models.CharField(max_length=50)),
+                ("description", models.TextField()),
             ],
         ),
         migrations.CreateModel(
-            name='Documents',
+            name="Documents",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('title', models.CharField(max_length=50)),
-                ('document', models.FileField(upload_to='documents/')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("title", models.CharField(max_length=50)),
+                ("document", models.FileField(upload_to="documents/")),
             ],
         ),
         migrations.CreateModel(
-            name='Images',
+            name="Images",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('image', models.ImageField(upload_to='images/')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("image", models.ImageField(upload_to="images/")),
             ],
         ),
         migrations.CreateModel(
-            name='SEO',
+            name="SEO",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('title', models.CharField(max_length=50)),
-                ('description', models.TextField()),
-                ('keywords', models.CharField(max_length=50)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("title", models.CharField(max_length=50)),
+                ("description", models.TextField()),
+                ("keywords", models.CharField(max_length=50)),
             ],
         ),
         migrations.CreateModel(
-            name='SiteServices',
+            name="SiteServices",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('image', models.ImageField(upload_to='site_services/')),
-                ('title', models.CharField(max_length=50)),
-                ('description', models.TextField()),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("image", models.ImageField(upload_to="site_services/")),
+                ("title", models.CharField(max_length=50)),
+                ("description", models.TextField()),
             ],
         ),
         migrations.CreateModel(
-            name='MainPage',
+            name="MainPage",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('slide1', models.ImageField(upload_to='main/slides/')),
-                ('slide2', models.ImageField(upload_to='main/slides/')),
-                ('slide3', models.ImageField(upload_to='main/slides/')),
-                ('title', models.CharField(max_length=50)),
-                ('description', models.TextField()),
-                ('block', models.ManyToManyField(blank=True, related_name='main_pages', to='main.blocks')),
-                ('seo', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name='main_page', to='main.seo')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("slide1", models.ImageField(upload_to="main/slides/")),
+                ("slide2", models.ImageField(upload_to="main/slides/")),
+                ("slide3", models.ImageField(upload_to="main/slides/")),
+                ("title", models.CharField(max_length=50)),
+                ("description", models.TextField()),
+                (
+                    "block",
+                    models.ManyToManyField(
+                        blank=True, related_name="main_pages", to="main.blocks"
+                    ),
+                ),
+                (
+                    "seo",
+                    models.OneToOneField(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="main_page",
+                        to="main.seo",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='ContactPage',
+            name="ContactPage",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('title', models.CharField(max_length=50)),
-                ('description', models.TextField()),
-                ('ceo_name', models.CharField(max_length=50)),
-                ('location', models.CharField(max_length=50)),
-                ('address', models.CharField(max_length=50)),
-                ('phone_number', phonenumber_field.modelfields.PhoneNumberField(max_length=32, region=None)),
-                ('email', models.EmailField(max_length=254)),
-                ('web_page_url', models.URLField()),
-                ('map_url', models.URLField()),
-                ('seo', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name='contact_page', to='main.seo')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("title", models.CharField(max_length=50)),
+                ("description", models.TextField()),
+                ("ceo_name", models.CharField(max_length=50)),
+                ("location", models.CharField(max_length=50)),
+                ("address", models.CharField(max_length=50)),
+                (
+                    "phone_number",
+                    phonenumber_field.modelfields.PhoneNumberField(
+                        max_length=32, region=None
+                    ),
+                ),
+                ("email", models.EmailField(max_length=254)),
+                ("web_page_url", models.URLField()),
+                ("map_url", models.URLField()),
+                (
+                    "seo",
+                    models.OneToOneField(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="contact_page",
+                        to="main.seo",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='AboutUsPage',
+            name="AboutUsPage",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('director_photo', models.ImageField(upload_to='about/')),
-                ('title', models.CharField(max_length=50)),
-                ('description', models.TextField()),
-                ('addtional_title', models.CharField(max_length=50)),
-                ('addtional_description', models.TextField()),
-                ('documents', models.ManyToManyField(blank=True, related_name='about_pages', to='main.documents')),
-                ('additional_gallery', models.ManyToManyField(blank=True, related_name='about_additional_gallery_pages', to='main.images')),
-                ('gallery', models.ManyToManyField(blank=True, related_name='about_gallery_pages', to='main.images')),
-                ('seo', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name='about_page', to='main.seo')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("director_photo", models.ImageField(upload_to="about/")),
+                ("title", models.CharField(max_length=50)),
+                ("description", models.TextField()),
+                ("addtional_title", models.CharField(max_length=50)),
+                ("addtional_description", models.TextField()),
+                (
+                    "documents",
+                    models.ManyToManyField(
+                        blank=True,
+                        related_name="about_pages",
+                        to="main.documents",
+                    ),
+                ),
+                (
+                    "additional_gallery",
+                    models.ManyToManyField(
+                        blank=True,
+                        related_name="about_additional_gallery_pages",
+                        to="main.images",
+                    ),
+                ),
+                (
+                    "gallery",
+                    models.ManyToManyField(
+                        blank=True,
+                        related_name="about_gallery_pages",
+                        to="main.images",
+                    ),
+                ),
+                (
+                    "seo",
+                    models.OneToOneField(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="about_page",
+                        to="main.seo",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='ServicePage',
+            name="ServicePage",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('seo', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name='service_page', to='main.seo')),
-                ('service', models.ManyToManyField(blank=True, related_name='service_pages', to='main.siteservices')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "seo",
+                    models.OneToOneField(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="service_page",
+                        to="main.seo",
+                    ),
+                ),
+                (
+                    "service",
+                    models.ManyToManyField(
+                        blank=True,
+                        related_name="service_pages",
+                        to="main.siteservices",
+                    ),
+                ),
             ],
         ),
     ]

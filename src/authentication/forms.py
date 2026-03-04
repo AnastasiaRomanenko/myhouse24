@@ -1,18 +1,29 @@
 from django import forms
 from django.contrib.auth import authenticate, get_user_model
-from email_validator import validate_email, EmailNotValidError
-from django.contrib.auth.forms import UserCreationForm, SetPasswordForm
-
+from django.contrib.auth.forms import SetPasswordForm, UserCreationForm
+from email_validator import EmailNotValidError, validate_email
 
 Users = get_user_model()
 
 
 class RegistrationForm(UserCreationForm):
     password1 = forms.CharField(
-        widget=forms.PasswordInput(attrs={"class": "form-control", "placeholder": "Пароль", "required": True}),
+        widget=forms.PasswordInput(
+            attrs={
+                "class": "form-control",
+                "placeholder": "Пароль",
+                "required": True,
+            }
+        ),
     )
     password2 = forms.CharField(
-        widget=forms.PasswordInput(attrs={"class": "form-control", "placeholder": "Повторить пароль", "required": True}),
+        widget=forms.PasswordInput(
+            attrs={
+                "class": "form-control",
+                "placeholder": "Повторить пароль",
+                "required": True,
+            }
+        ),
     )
     accept_terms_and_conditions = forms.BooleanField(
         widget=forms.CheckboxInput(
@@ -24,13 +35,32 @@ class RegistrationForm(UserCreationForm):
             }
         ),
     )
+
     class Meta:
         model = Users
         fields = ["first_name", "last_name", "email"]
         widgets = {
-            "first_name": forms.TextInput(attrs={"class": "form-control", "placeholder": "Имя", "required": True}),
-            "last_name": forms.TextInput(attrs={"class": "form-control", "placeholder": "Фамилия", "required": True}),
-            "email": forms.EmailInput(attrs={"class": "form-control", "placeholder": "Почта", "required": True}),
+            "first_name": forms.TextInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Имя",
+                    "required": True,
+                }
+            ),
+            "last_name": forms.TextInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Фамилия",
+                    "required": True,
+                }
+            ),
+            "email": forms.EmailInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Почта",
+                    "required": True,
+                }
+            ),
         }
 
     # def clean(self):
@@ -43,16 +73,30 @@ class RegistrationForm(UserCreationForm):
     def clean_email(self):
         email = self.cleaned_data["email"]
         if Users.objects.filter(email=email).exists():
-            raise forms.ValidationError("Почта уже существует. Выберите другую.")
+            raise forms.ValidationError(
+                "Почта уже существует. Выберите другую."
+            )
         return email
 
 
 class UserLoginForm(forms.Form):
     login = forms.CharField(
-        widget=forms.TextInput(attrs={"class": "form-control", "placeholder": "Почта или ID", "required": True})
+        widget=forms.TextInput(
+            attrs={
+                "class": "form-control",
+                "placeholder": "Почта или ID",
+                "required": True,
+            }
+        )
     )
     password = forms.CharField(
-        widget=forms.PasswordInput(attrs={"class": "form-control", "placeholder": "Пароль", "required": True})
+        widget=forms.PasswordInput(
+            attrs={
+                "class": "form-control",
+                "placeholder": "Пароль",
+                "required": True,
+            }
+        )
     )
 
     def clean(self):
@@ -64,7 +108,9 @@ class UserLoginForm(forms.Form):
 
         # ID
         if login.isdecimal():
-            user = authenticate(external_id=login, password=password)  # IDAuthBackend
+            user = authenticate(
+                external_id=login, password=password
+            )  # IDAuthBackend
             if not user:
                 raise forms.ValidationError("Неправильный ID или пароль.")
             self.cleaned_data["user"] = user
@@ -86,10 +132,22 @@ class UserLoginForm(forms.Form):
 
 class AdminLoginForm(forms.Form):
     login = forms.EmailField(
-        widget=forms.EmailInput(attrs={"class": "form-control", "placeholder": "Почта", "required": True})
+        widget=forms.EmailInput(
+            attrs={
+                "class": "form-control",
+                "placeholder": "Почта",
+                "required": True,
+            }
+        )
     )
     password = forms.CharField(
-        widget=forms.PasswordInput(attrs={"class": "form-control", "placeholder": "Пароль", "required": True})
+        widget=forms.PasswordInput(
+            attrs={
+                "class": "form-control",
+                "placeholder": "Пароль",
+                "required": True,
+            }
+        )
     )
 
     def clean(self):
@@ -109,20 +167,39 @@ class AdminLoginForm(forms.Form):
         self.cleaned_data["user"] = user
         return self.cleaned_data
 
+
 class PasswordResetRequestForm(forms.Form):
     email = forms.EmailField(
-        widget=forms.EmailInput(attrs={"class": "form-control", "placeholder": "Email", "required": True})
+        widget=forms.EmailInput(
+            attrs={
+                "class": "form-control",
+                "placeholder": "Email",
+                "required": True,
+            }
+        )
     )
+
     def clean_email(self):
         email = self.cleaned_data["email"].strip()
         return email
 
+
 class CustomSetPasswordForm(SetPasswordForm):
-    new_password1 = (forms.CharField(
-        widget=forms.PasswordInput(attrs={"class": "form-control", "placeholder": "Пароль", "required": True}))
+    new_password1 = forms.CharField(
+        widget=forms.PasswordInput(
+            attrs={
+                "class": "form-control",
+                "placeholder": "Пароль",
+                "required": True,
+            }
+        )
     )
-    new_password2 = (forms.CharField(
-        widget=forms.PasswordInput(attrs={"class": "form-control", "placeholder": "Повторить пароль", "required": True}))
+    new_password2 = forms.CharField(
+        widget=forms.PasswordInput(
+            attrs={
+                "class": "form-control",
+                "placeholder": "Повторить пароль",
+                "required": True,
+            }
+        )
     )
-
-

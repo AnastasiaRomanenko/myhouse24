@@ -3,26 +3,27 @@ from phonenumber_field.phonenumber import PhoneNumber
 
 from src.users.models import Users
 
+
 class AdminForms(forms.ModelForm):
     password = forms.CharField(
         label="Пароль",
-        widget=forms.PasswordInput(attrs={'class': 'form-control'}),
-        required=False 
+        widget=forms.PasswordInput(attrs={"class": "form-control"}),
+        required=False,
     )
     repeat_password = forms.CharField(
         label="Повторить пароль",
-        widget=forms.PasswordInput(attrs={'class': 'form-control'}),
-        required=False
+        widget=forms.PasswordInput(attrs={"class": "form-control"}),
+        required=False,
     )
 
     class Meta:
         model = Users
-        fields = ['first_name', 'last_name', 'phone_number', 'email']
+        fields = ["first_name", "last_name", "phone_number", "email"]
         widgets = {
-            'first_name': forms.TextInput(attrs={'class': 'form-control'}),
-            'last_name': forms.TextInput(attrs={'class': 'form-control'}),
-            'phone_number': PhoneNumber(),
-            'email': forms.EmailInput(attrs={'class': 'form-control'}),
+            "first_name": forms.TextInput(attrs={"class": "form-control"}),
+            "last_name": forms.TextInput(attrs={"class": "form-control"}),
+            "phone_number": PhoneNumber(),
+            "email": forms.EmailInput(attrs={"class": "form-control"}),
         }
 
     def clean(self):
@@ -47,5 +48,3 @@ class AdminForms(forms.ModelForm):
         if commit:
             user.save()
         return user
-
-

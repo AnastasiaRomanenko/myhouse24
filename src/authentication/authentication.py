@@ -1,7 +1,5 @@
-from django import forms
-from django.contrib.auth.backends import ModelBackend
-from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import get_user_model
+from django.contrib.auth.backends import ModelBackend
 
 Users = get_user_model()
 
@@ -26,7 +24,8 @@ class EmailAuthBackend(ModelBackend):
 
 
 class IDAuthBackend(ModelBackend):
-    """Authenticate users using their external_id instead of a username (not applicable for admin)."""
+    """Authenticate users using their external_id
+    instead of a username (not applicable for admin)."""
 
     def authenticate(self, request, username=None, password=None, **kwargs):
         try:

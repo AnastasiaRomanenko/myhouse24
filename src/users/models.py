@@ -1,8 +1,11 @@
-from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
+
 from src.users.enums import Status
 from src.users.managers import UserManager
+
+
 # Create your models here.
 class Roles(models.Model):
     role = models.CharField(max_length=50)

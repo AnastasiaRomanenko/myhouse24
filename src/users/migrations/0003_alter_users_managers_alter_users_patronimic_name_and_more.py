@@ -8,38 +8,50 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('users', '0002_roles_has_meter_readings_roles_has_payment_details_and_more'),
+        (
+            "users",
+            "0002_roles_has_meter_readings_roles_has_payment_details_and_more",
+        ),
     ]
 
     operations = [
         migrations.AlterModelManagers(
-            name='users',
-            managers=[
-            ],
+            name="users",
+            managers=[],
         ),
         migrations.AlterField(
-            model_name='users',
-            name='patronimic_name',
+            model_name="users",
+            name="patronimic_name",
             field=models.CharField(blank=True, max_length=50, null=True),
         ),
         migrations.AlterField(
-            model_name='users',
-            name='phone_number',
-            field=phonenumber_field.modelfields.PhoneNumberField(blank=True, max_length=32, null=True, region=None),
+            model_name="users",
+            name="phone_number",
+            field=phonenumber_field.modelfields.PhoneNumberField(
+                blank=True, max_length=32, null=True, region=None
+            ),
         ),
         migrations.AlterField(
-            model_name='users',
-            name='role',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='users', to='users.roles'),
+            model_name="users",
+            name="role",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="users",
+                to="users.roles",
+            ),
         ),
         migrations.AlterField(
-            model_name='users',
-            name='telegram',
+            model_name="users",
+            name="telegram",
             field=models.CharField(blank=True, max_length=50, null=True),
         ),
         migrations.AlterField(
-            model_name='users',
-            name='viber',
-            field=phonenumber_field.modelfields.PhoneNumberField(blank=True, max_length=32, null=True, region=None),
+            model_name="users",
+            name="viber",
+            field=phonenumber_field.modelfields.PhoneNumberField(
+                blank=True, max_length=32, null=True, region=None
+            ),
         ),
     ]

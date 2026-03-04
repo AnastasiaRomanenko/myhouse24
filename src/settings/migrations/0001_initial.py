@@ -8,61 +8,140 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='PaymentDetails',
+            name="PaymentDetails",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('company_name', models.CharField(max_length=50)),
-                ('information', models.TextField()),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("company_name", models.CharField(max_length=50)),
+                ("information", models.TextField()),
             ],
         ),
         migrations.CreateModel(
-            name='PaymentItems',
+            name="PaymentItems",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=50)),
-                ('type', models.CharField(choices=[('income', 'Приход'), ('expense', 'Расход')], max_length=32)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=50)),
+                (
+                    "type",
+                    models.CharField(
+                        choices=[("income", "Приход"), ("expense", "Расход")],
+                        max_length=32,
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='Tariffs',
+            name="Tariffs",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('title', models.CharField(max_length=50)),
-                ('description', models.TextField()),
-                ('update_at', models.DateTimeField()),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("title", models.CharField(max_length=50)),
+                ("description", models.TextField()),
+                ("update_at", models.DateTimeField()),
             ],
         ),
         migrations.CreateModel(
-            name='UnitsOfMeasurement',
+            name="UnitsOfMeasurement",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('title', models.CharField(max_length=50)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("title", models.CharField(max_length=50)),
             ],
         ),
         migrations.CreateModel(
-            name='Services',
+            name="Services",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('title', models.CharField(max_length=50)),
-                ('show', models.BooleanField(default=True)),
-                ('unit_of_measurement', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='services', to='settings.unitsofmeasurement')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("title", models.CharField(max_length=50)),
+                ("show", models.BooleanField(default=True)),
+                (
+                    "unit_of_measurement",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        related_name="services",
+                        to="settings.unitsofmeasurement",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='ServiceTariffs',
+            name="ServiceTariffs",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('price', models.FloatField()),
-                ('service', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='service_tariffs', to='settings.services')),
-                ('tariff', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='service_tariffs', to='settings.tariffs')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("price", models.FloatField()),
+                (
+                    "service",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="service_tariffs",
+                        to="settings.services",
+                    ),
+                ),
+                (
+                    "tariff",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="service_tariffs",
+                        to="settings.tariffs",
+                    ),
+                ),
             ],
             options={
-                'constraints': [models.UniqueConstraint(fields=('service', 'tariff'), name='uniq_service_tariff')],
+                "constraints": [
+                    models.UniqueConstraint(
+                        fields=("service", "tariff"),
+                        name="uniq_service_tariff",
+                    )
+                ],
             },
         ),
     ]

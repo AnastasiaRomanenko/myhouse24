@@ -1,12 +1,11 @@
 import requests
 from django.conf import settings
 from django.contrib.auth import login
-from django.shortcuts import redirect, render
 from django.contrib.auth.views import LoginView
+from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
 
-from src.authentication.forms import UserLoginForm, AdminLoginForm
-from django.conf import settings
+from src.authentication.forms import AdminLoginForm, UserLoginForm
 
 
 class CustomLoginView(LoginView):
@@ -16,12 +15,16 @@ class CustomLoginView(LoginView):
     success_url = reverse_lazy("core:home")
 
     def get(self, request, *args, **kwargs):
-        return render(request, self.template_name, {
-            "user_form": self.user_form(),
-            "admin_form": self.admin_form(),
-            "site_key": settings.RECAPTCHA_SITE_KEY,
-            "active_tab": "user",
-        })
+        return render(
+            request,
+            self.template_name,
+            {
+                "user_form": self.user_form(),
+                "admin_form": self.admin_form(),
+                "site_key": settings.RECAPTCHA_SITE_KEY,
+                "active_tab": "user",
+            },
+        )
 
     def post(self, request, *args, **kwargs):
         login_type = request.POST.get("login_type", "user")
@@ -49,20 +52,28 @@ class CustomLoginView(LoginView):
         ).json()
 
         if not verify.get("success"):
-            return render(request, self.template_name, {
-                "user_form": user_form,
-                "admin_form": admin_form,
-                "site_key": settings.RECAPTCHA_SITE_KEY,
-                "active_tab": active_tab,
-            })
+            return render(
+                request,
+                self.template_name,
+                {
+                    "user_form": user_form,
+                    "admin_form": admin_form,
+                    "site_key": settings.RECAPTCHA_SITE_KEY,
+                    "active_tab": active_tab,
+                },
+            )
 
         if not active_form.is_valid():
-            return render(request, self.template_name, {
-                "user_form": user_form,
-                "admin_form": admin_form,
-                "site_key": settings.RECAPTCHA_SITE_KEY,
-                "active_tab": active_tab,
-            })
+            return render(
+                request,
+                self.template_name,
+                {
+                    "user_form": user_form,
+                    "admin_form": admin_form,
+                    "site_key": settings.RECAPTCHA_SITE_KEY,
+                    "active_tab": active_tab,
+                },
+            )
 
         user = active_form.cleaned_data["user"]
         login(request, user)

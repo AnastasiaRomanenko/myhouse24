@@ -7,43 +7,74 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='Flats',
+            name="Flats",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('number', models.PositiveSmallIntegerField()),
-                ('area', models.FloatField()),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("number", models.PositiveSmallIntegerField()),
+                ("area", models.FloatField()),
             ],
         ),
         migrations.CreateModel(
-            name='Floors',
+            name="Floors",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('title', models.CharField(max_length=50)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("title", models.CharField(max_length=50)),
             ],
         ),
         migrations.CreateModel(
-            name='Houses',
+            name="Houses",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('title', models.CharField(max_length=50)),
-                ('address', models.CharField(max_length=50)),
-                ('image1', models.ImageField(upload_to='houses/')),
-                ('image2', models.ImageField(upload_to='houses/')),
-                ('image3', models.ImageField(upload_to='houses/')),
-                ('image4', models.ImageField(upload_to='houses/')),
-                ('image5', models.ImageField(upload_to='houses/')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("title", models.CharField(max_length=50)),
+                ("address", models.CharField(max_length=50)),
+                ("image1", models.ImageField(upload_to="houses/")),
+                ("image2", models.ImageField(upload_to="houses/")),
+                ("image3", models.ImageField(upload_to="houses/")),
+                ("image4", models.ImageField(upload_to="houses/")),
+                ("image5", models.ImageField(upload_to="houses/")),
             ],
         ),
         migrations.CreateModel(
-            name='Sections',
+            name="Sections",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('title', models.CharField(max_length=50)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("title", models.CharField(max_length=50)),
             ],
         ),
     ]

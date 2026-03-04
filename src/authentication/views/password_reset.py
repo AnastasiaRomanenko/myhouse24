@@ -1,14 +1,16 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.tokens import default_token_generator
+from django.contrib.auth.views import PasswordResetView
 from django.shortcuts import redirect, render
 from django.template.loader import render_to_string
-from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
-from src.authentication.tasks import send_bulk_emails
+from django.utils.http import urlsafe_base64_encode
+
 from src.authentication.forms import PasswordResetRequestForm
-from django.contrib.auth.views import PasswordResetView
+from src.authentication.tasks import send_bulk_emails
 
 Users = get_user_model()
+
 
 class CustomPasswordResetView(PasswordResetView):
     form_class = PasswordResetRequestForm
@@ -31,13 +33,20 @@ class CustomPasswordResetView(PasswordResetView):
             uidb64 = urlsafe_base64_encode(force_bytes(user.pk))
             token = default_token_generator.make_token(user)
 
-            body = render_to_string(self.email_template_name, {
-                "user": user,
-                "token": token,
-                "uid": uidb64,
-                "protocol": "https" if request.is_secure() else "http",
-                "domain": request.get_host(),
-            }).strip().replace("\n", "")
+            body = (
+                render_to_string(
+                    self.email_template_name,
+                    {
+                        "user": user,
+                        "token": token,
+                        "uid": uidb64,
+                        "protocol": "https" if request.is_secure() else "http",
+                        "domain": request.get_host(),
+                    },
+                )
+                .strip()
+                .replace("\n", "")
+            )
 
             send_bulk_emails.delay(self.subject_template_name, body, email)
             return redirect("authentication:password_reset_done")

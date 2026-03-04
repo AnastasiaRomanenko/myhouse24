@@ -7,77 +7,172 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='Accounting',
+            name="Accounting",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('type', models.CharField(choices=[('income', 'Приход'), ('expense', 'Расход')], max_length=16)),
-                ('random_number', models.CharField(max_length=11)),
-                ('amount', models.FloatField()),
-                ('created_at', models.DateField()),
-                ('completed', models.BooleanField(default=False)),
-                ('comment', models.TextField(blank=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "type",
+                    models.CharField(
+                        choices=[("income", "Приход"), ("expense", "Расход")],
+                        max_length=16,
+                    ),
+                ),
+                ("random_number", models.CharField(max_length=11)),
+                ("amount", models.FloatField()),
+                ("created_at", models.DateField()),
+                ("completed", models.BooleanField(default=False)),
+                ("comment", models.TextField(blank=True)),
             ],
         ),
         migrations.CreateModel(
-            name='BankBook',
+            name="BankBook",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('status', models.BooleanField(default=False)),
-                ('random_number', models.CharField(max_length=11)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("status", models.BooleanField(default=False)),
+                ("random_number", models.CharField(max_length=11)),
             ],
         ),
         migrations.CreateModel(
-            name='Message',
+            name="Message",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('title', models.CharField(max_length=50)),
-                ('description', models.TextField()),
-                ('to_debtors', models.BooleanField(default=False)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("title", models.CharField(max_length=50)),
+                ("description", models.TextField()),
+                ("to_debtors", models.BooleanField(default=False)),
             ],
         ),
         migrations.CreateModel(
-            name='MeterReading',
+            name="MeterReading",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('current_data', models.FloatField()),
-                ('status', models.CharField(choices=[('new', 'Новое'), ('taken_into_account', 'Учтено'), ('taken_into_account_and_Paid', 'Учтено и оплачено'), ('null', 'Нулевое')], max_length=27)),
-                ('random_number', models.CharField(max_length=11)),
-                ('created_at', models.DateField()),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("current_data", models.FloatField()),
+                (
+                    "status",
+                    models.CharField(
+                        choices=[
+                            ("new", "Новое"),
+                            ("taken_into_account", "Учтено"),
+                            (
+                                "taken_into_account_and_Paid",
+                                "Учтено и оплачено",
+                            ),
+                            ("null", "Нулевое"),
+                        ],
+                        max_length=27,
+                    ),
+                ),
+                ("random_number", models.CharField(max_length=11)),
+                ("created_at", models.DateField()),
             ],
         ),
         migrations.CreateModel(
-            name='PaymentReceipt',
+            name="PaymentReceipt",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('random_number', models.CharField(max_length=11)),
-                ('date_from', models.DateField()),
-                ('completed', models.BooleanField(default=False)),
-                ('status', models.CharField(choices=[('paid', 'Оплачено'), ('partially paid', 'Частично оплачено'), ('not_paid', 'Не оплачено')], max_length=16)),
-                ('period_from', models.DateField()),
-                ('period_to', models.DateField()),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("random_number", models.CharField(max_length=11)),
+                ("date_from", models.DateField()),
+                ("completed", models.BooleanField(default=False)),
+                (
+                    "status",
+                    models.CharField(
+                        choices=[
+                            ("paid", "Оплачено"),
+                            ("partially paid", "Частично оплачено"),
+                            ("not_paid", "Не оплачено"),
+                        ],
+                        max_length=16,
+                    ),
+                ),
+                ("period_from", models.DateField()),
+                ("period_to", models.DateField()),
             ],
         ),
         migrations.CreateModel(
-            name='PaymentReceiptService',
+            name="PaymentReceiptService",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('price', models.FloatField()),
-                ('amount', models.PositiveSmallIntegerField()),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("price", models.FloatField()),
+                ("amount", models.PositiveSmallIntegerField()),
             ],
         ),
         migrations.CreateModel(
-            name='Request',
+            name="Request",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('description', models.TextField()),
-                ('status', models.CharField(choices=[('new', 'Новое'), ('in_progress', 'В работе'), ('done', 'Выполнено')], max_length=16)),
-                ('comment', models.TextField(blank=True)),
-                ('date_time', models.DateTimeField()),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("description", models.TextField()),
+                (
+                    "status",
+                    models.CharField(
+                        choices=[
+                            ("new", "Новое"),
+                            ("in_progress", "В работе"),
+                            ("done", "Выполнено"),
+                        ],
+                        max_length=16,
+                    ),
+                ),
+                ("comment", models.TextField(blank=True)),
+                ("date_time", models.DateTimeField()),
             ],
         ),
     ]

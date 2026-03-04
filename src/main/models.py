@@ -1,6 +1,8 @@
 from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
+
 # Create your models here.
+
 
 class SEO(models.Model):
     title = models.CharField(max_length=50)
@@ -51,8 +53,12 @@ class MainPage(models.Model):
     title = models.CharField(max_length=50)
     description = models.TextField()
 
-    block = models.ManyToManyField(Blocks, related_name="main_pages", blank=True)
-    seo = models.OneToOneField(SEO, on_delete=models.CASCADE, related_name="main_page")
+    block = models.ManyToManyField(
+        Blocks, related_name="main_pages", blank=True
+    )
+    seo = models.OneToOneField(
+        SEO, on_delete=models.CASCADE, related_name="main_page"
+    )
 
     def __str__(self) -> str:
         return f"MainPage #{self.pk}"
@@ -63,23 +69,35 @@ class AboutUsPage(models.Model):
     title = models.CharField(max_length=50)
     description = models.TextField()
 
-    gallery = models.ManyToManyField(Images, related_name="about_gallery_pages", blank=True)
+    gallery = models.ManyToManyField(
+        Images, related_name="about_gallery_pages", blank=True
+    )
 
     addtional_title = models.CharField(max_length=50)
     addtional_description = models.TextField()
-    additional_gallery = models.ManyToManyField(Images, related_name="about_additional_gallery_pages", blank=True)
+    additional_gallery = models.ManyToManyField(
+        Images, related_name="about_additional_gallery_pages", blank=True
+    )
 
-    documents = models.ManyToManyField(Documents, related_name="about_pages", blank=True)
+    documents = models.ManyToManyField(
+        Documents, related_name="about_pages", blank=True
+    )
 
-    seo = models.OneToOneField(SEO, on_delete=models.CASCADE, related_name="about_page")
+    seo = models.OneToOneField(
+        SEO, on_delete=models.CASCADE, related_name="about_page"
+    )
 
     def __str__(self) -> str:
         return f"AboutUsPage #{self.pk}"
 
 
 class ServicePage(models.Model):
-    service = models.ManyToManyField(SiteServices, related_name="service_pages", blank=True)
-    seo = models.OneToOneField(SEO, on_delete=models.CASCADE, related_name="service_page")
+    service = models.ManyToManyField(
+        SiteServices, related_name="service_pages", blank=True
+    )
+    seo = models.OneToOneField(
+        SEO, on_delete=models.CASCADE, related_name="service_page"
+    )
 
     def __str__(self) -> str:
         return f"ServicePage #{self.pk}"
@@ -97,7 +115,9 @@ class ContactPage(models.Model):
     web_page_url = models.URLField()
     map_url = models.URLField()
 
-    seo = models.OneToOneField(SEO, on_delete=models.CASCADE, related_name="contact_page")
+    seo = models.OneToOneField(
+        SEO, on_delete=models.CASCADE, related_name="contact_page"
+    )
 
     def __str__(self) -> str:
         return f"ContactPage #{self.pk}"
