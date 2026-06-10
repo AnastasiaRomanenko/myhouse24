@@ -1,0 +1,50 @@
+{% extends 'admin_panel/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="box">
+    <div class="box-header with-border">
+        <div class="box-tools">
+            <a href="{% url 'users:admin_update' admin_user.id %}" class="btn btn-primary btn-sm">
+                <span class="hidden-xs">Edytuj profil</span><i class="fa fa-pencil visible-xs" aria-hidden="true"></i>
+            </a>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12 col-lg-4">
+            <table class="table table-bordered table-striped table-view">
+                <tbody>
+                    <tr>
+                        <td>Użytkownik</td>
+                        <td>{{ admin_user.get_full_name|default:"-" }}</td>
+                    </tr>
+                    <tr>
+                        <td>Rola</td>
+                        <td>{{ admin_user.role.role|default:"-" }}</td>
+                    </tr>
+                    <tr>
+                        <td>Telefon</td>
+                        <td>{{ admin_user.phone_number|default:"-" }}</td>
+                    </tr>
+                    <tr>
+                        <td>E-mail (login)</td>
+                        <td>{{ admin_user.email|default:"-" }}</td>
+                    </tr>
+                    <tr>
+                        <td>Status</td>
+                        <td>
+                            {% if admin_user.status == 'active' %}
+                                <small class="label label-success">Aktywny</small>
+                            {% elif admin_user.status == 'new' %}
+                                <small class="label label-warning">Nowy</small>
+                            {% else %}
+                                <small class="label label-danger">Nieaktywny</small>
+                            {% endif %}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

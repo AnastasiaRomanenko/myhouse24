@@ -1,0 +1,145 @@
+{% extends 'website/base.html' %}
+{% load static %}
+
+{% block title %}{{ seo.title|default:"Strona główna" }}{% endblock %}
+{% block meta_description %}{{ seo.description|default:"" }}{% endblock %}
+{% block meta_keywords %}{{ seo.keywords|default:"" }}{% endblock %}
+
+{% block content %}
+<div class="box">
+    <div class="box-body">
+        <div id="main-slider" class="carousel slide" data-ride="carousel">
+            <div class="carousel-inner" role="listbox">
+
+                {% if main_page.slide1 %}
+                <div class="item active">
+                    <img src="{{ main_page.slide1.url }}" class="img-responsive" style="width: 100%; height: 500px; object-fit: cover;" alt="Slajd 1">
+                    <div class="carousel-caption" style="bottom: 40%;">
+                        <div class="slideTitle hidden-xs" style="
+                            display: inline-block;
+                            background-color: rgba(110, 110, 110, 0.9);
+                            color: white;
+                            padding: 15px 40px;
+                            font-size: 3.5rem;
+                            font-weight: 500;
+                            border-radius: 8px;
+                            box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
+                            {{ main_page.title }}
+                        </div>
+                    </div>
+                </div> {% endif %}
+
+                {% if main_page.slide2 %}
+                <div class="item {% if not main_page.slide1 %}active{% endif %}">
+                    <img src="{{ main_page.slide2.url }}" class="img-responsive" style="width: 100%; height: 500px; object-fit: cover;" alt="Slajd 2">
+                    <div class="carousel-caption" style="bottom: 40%;">
+                        <div class="slideTitle hidden-xs" style="
+                            display: inline-block;
+                            background-color: rgba(110, 110, 110, 0.9);
+                            color: white;
+                            padding: 15px 40px;
+                            font-size: 3.5rem;
+                            font-weight: 500;
+                            border-radius: 8px;
+                            box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
+                            {{ main_page.title }}
+                        </div>
+                    </div>
+                </div> {% endif %}
+
+                {% if main_page.slide3 %}
+                <div class="item {% if not main_page.slide1 and not main_page.slide2 %}active{% endif %}">
+                    <img src="{{ main_page.slide3.url }}" class="img-responsive" style="width: 100%; height: 500px; object-fit: cover;" alt="Slajd 3">
+                    <div class="carousel-caption" style="bottom: 40%;">
+                        <div class="slideTitle hidden-xs" style="
+                            display: inline-block;
+                            background-color: rgba(110, 110, 110, 0.9);
+                            color: white;
+                            padding: 15px 40px;
+                            font-size: 3.5rem;
+                            font-weight: 500;
+                            border-radius: 8px;
+                            box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
+                            {{ main_page.title }}
+                        </div>
+                    </div>
+                </div> {% endif %}
+
+            </div>
+
+            <a class="left carousel-control" href="#main-slider" role="button" data-slide="prev">
+                <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+                <span class="sr-only">Poprzedni</span>
+            </a>
+            <a class="right carousel-control" href="#main-slider" role="button" data-slide="next">
+                <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+                <span class="sr-only">Następny</span>
+            </a>
+        </div>
+
+        <div class="info" style="margin-top: 40px;">
+            <div class="container">
+                <div class="row">
+                    <div class="col-xs-12 col-sm-8 col">
+                        {{ main_page.description|safe }}
+
+                        <div class="row" style="margin-top: 20px; margin-bottom: 30px;">
+                            <div class="col-xs-4">
+                                <a href="{% url 'main:about_page' %}" class="btn btn-primary">Dowiedz się więcej</a>
+                            </div>
+                            {% if main_page.show_app_links %}
+                                <div class="col-xs-4">
+                                    <a href="#">
+                                        <img src="{% static 'dist/img/appstore.png' %}" class="img-responsive imgStore" alt="">
+                                    </a>
+                                </div>
+                                <div class="col-xs-4">
+                                    <a href="#">
+                                        <img src="{% static 'dist/img/googleplay.png' %}" class="img-responsive imgStore" alt="">
+                                    </a>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-xs-12 col-sm-5 col-md-4">
+                        <div class="page-header">
+                            <h3>Kontakty</h3>
+                        </div>
+                        {% if contact %}
+                            <p><i class="bi bi-person-fill"></i> {{ contact.name }}</p>
+                            <p><i class="bi bi-compass-fill"></i> {{ contact.location }}</p>
+                            <p><i class="bi bi-map-fill"></i> {{ contact.address }}</p>
+                            <p><i class="bi bi-phone-fill"></i> <a href="tel:{{ contact.phone_number }}">{{ contact.phone_number }}</a></p>
+                            <p><i class="bi bi-envelope-fill"></i> <a href="mailto:{{ contact.email }}">{{ contact.email }}</a></p>
+                        {% else %}
+                            <p>Kontakty nie są jeszcze skonfigurowane.</p>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="row row-eq-height">
+                    <div class="col-xs-12">
+                        <div class="page-header">
+                            <h3>W naszym sąsiedztwie</h3>
+                        </div>
+                    </div>
+                    {% for card in info_cards %}
+                        <div class="col-xs-12 col-sm-6 col-md-4 advantage-item">
+                            <div class="thumbnail">
+                                {% if card.image %}
+                                    <img src="{{ card.image.url }}" class="img-responsive" style="margin-bottom: 15px; border-radius: 4px;" alt="{{ card.title }}">
+                                {% endif %}
+                                <div class="caption" style="padding-left: 30px">
+                                    <h2>{{ card.title }}</h2>
+                                    <p>{{ card.description|safe }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        {% empty %}
+                            <p>Brak informacji.</p>
+                        {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

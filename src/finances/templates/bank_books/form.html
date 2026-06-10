@@ -1,0 +1,167 @@
+{% extends 'admin_panel/base.html' %}
+{% load static %}
+
+{% block content %}
+<form id="w0" action="{{ form_url }}" method="post">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+
+    <div class="row">
+        <div class="col-xs-12 col-md-7 col-lg-6">
+            <div class="page-header-spec">
+                <div class="form-group">
+                    <div class="input-group">
+                        <div class="input-group-addon">№</div>
+                        {{ form.random_number }}
+                    </div>
+                    <div class="help-block text-danger">{{ form.random_number.errors }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="box">
+        <div class="box-body">
+            <div class="row">
+                <div class="col-xs-12 col-sm-6">
+                    <div class="form-group">
+                        <label class="control-label">Status</label>
+                        {{ form.status }}
+                        <div class="help-block text-danger">{{ form.status.errors }}</div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">Budynek</label>
+                        <select id="id_house" class="form-control js-house-select" name="house">
+                            {% if selected_house %}
+                                <option value="{{ selected_house.id }}" selected>{{ selected_house.title }}</option>
+                            {% endif %}
+                        </select>
+                        <div class="help-block text-danger">{{ form.house.errors }}</div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">Sekcja</label>
+                        <select id="id_section" class="form-control" name="section">
+                            <option value="">Wybierz...</option>
+                            {% for section in sections %}
+                                <option value="{{ section.id }}" {% if form.section.value|stringformat:"s" == section.id|stringformat:"s" %}selected{% endif %}>{{ section.title }}</option>
+                            {% endfor %}
+                        </select>
+                        <div class="help-block text-danger">{{ form.section.errors }}</div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">Piętro</label>
+                        <select id="id_floor" class="form-control" name="floor">
+                            <option value="">Wybierz...</option>
+                            {% for floor in floors %}
+                                <option value="{{ floor.id }}" {% if form.floor.value|stringformat:"s" == floor.id|stringformat:"s" %}selected{% endif %}>{{ floor.title }}</option>
+                            {% endfor %}
+                        </select>
+                        <div class="help-block text-danger">{{ form.floor.errors }}</div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">Mieszkanie</label>
+                        <select id="id_flat" class="form-control js-flat-select" name="flat">
+                            {% if form.instance.flat_id %}
+                                <option value="{{ form.instance.flat_id }}" selected>{{ form.instance.flat.number }}</option>
+                            {% endif %}
+                        </select>
+                        <div class="help-block text-danger">{{ form.flat.errors }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-xs-12 text-right">
+                    <div class="form-group">
+                        <a href="{% url 'finances:bank_books_list' %}" class="btn btn-default margin-bottom-15">Anuluj</a>
+                        <button type="submit" class="btn btn-success margin-bottom-15" name="action_save">Zapisz</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(function () {
+    function initSelect2($element, url, placeholder) {
+        $element.select2({
+            width: '100%',
+            allowClear: true,
+            placeholder: placeholder,
+            language: 'pl',
+            ajax: {
+                url: url,
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return {term: params.term || '', page: params.page || 1};
+                },
+                processResults: function (data) {
+                    return data;
+                },
+                cache: true
+            }
+        });
+    }
+
+    function fillSimpleSelect($select, items, labelKey, selectedValue) {
+        $select.empty().append($('<option>', {value: '', text: 'Wybierz...'}));
+        $.each(items, function (_, item) {
+            var option = $('<option>', {value: item.id, text: item[labelKey]});
+            if (String(item.id) === String(selectedValue || '')) {
+                option.prop('selected', true);
+            }
+            $select.append(option);
+        });
+        $select.trigger('change.select2');
+    }
+
+    initSelect2($('#id_house'), "{% url 'buildings:house_select2' %}", 'Wybierz...');
+    $('#id_section').select2({width: '100%', language: 'pl'});
+    $('#id_floor').select2({width: '100%', language: 'pl'});
+    $('#id_flat').select2({width: '100%', language: 'pl'});
+
+    function loadFlats() {
+        var houseId = $('#id_house').val();
+        var sectionId = $('#id_section').val();
+        var floorId = $('#id_floor').val();
+        if (!houseId || !sectionId || !floorId) {
+            fillSimpleSelect($('#id_flat'), [], 'number', '');
+            return;
+        }
+        $.getJSON(
+            "{% url 'finances:get_flats' %}",
+            {house_id: houseId, section_id: sectionId, floor_id: floorId},
+            function (data) {
+                fillSimpleSelect($('#id_flat'), data, 'number', '');
+            }
+        );
+    }
+
+    function loadSectionsFloors(houseId) {
+        if (!houseId) {
+            fillSimpleSelect($('#id_section'), [], 'title', '');
+            fillSimpleSelect($('#id_floor'), [], 'title', '');
+            fillSimpleSelect($('#id_flat'), [], 'number', '');
+            return;
+        }
+        $.getJSON("{% url 'finances:get_sections' %}", {house_id: houseId}, function (data) {
+            fillSimpleSelect($('#id_section'), data, 'title', '');
+        });
+        $.getJSON("{% url 'finances:get_floors' %}", {house_id: houseId}, function (data) {
+            fillSimpleSelect($('#id_floor'), data, 'title', '');
+        });
+        fillSimpleSelect($('#id_flat'), [], 'number', '');
+    }
+
+    $('#id_house').on('change', function () {
+        loadSectionsFloors($(this).val());
+    });
+    $('#id_section').on('change', loadFlats);
+    $('#id_floor').on('change', loadFlats);
+});
+</script>
+{% endblock %}

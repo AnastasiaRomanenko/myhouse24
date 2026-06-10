@@ -1,21 +1,28 @@
 from django.db import models
 
+
 class PaymentReceiptStatus(models.TextChoices):
-    PAID = "paid", "Оплачено"
-    PARTIALLY_PAID = "partially paid", "Частично оплачено"
-    NOT_PAID = "not_paid", "Не оплачено"
+    PAID = "paid", "Opłacono"
+    PARTIALLY_PAID = "partially paid", "Częściowo opłacono"
+    NOT_PAID = "not_paid", "Nie opłacono"
+
 
 class AccountingType(models.TextChoices):
-    INCOME = "income", "Приход"
-    EXPENSE = "expense", "Расход"
+    INCOME = "income", "Przychód"
+    EXPENSE = "expense", "Wydatek"
+
 
 class RequestStatus(models.TextChoices):
-    NEW = "new", "Новое"
-    IN_PROGRESS = "in_progress", "В работе"
-    DONE = "done", "Выполнено"
+    NEW = "new", "Nowe"
+    IN_PROGRESS = "in_progress", "W trakcie"
+    DONE = "done", "Zakończono"
+
 
 class MeterReadingStatus(models.TextChoices):
-    NEW = "new", "Новое"
-    TAKEN_INTO_ACCOUNT = "taken_into_account", "Учтено"
-    TAKEN_INTO_ACCOUNT_AND_PAID = "taken_into_account_and_Paid", "Учтено и оплачено"
-    NULL = "null", "Нулевое"
+    NEW = "new", "Nowe"
+    TAKEN_INTO_ACCOUNT = "taken_into_account", "Uwzględniono"
+    TAKEN_INTO_ACCOUNT_AND_PAID = (
+        "taken_into_account_and_Paid",
+        "Uwzględniono i opłacono",
+    )
+    NULL = "null", "Zerowe"

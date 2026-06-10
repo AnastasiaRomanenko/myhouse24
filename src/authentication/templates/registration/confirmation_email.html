@@ -1,14 +1,23 @@
-{% autoescape off %}
-Добро пожаловать в МойДом24 {{ user.email }}!
-Чтобы подтвердить свой аккаунт, нажмите на ссылку ниже:
+<p>
+    Witamy w MójDom24 {{ user.email }}!
+</p>
 
+<p>
+    Aby potwierdzić swoje konto, kliknij poniższy link:
+</p>
 
-{{ protocol }}://{{ domain }}{% url 'authentication:registration_complete' uidb64=uid token=token %}
+<p>
+    <a href="{{ protocol }}://{{ domain }}{% url 'authentication:registration_complete' uidb64=uid token=token %}">
+        Potwierdź konto
+    </a>
+</p>
 
+<p>
+    Jeśli kliknięcie powyższego linku nie działa, skopiuj i wklej adres URL w nowym oknie przeglądarki:
+    <br>{{ protocol }}://{{ domain }}{% url 'authentication:password_reset_confirm' uidb64=uid token=token %}
+</p>
 
-Если переход по ссылке выше не работает, пожалуйста, скопируйте и вставьте URL-адрес в новое окно браузера.
-
-
-С уважением,
-Команда МойДом24
-{% endautoescape %}
+<p>
+    Z poważaniem,
+    <br>Zespół MójDom24
+</p>

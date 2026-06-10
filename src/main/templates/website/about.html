@@ -1,0 +1,130 @@
+{% extends 'website/base.html' %}
+{% load static %}
+
+{% block title %}{{ seo.title|default:"O nas" }}{% endblock %}
+{% block meta_description %}{{ seo.description|default:"" }}{% endblock %}
+{% block meta_keywords %}{{ seo.keywords|default:"" }}{% endblock %}
+
+{% block content %}
+    <div class="breadcrumbs">
+        <div class="container">
+            <div class="row">
+                <div class="col-xs-12">
+                    <ol class="breadcrumb">
+                        <li><a href="{% url 'main:home_page' %}">Strona główna</a></li>
+                        <li class="active">O nas</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="about">
+        <div class="container">
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="page-header">
+                        <h1>{{ about_page.title }}</h1>
+                    </div>
+
+                    {% if about_page.director_photo %}
+                        <img src="{{ about_page.director_photo.url }}" class="img-responsive imgFloatRight" alt="Zdjęcie dyrektora" style="max-width: 250px; border-radius: 5px; margin-left: 20px; margin-bottom: 20px;">
+                    {% endif %}
+
+                    <div style="font-size: 16px; line-height: 1.6;">
+                        {{ about_page.description|safe }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="gallery g1" style="margin-top: 30px;">
+        <div class="container">
+            <div class="row">
+                {% for image in about_page.gallery.all %}
+                    <div class="col-xs-12 col-sm-6 col-md-3 item" style="margin-bottom: 20px;">
+                        <a href="{{ image.image.url }}" class="big">
+                            <img src="{{ image.image.url }}" alt="Zdjęcie galerii {{ forloop.counter }}" class="img-responsive img-thumbnail" style="height: 200px; width: 100%; object-fit: cover;">
+                        </a>
+                    </div>
+                {% empty %}
+                    <div class="col-xs-12 text-center text-muted">
+                        <p>Brak zdjęć w galerii.</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <div class="about" style="margin-top: 40px;">
+        <div class="container">
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="page-header">
+                        <h3>{{ about_page.additional_title }}</h3>
+                    </div>
+
+                    <div style="font-size: 16px; line-height: 1.6;">
+                        {{ about_page.additional_description|safe }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="gallery g2" style="margin-top: 30px; margin-bottom: 50px;">
+        <div class="container">
+            <div class="row">
+                {% for image in about_page.additional_gallery.all %}
+                    <div class="col-xs-12 col-sm-6 col-md-3 item" style="margin-bottom: 20px;">
+                        <a href="{{ image.image.url }}" class="big">
+                            <img src="{{ image.image.url }}" alt="Dodatkowe zdjęcie {{ forloop.counter }}" class="img-responsive img-thumbnail" style="height: 200px; width: 100%; object-fit: cover;">
+                        </a>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <div class="documents">
+        <div class="container">
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="page-header">
+                        <h3>Dokumenty</h3>
+                    </div>
+
+                    {% for document in about_page.documents.all %}
+                        <div class="media">
+                            <div class="media-left">
+                                <div class="media-object">
+                                    <i class="fa fa-file-pdf-o fa-3x"></i>
+                                </div>
+                            </div>
+                            <div class="media-body">
+                                <h4 class="media-heading">{{ document.title }}</h4>
+                                <a href="{{ document.document.url }}" download class="btn btn-default btn-xs">
+                                    <i class="fa fa-download" aria-hidden="true"></i> Pobierz
+                                </a>
+                            </div>
+                        </div>
+                    {% empty %}
+                        <p class="text-muted">Brak dokumentów.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            if (window.jQuery) {
+                jQuery(function ($) {
+                    $('.g1 .item a').simpleLightbox({ captionsData: 'alt' });
+                    $('.g2 .item a').simpleLightbox({ captionsData: 'alt' });
+                });
+            }
+        });
+    </script>
+{% endblock %}

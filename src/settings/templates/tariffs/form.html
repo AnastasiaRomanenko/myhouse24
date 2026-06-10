@@ -1,0 +1,242 @@
+{% extends 'admin_panel/base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<style>
+    input[name$="-DELETE"] {
+        display: none;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="box">
+    <div class="box-body">
+        <form method="post">
+            {% csrf_token %}
+
+            {{ formset.management_form }}
+
+            <div class="row">
+                <div class="col-xs-12 col-lg-7">
+                    <div class="form-group">
+                        <label class="control-label">Nazwa taryfy</label>
+                        {{ form.title }}
+                        <div class="help-block text-danger">{{ form.title.errors }}</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label">Opis taryfy</label>
+                        {{ form.description }}
+                        <div class="help-block text-danger">{{ form.description.errors }}</div>
+                    </div>
+                </div>
+
+                <div class="col-xs-12 col-lg-7">
+                    <div id="formset-rows">
+                        {% for subform in formset %}
+                            <div class="row formset-row margin-bottom-15">
+                                {{ subform.id }}
+                                {{ subform.DELETE }}
+
+                                <div class="col-xs-6 col-md-4">
+                                    <div class="form-group margin-bottom-0">
+                                        <label>Usługa</label>
+                                        {{ subform.service }}
+                                        <div class="help-block text-danger">{{ subform.service.errors }}</div>
+                                    </div>
+                                </div>
+
+                                <div class="col-xs-6 col-md-3">
+                                    <div class="form-group margin-bottom-0">
+                                        <label>Cena</label>
+                                        {{ subform.price }}
+                                        <div class="help-block text-danger">{{ subform.price.errors }}</div>
+                                    </div>
+                                </div>
+
+
+                                <div class="col-xs-6 col-md-2">
+                                    <div class="form-group margin-bottom-0">
+                                        <label>Waluta</label>
+                                        <input type="text" class="form-control" value="zł" readonly>
+                                    </div>
+                                </div>
+
+                                <div class="col-xs-6 col-md-3">
+                                    <div class="form-group margin-bottom-0">
+                                        <label>Jedn. miary</label>
+                                        <div class="input-group">
+                                            <input type="text" class="form-control service-unit-field" readonly
+                                                value="{% if subform.instance.service_id %}{{ subform.instance.service.unit_of_measurement.title }}{% endif %}">
+                                            <span class="input-group-btn">
+                                                <button type="button"
+                                                        class="btn btn-default delete-tariff-service-btn"
+                                                        data-checkbox-id="{{ subform.DELETE.id_for_label }}">
+                                                    <i class="fa fa-trash"></i>
+                                                </button>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    <button type="button" id="add-row-btn" class="btn btn-default margin-bottom-15">
+                        Dodaj usługę
+                    </button>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-xs-12 col-lg-7 text-right">
+                    <div class="form-group">
+                        <a href="{% url 'settings:tariffs_list' %}" class="btn btn-default">Anuluj</a>
+                        <button type="submit" class="btn btn-success">Zapisz</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+jQuery(function ($) {
+    const servicePrefix = "services";
+    const servicesData = {{ services_json|safe }};
+
+    // Build options string
+    const optionsHtml = servicesData.map(s =>
+        `<option value="${s.id}" data-unit-title="${s.unit}">${s.title}</option>`
+    ).join("");
+
+    $(document).on("click", ".delete-tariff-service-btn", function () {
+        const row = $(this).closest(".formset-row");
+        const checkboxId = $(this).data("checkbox-id");
+        const checkbox = $("#" + checkboxId);
+
+        // Check if this row has a saved DB record (id field is non-empty)
+        const idField = row.find("input[type=hidden][name$='-id']");
+        const hasSavedRecord = idField.length && idField.val() !== "";
+
+        if (hasSavedRecord) {
+            // Existing record — check DELETE and hide
+            checkbox.prop("checked", true);
+            row.hide();
+        } else {
+            // New unsaved row — remove from DOM and fix count
+            row.remove();
+            $("#id_" + servicePrefix + "-TOTAL_FORMS").val(
+                $(".formset-row").length
+            );
+        }
+    });
+
+    function updateTotalForms() {
+        $("#id_" + servicePrefix + "-TOTAL_FORMS").val(
+            $(".formset-row").length
+        );
+    }
+
+    function updateUnitTitle(row) {
+        const select = row.find(".service-select");
+        const selectedId = parseInt(select.val(), 10);
+
+        const service = servicesData.find(s => s.id === selectedId);
+        row.find(".service-unit-field").val(service ? service.unit : "");
+    }
+
+    // Bind change event on existing rows
+    // After page loads, populate unit fields for existing rows
+    $(".formset-row").each(function () {
+        const row = $(this);
+        const select = row.find(".service-select");
+        const unitField = row.find(".service-unit-field");
+
+        // If unit field is empty, populate from servicesData
+        if (!unitField.val()) {
+            const selectedId = parseInt(select.val(), 10);
+            const service = servicesData.find(s => s.id === selectedId);
+            if (service) unitField.val(service.unit);
+        }
+
+        select.on("change", function () {
+            updateUnitTitle(row);
+        });
+    });
+    $("#add-row-btn").on("click", function () {
+        const totalForms = $("#id_" + servicePrefix + "-TOTAL_FORMS");
+        const index = parseInt(totalForms.val(), 10);
+
+        const html = `
+            <div class="row formset-row margin-bottom-15">
+                <input type="hidden"
+                       name="${servicePrefix}-${index}-id"
+                       id="id_${servicePrefix}-${index}-id">
+                <input type="checkbox"
+                       name="${servicePrefix}-${index}-DELETE"
+                       id="id_${servicePrefix}-${index}-DELETE"
+                       style="display:none;">
+
+                <div class="col-xs-6 col-md-4">
+                    <div class="form-group margin-bottom-0">
+                        <label>Usługa</label>
+                        <select name="${servicePrefix}-${index}-service"
+                                id="id_${servicePrefix}-${index}-service"
+                                class="form-control service-select">
+                            <option value="">Wybierz...</option>
+                            ${optionsHtml}
+                        </select>
+                    </div>
+                </div>
+
+                <div class="col-xs-6 col-md-3">
+                    <div class="form-group margin-bottom-0">
+                        <label>Cena</label>
+                        <input type="number"
+                               name="${servicePrefix}-${index}-price"
+                               id="id_${servicePrefix}-${index}-price"
+                               class="form-control"
+                               step="0.01">
+                    </div>
+                </div>
+
+                <div class="col-xs-6 col-md-2">
+                    <div class="form-group margin-bottom-0">
+                        <label>Waluta</label>
+                        <input type="text" class="form-control" value="zł" readonly>
+                    </div>
+                </div>
+
+                <div class="col-xs-6 col-md-3">
+                    <div class="form-group margin-bottom-0">
+                        <label>Jedn. miary</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control service-unit-field" readonly>
+                            <span class="input-group-btn">
+                                <button type="button"
+                                        class="btn btn-default delete-tariff-service-btn"
+                                        data-checkbox-id="id_${servicePrefix}-${index}-DELETE">
+                                    <i class="fa fa-trash"></i>
+                                </button>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        $("#formset-rows").append(html);
+        totalForms.val(index + 1);
+
+        const newRow = $("#formset-rows .formset-row").last();
+        newRow.find(".service-select").on("change", function () {
+            updateUnitTitle(newRow);
+        });
+    });
+});
+</script>
+{% endblock %}

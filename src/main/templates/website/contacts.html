@@ -1,0 +1,64 @@
+{% extends 'website/base.html' %}
+{% load static %}
+
+{% block title %}{{ seo.title|default:"Kontakty" }}{% endblock %}
+{% block meta_description %}{{ seo.description|default:"" }}{% endblock %}
+{% block meta_keywords %}{{ seo.keywords|default:"" }}{% endblock %}
+
+{% block content %}
+<div class="breadcrumbs">
+    <div class="container">
+        <div class="row">
+            <div class="col-xs-12">
+                <ol class="breadcrumb">
+                    <li><a href="{% url 'main:home_page' %}">Strona główna</a></li>
+                    <li class="active">Kontakty</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if contact_data.map_code %}
+    {{ contact_data.map_code|safe }}
+{% endif %}
+
+<div class="contacts">
+    <div class="container">
+        <div class="row">
+            <div class="col-xs-12 col-sm-7 col-md-8">
+                <div class="page-header">
+                    <h3>{{ contact_data.title|default:"Opis" }}</h3>
+                </div>
+                {{ contact_data.description|safe }}
+            </div>
+
+            <div class="col-xs-12 col-sm-5 col-md-4">
+                <div class="page-header">
+                    <h3>Kontakty</h3>
+                </div>
+                {% if contact_data.fullname %}
+                    <p><i class="bi bi-person-fill"></i> {{ contact_data.fullname }}</p>
+                {% endif %}
+
+                {% if contact_data.location %}
+                    <p><i class="bi bi-compass-fill"></i> {{ contact_data.location }}</p>
+                {% endif %}
+
+                {% if contact_data.address %}
+                    <p><i class="bi bi-map-fill"></i> {{ contact_data.address }}</p>
+                {% endif %}
+
+                {% if contact_data.phone %}
+                    <p><i class="bi bi-phone-fill"></i> <a href="tel:{{ contact_data.phone }}">{{ contact_data.phone }}</a></p>
+                {% endif %}
+
+                {% if contact_data.email %}
+                    <p><i class="bi bi-envelope-fill"></i> <a href="mailto:{{ contact_data.email }}">{{ contact_data.email }}</a></p>
+                {% endif %}
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

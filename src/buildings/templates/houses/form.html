@@ -1,0 +1,497 @@
+{% extends 'admin_panel/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="box">
+    <div class="box-body">
+        <form id="w0" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="row">
+                <div class="col-xs-12 col-lg-4">
+                    <div class="form-group">
+                        <label class="control-label" for="houseform-title">Nazwa</label>
+                        <input type="text" id="houseform-title" class="form-control" name="title" value="{{ house.title|default:'' }}">
+                        <div class="help-block text-danger">{{ form.title.errors }}</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label" for="houseform-address">Adres</label>
+                        <input type="text" id="houseform-address" class="form-control" name="address" value="{{ house.address|default:'' }}">
+                        <div class="help-block text-danger">{{ form.address.errors }}</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label" for="houseform-image1">Zdjęcie #1. Rozmiar: (522x350)</label>
+                        <input type="file" id="houseform-image1" name="image1" accept="image/*">
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label" for="houseform-image2">Zdjęcie #2. Rozmiar: (248x160)</label>
+                        <input type="file" id="houseform-image2" name="image2" accept="image/*">
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label" for="houseform-image3">Zdjęcie #3. Rozmiar: (248x160)</label>
+                        <input type="file" id="houseform-image3" name="image3" accept="image/*">
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label" for="houseform-image4">Zdjęcie #4. Rozmiar: (248x160)</label>
+                        <input type="file" id="houseform-image4" name="image4" accept="image/*">
+                    </div>
+                    <div class="form-group field-houseform-image5">
+                        <label class="control-label" for="houseform-image5">Zdjęcie #5. Rozmiar: (248x160)</label>
+                        <input type="file" id="houseform-image5" name="image5" accept="image/*">
+                    </div>
+                </div>
+
+                <div class="col-xs-12 col-lg-8">
+                    <div class="row">
+                        <div class="col-xs-12 col-md-6">
+                            {% if house.image1 %}
+                                <img src="{{ house.image1.url }}" class="img-responsive largeImg margin-bottom-30" alt="Zdjęcie #1">
+                            {% else %}
+                                <img src="{% static 'assets/empty_placeholder.jpeg' %}" width="522px" height="350px" class="img-responsive largeImg margin-bottom-30" alt="">
+                            {% endif %}
+                        </div>
+                        <div class="col-xs-6 col-md-3">
+                            {% if house.image2 %}
+                                <img src="{{ house.image2.url }}" class="img-responsive smallImg margin-bottom-30" alt="Zdjęcie #2">
+                            {% else %}
+                                <img src="{% static 'assets/empty_placeholder.jpeg' %}" width="248px" height="160px" class="img-responsive smallImg margin-bottom-30" alt="">
+                            {% endif %}
+                        </div>
+                        <div class="col-xs-6 col-md-3">
+                            {% if house.image3 %}
+                                <img src="{{ house.image3.url }}" class="img-responsive smallImg margin-bottom-30" alt="Zdjęcie #3">
+                            {% else %}
+                                <img src="{% static 'assets/empty_placeholder.jpeg' %}" width="248px" height="160px" class="img-responsive smallImg margin-bottom-30" alt="">
+                            {% endif %}
+                        </div>
+                        <div class="col-xs-6 col-md-3">
+                            {% if house.image4 %}
+                                <img src="{{ house.image4.url }}" class="img-responsive smallImg margin-bottom-30" alt="Zdjęcie #4">
+                            {% else %}
+                                <img src="{% static 'assets/empty_placeholder.jpeg' %}" width="248px" height="160px" class="img-responsive smallImg margin-bottom-30" alt="">
+                            {% endif %}
+                        </div>
+                        <div class="col-xs-6 col-md-3">
+                            {% if house.image5 %}
+                                <img src="{{ house.image5.url }}" class="img-responsive smallImg margin-bottom-30" alt="Zdjęcie #5">
+                            {% else %}
+                                <img src="{% static 'assets/empty_placeholder.jpeg' %}" width="248px" height="160px" class="img-responsive smallImg margin-bottom-30" alt="">
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-xs-12 col-lg-8">
+                    <div class="nav-tabs-custom">
+                        <ul class="nav nav-tabs">
+                            <li class="active"><a href="#tab-sections" data-toggle="tab" aria-expanded="true">Sekcje</a></li>
+                            <li><a href="#tab-floors" data-toggle="tab" aria-expanded="false">Piętra</a></li>
+                            <li><a href="#tab-houseuseradmins" data-toggle="tab" aria-expanded="false">Użytkownicy</a></li>
+                        </ul>
+
+                        <div class="tab-content">
+                            <div class="tab-pane active clearfix" id="tab-sections">
+                                {{ section_formset.management_form }}
+                                <div id="form-section-rows">
+                                    {% for form in section_formset %}
+                                    {% if form.instance.pk %}
+                                        <div class="row form-section">
+                                            {{ form.id }}
+                                            <div class="col-xs-12">
+                                                <div class="form-group">
+                                                    <label>Nazwa</label>
+                                                    <div class="input-group">
+                                                        {{ form.title }}
+                                                        <span class="input-group-btn">
+                                                            <button type="button" class="btn btn-danger form-row-remove-btn">
+                                                                <i class="fa fa-trash"></i>
+                                                            </button>
+                                                        </span>
+                                                    </div>
+                                                    {% if form.DELETE %}
+                                                        <div style="display:none;">{{ form.DELETE }}</div>
+                                                    {% endif %}
+                                                    <div class="text-danger">{{ form.title.errors }}</div>
+                                                </div>
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                                <button class="btn btn-success pull-right form-row-add-section-btn" type="button">Dodaj</button>
+                            </div>
+
+                            <div class="tab-pane clearfix" id="tab-floors">
+                                {{ floor_formset.management_form }}
+                                <div id="form-floor-rows">
+                                    {% for form in floor_formset %}
+                                    {% if form.instance.pk %}
+                                        <div class="row form-floor">
+                                            {{ form.id }}
+                                            <div class="col-xs-12">
+                                                <div class="form-group">
+                                                    <label>Nazwa</label>
+                                                    <div class="input-group">
+                                                        {{ form.title }}
+                                                        <span class="input-group-btn">
+                                                            <button type="button" class="btn btn-danger form-row-remove-btn">
+                                                                <i class="fa fa-trash"></i>
+                                                            </button>
+                                                        </span>
+                                                    </div>
+                                                    {% if form.DELETE %}
+                                                        <div style="display:none;">{{ form.DELETE }}</div>
+                                                    {% endif %}
+                                                    <div class="text-danger">{{ form.title.errors }}</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                    {% endfor %}
+                                </div>
+                                <button class="btn btn-success pull-right form-row-add-floor-btn" type="button">Dodaj</button>
+                            </div>
+
+<div class="tab-pane clearfix" id="tab-houseuseradmins">
+    <div id="form-worker-rows">
+
+        {% for worker in workers_json %}
+            {% if worker.id|stringformat:"s" in selected_worker_ids %}
+                <div class="row form-worker">
+                    <div class="col-xs-12 col-sm-7">
+                        <div class="form-group">
+                            <label>Imię i nazwisko</label>
+
+                            <select name="workers" class="form-control worker-user-select">
+                                <option value="">Wybierz...</option>
+
+                                {% for option in workers_json %}
+                                    <option value="{{ option.id }}"
+                                            {% if option.id == worker.id %}selected{% endif %}>
+                                        {{ option.email }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="col-xs-12 col-sm-5">
+                        <div class="form-group">
+                            <label>Rola</label>
+
+                            <div class="input-group">
+                                <input type="text"
+                                       class="form-control worker-role-input"
+                                       readonly
+                                       value="{{ worker.role }}">
+
+                                <span class="input-group-btn">
+                                    <button type="button" class="btn btn-danger form-row-remove-btn">
+                                        <i class="fa fa-trash"></i>
+                                    </button>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        {% endfor %}
+
+    </div>
+
+    <div class="text-danger">
+        {{ form.workers.errors }}
+    </div>
+
+    <button class="btn btn-success pull-right form-row-add-houseuseradmin-btn" type="button">
+        Dodaj
+    </button>
+</div>                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-xs-12 text-right">
+                    <div class="form-group">
+                        <a href="{% url 'buildings:house_list' %}" class="btn btn-default">Anuluj</a>
+                        <button type="submit" class="btn btn-success">Zapisz</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+jQuery(function ($) {
+
+    function reindexSections() {
+        var i = 1;
+        $("#form-section-rows .form-section:visible").each(function () {
+            $(this).find("input.form-control").val("Sekcja " + i);
+            i++;
+        });
+    }
+
+    $("#form-section-rows").on("click", ".form-row-remove-btn", function () {
+        var row = $(this).closest(".form-section");
+        var deleteInput = row.find("input[name$='-DELETE']");
+
+        if (deleteInput.length) {
+            deleteInput.prop("checked", true);
+            row.hide();
+        } else {
+            row.remove();
+        }
+
+        reindexSections();
+        updateTotalForms("sections");
+    });
+
+    $(".form-row-add-section-btn").on("click", function () {
+        var total = parseInt($("#id_sections-TOTAL_FORMS").val(), 10);
+        var newIndex = total;
+        var sectionNumber = $("#form-section-rows .form-section:visible").length + 1;
+
+        var html = `
+            <div class="row form-section">
+                <input type="hidden" name="sections-${newIndex}-id" id="id_sections-${newIndex}-id">
+                <input type="hidden" name="sections-${newIndex}-house" id="id_sections-${newIndex}-house">
+                <div class="col-xs-12">
+                    <div class="form-group">
+                        <label>Nazwa</label>
+                        <div class="input-group">
+                            <input type="text" name="sections-${newIndex}-title"
+                                   id="id_sections-${newIndex}-title"
+                                   class="form-control"
+                                   value="Sekcja ${sectionNumber}">
+                            <span class="input-group-btn">
+                                <button type="button" class="btn btn-danger form-row-remove-btn">
+                                    <i class="fa fa-trash"></i>
+                                </button>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>`;
+
+        $("#form-section-rows").append(html);
+        $("#id_sections-TOTAL_FORMS").val(total + 1);
+        reindexSections();
+    });
+
+    function reindexFloors() {
+        var i = 1;
+        $("#form-floor-rows .form-floor:visible").each(function () {
+            $(this).find("input.form-control").val("Piętro " + i);
+            i++;
+        });
+    }
+
+    $("#form-floor-rows").on("click", ".form-row-remove-btn", function () {
+        var row = $(this).closest(".form-floor");
+        var deleteInput = row.find("input[name$='-DELETE']");
+
+        if (deleteInput.length) {
+            deleteInput.prop("checked", true);
+            row.hide();
+        } else {
+            row.remove();
+        }
+
+        reindexFloors();
+        updateTotalForms("floors");
+    });
+
+    $(".form-row-add-floor-btn").on("click", function () {
+        var total = parseInt($("#id_floors-TOTAL_FORMS").val(), 10);
+        var newIndex = total;
+        var floorNumber = $("#form-floor-rows .form-floor:visible").length + 1;
+
+        var html = `
+            <div class="row form-floor">
+                <input type="hidden" name="floors-${newIndex}-id" id="id_floors-${newIndex}-id">
+                <input type="hidden" name="floors-${newIndex}-house" id="id_floors-${newIndex}-house">
+                <div class="col-xs-12">
+                    <div class="form-group">
+                        <label>Nazwa</label>
+                        <div class="input-group">
+                            <input type="text" name="floors-${newIndex}-title"
+                                   id="id_floors-${newIndex}-title"
+                                   class="form-control"
+                                   value="Piętro ${floorNumber}">
+                            <span class="input-group-btn">
+                                <button type="button" class="btn btn-danger form-row-remove-btn">
+                                    <i class="fa fa-trash"></i>
+                                </button>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>`;
+
+        $("#form-floor-rows").append(html);
+        $("#id_floors-TOTAL_FORMS").val(total + 1);
+        reindexFloors();
+    });
+
+       const workersData = {{ workers_json|safe }};
+
+    function getWorkerRole(userId) {
+        const worker = workersData.find(w => String(w.id) === String(userId));
+        return worker ? worker.role : "";
+    }
+
+    function getSelectedWorkerIds(exceptRow = null) {
+        const ids = [];
+
+        $(".form-worker").each(function () {
+            const row = $(this);
+
+            if (exceptRow && row.is(exceptRow)) {
+                return;
+            }
+
+            const value = row.find(".worker-user-select").val();
+
+            if (value) {
+                ids.push(String(value));
+            }
+        });
+
+        return ids;
+    }
+
+    function buildWorkerOptions(selectedId = "") {
+        const selectedIds = getSelectedWorkerIds();
+
+        let html = `<option value="">Wybierz...</option>`;
+
+        workersData.forEach(worker => {
+            const workerId = String(worker.id);
+            const isSelected = workerId === String(selectedId);
+            const isAlreadyUsed = selectedIds.includes(workerId);
+
+            if (!isSelected && isAlreadyUsed) {
+                return;
+            }
+
+            html += `
+                <option value="${worker.id}" ${isSelected ? "selected" : ""}>
+                    ${worker.email}
+                </option>
+            `;
+        });
+
+        return html;
+    }
+
+    function refreshWorkerOptions() {
+        $(".form-worker").each(function () {
+            const row = $(this);
+            const select = row.find(".worker-user-select");
+            const currentValue = select.val();
+
+            const selectedIds = getSelectedWorkerIds(row);
+
+            let html = `<option value="">Wybierz...</option>`;
+
+            workersData.forEach(worker => {
+                const workerId = String(worker.id);
+                const isCurrent = workerId === String(currentValue);
+                const isUsedElsewhere = selectedIds.includes(workerId);
+
+                if (!isCurrent && isUsedElsewhere) {
+                    return;
+                }
+
+                html += `
+                    <option value="${worker.id}" ${isCurrent ? "selected" : ""}>
+                        ${worker.email}
+                    </option>
+                `;
+            });
+
+            select.html(html);
+        });
+    }
+
+    function updateWorkerRole(row) {
+        const select = row.find(".worker-user-select");
+        const roleInput = row.find(".worker-role-input");
+
+        roleInput.val(getWorkerRole(select.val()));
+    }
+
+    function createWorkerRow(selectedId = "") {
+        return `
+            <div class="row form-worker">
+                <div class="col-xs-12 col-sm-7">
+                    <div class="form-group">
+                        <label>Imię i nazwisko</label>
+
+                        <select name="workers" class="form-control worker-user-select">
+                            ${buildWorkerOptions(selectedId)}
+                        </select>
+                    </div>
+                </div>
+
+                <div class="col-xs-12 col-sm-5">
+                    <div class="form-group">
+                        <label>Rola</label>
+
+                        <div class="input-group">
+                            <input type="text"
+                                   class="form-control worker-role-input"
+                                   readonly>
+
+                            <span class="input-group-btn">
+                                <button type="button" class="btn btn-danger form-row-remove-btn">
+                                    <i class="fa fa-trash"></i>
+                                </button>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    $(".form-worker").each(function () {
+        updateWorkerRole($(this));
+    });
+
+    refreshWorkerOptions();
+
+    $(document).on("change", ".worker-user-select", function () {
+        const row = $(this).closest(".form-worker");
+
+        updateWorkerRole(row);
+        refreshWorkerOptions();
+    });
+
+    $("#form-worker-rows").on("click", ".form-row-remove-btn", function () {
+        $(this).closest(".form-worker").remove();
+        refreshWorkerOptions();
+    });
+
+    $(".form-row-add-houseuseradmin-btn").on("click", function () {
+        $("#form-worker-rows").append(createWorkerRow());
+        refreshWorkerOptions();
+    });
+
+
+    function updateTotalForms(prefix) {
+        var visibleCount = $(`#form-${prefix === "sections" ? "section" : prefix === "floors" ? "floor" : "worker"}-rows .form-section`).length;
+        $(`#id_${prefix}-TOTAL_FORMS`).val(visibleCount);
+    }
+
+});
+</script>
+{% endblock %}

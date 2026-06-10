@@ -1,0 +1,31 @@
+{% extends 'crm/base.html' %}
+{% load static %}
+
+{% block page_title %}{{ message.title }}{% endblock %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item"><a href="{% url 'crm:cabinet' %}">Strona główna</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'crm:message_list' %}">Wiadomości</a></li>
+    <li class="breadcrumb-item active">{{ message.title|truncatechars:30 }}</li>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-9">
+        <div class="box">
+            <div class="box-header with-border">
+                <h3 class="box-title">{{ message.title }}</h3>
+                <div class="box-tools">
+                    <span class="text-muted">Do: {{ message.flat }}</span>
+                </div>
+            </div>
+            <div class="box-body">
+                {{ message.description|safe }}
+            </div>
+            <div class="box-footer">
+                <a href="{% url 'crm:message_list' %}" class="btn btn-default">Powrót do listy</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

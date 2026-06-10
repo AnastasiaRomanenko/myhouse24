@@ -1,0 +1,105 @@
+{% extends 'admin_panel/base.html' %}
+{% load static %}
+
+{% block content %}
+
+<div class="box">
+    <div class="box">
+        <div class="box-header with-border">
+            <h3 class="box-title"></h3>
+            <div class="box-tools">
+                <a href="{% url 'buildings:house_update' house.id %}" class="btn btn-primary btn-sm">
+                    <span class="hidden-xs">Edytuj budynek</span><i class="fa fa-pencil visible-xs" aria-hidden="true"></i>
+                </a>
+            </div>
+        </div>
+        <div class="box-body">
+            <div class="row">
+
+                <div class="col-xs-12 col-lg-4">
+                    <table class="table table-bordered table-striped table-view">
+                        <tbody>
+                            <tr>
+                                <td>Nazwa</td>
+                                <td>{{ house.title|default:"" }}</td>
+                            </tr>
+                            <tr>
+                                <td>Adres</td>
+                                <td>{{ house.address|default:"" }}</td>
+                            </tr>
+                            <tr>
+                                <td>Sekcji</td>
+                                <td>{{ sections_count|default:"" }}</td>
+                            </tr>
+                            <tr>
+                                <td>Pięter</td>
+                                <td>{{ floors_count|default:"" }}</td>
+                            </tr>
+                            <tr>
+                                <td>Użytkownicy</td>
+                                <td>
+                                    {% for worker in house.workers.all %}
+                                        <p class="no-margin">
+                                            <strong>{{ worker.email }}</strong>
+
+                                            {% if worker.role %}
+                                                - {{ worker.role.role }}
+                                            {% endif %}
+                                        </p>
+                                    {% empty %}
+                                        <span class="text-muted">Brak przypisanych użytkowników</span>
+                                    {% endfor %}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="col-xs-12 col-lg-8">
+                    <div class="row">
+                        <div class="col-xs-12 col-md-6">
+                            {% if house.image1 %}
+                                <img src="{{ house.image1.url }}" class="img-responsive largeImg margin-bottom-30" alt="Zdjęcie 1">
+                            {% else %}
+                                <img src="{% static 'assets/empty_placeholder.jpeg' %}" width="522" height="350" class="img-responsive largeImg margin-bottom-30" alt="">
+                            {% endif %}
+                        </div>
+
+                        <div class="col-xs-6 col-md-3">
+                            {% if house.image2 %}
+                                <img src="{{ house.image2.url }}" class="img-responsive smallImg margin-bottom-30" alt="Zdjęcie 2">
+                            {% else %}
+                                <img src="{% static 'assets/empty_placeholder.jpeg' %}" width="248px" height="160px" class="img-responsive smallImg margin-bottom-30" alt="">
+                            {% endif %}
+                        </div>
+
+                        <div class="col-xs-6 col-md-3">
+                            {% if house.image3 %}
+                                <img src="{{ house.image3.url }}" class="img-responsive smallImg margin-bottom-30" alt="Zdjęcie 3">
+                            {% else %}
+                                <img src="{% static 'assets/empty_placeholder.jpeg' %}" width="248px" height="160px" class="img-responsive smallImg margin-bottom-30" alt="">
+                            {% endif %}
+                        </div>
+
+                        <div class="col-xs-6 col-md-3">
+                            {% if house.image4 %}
+                                <img src="{{ house.image4.url }}" class="img-responsive smallImg margin-bottom-30" alt="Zdjęcie 4">
+                            {% else %}
+                                <img src="{% static 'assets/empty_placeholder.jpeg' %}" width="248px" height="160px" class="img-responsive smallImg margin-bottom-30" alt="">
+                            {% endif %}
+                        </div>
+
+                        <div class="col-xs-6 col-md-3">
+                            {% if house.image5 %}
+                                <img src="{{ house.image5.url }}" class="img-responsive smallImg margin-bottom-30" alt="Zdjęcie 5">
+                            {% else %}
+                                <img src="{% static 'assets/empty_placeholder.jpeg' %}" width="248px" height="160px" class="img-responsive smallImg margin-bottom-30" alt="">
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

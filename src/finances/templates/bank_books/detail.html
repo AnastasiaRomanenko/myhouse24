@@ -1,0 +1,97 @@
+{% extends 'admin_panel/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="row">
+    <div class="col-xs-12 col-md-7 col-lg-6">
+        <div class="page-header-spec">
+            <div class="form-group">
+                <div class="input-group date">
+                    <div class="input-group-addon">№</div>
+                    <div class="form-control pull-right">{{ bank_book.random_number }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="box">
+    <div class="box-header with-border">
+        <h3 class="box-title"></h3>
+        <div class="box-tools">
+            <a href="{% url 'finances:accounting_income_for_book' bank_book.id %}" class="btn btn-primary btn-sm">
+                <span class="hidden-xs">Przyjmij płatność</span><i class="fa fa-pencil visible-xs" aria-hidden="true"></i>
+            </a>
+            <a href="{% url 'finances:payment_receipts_create' bank_book.id %}" class="btn btn-primary btn-sm">
+                <span class="hidden-xs">Wystaw rachunek</span><i class="fa fa-pencil visible-xs" aria-hidden="true"></i>
+            </a>
+            <a href="{% url 'finances:bank_books_update' bank_book.id %}" class="btn btn-primary btn-sm">
+                <span class="hidden-xs">Edytuj konto</span><i class="fa fa-pencil visible-xs" aria-hidden="true"></i>
+            </a>
+        </div>
+    </div>
+    <div class="box-body">
+        <div class="row">
+            <div class="col-xs-12 col-lg-4">
+                <table class="table table-bordered table-striped table-view">
+                    <tbody>
+                        <tr>
+                            <td>Status</td>
+                            <td>
+                                {% if bank_book.status %}
+                                    <small class="label label-success">Aktywny</small>
+                                {% else %}
+                                    <small class="label label-default">Nieaktywny</small>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Budynek</td>
+                            <td>
+                                {% if bank_book.flat.house %}
+                                    <a href="{% url 'buildings:house_detail' bank_book.flat.house.id %}">{{ bank_book.flat.house.title }}</a>
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Sekcja</td>
+                            <td>{{ bank_book.flat.section.title|default:"-" }}</td>
+                        </tr>
+                        <tr>
+                            <td>Mieszkanie</td>
+                            <td>
+                                {% if bank_book.flat %}
+                                    <a href="{% url 'buildings:flat_detail' bank_book.flat.id %}">{{ bank_book.flat.number }}</a>
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Właściciel</td>
+                            <td>
+                                {% if bank_book.flat.owner %}
+                                    <a href="{% url 'users:owner_profile' bank_book.flat.owner.id %}">{{ bank_book.flat.owner.get_full_name|default:bank_book.flat.owner.email }}</a>
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Saldo</td>
+                            <td>{{ reminder }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                {% if bank_book.flat_id %}
+                <p><a href="{% url 'finances:meter_readings_list' %}?flat_id={{ bank_book.flat.id }}">Zobacz odczyty liczników</a></p>
+                {% endif %}
+                <p><a href="{% url 'finances:accounting_list' %}?account_uid={{ bank_book.random_number }}">Zobacz przychody</a></p>
+                <p><a href="{% url 'finances:payment_receipts_list' %}?bank_book_id={{ bank_book.id }}">Zobacz rachunki</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

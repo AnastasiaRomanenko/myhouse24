@@ -1,11 +1,11 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="ru-RU">
+<html lang="pl">
 <head>
     <meta charset="UTF-8"/>
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
-    <link rel="icon" type="image/png" href="https://myhouse24.demodev.cc/favicon.png">
-    <title>Вход</title>
+    <link rel="icon" type="image/png" href="{% static 'assets/favicon.png' %}">
+    <title>Rejestracja</title>
     <link href="{% static 'bower_components/bootstrap/dist/css/bootstrap.min.css' %}" rel="stylesheet">
     <link href="{% static 'bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css' %}" rel="stylesheet">
     <link href="{% static 'bower_components/font-awesome/css/font-awesome.min.css' %}" rel="stylesheet">
@@ -33,7 +33,7 @@
             <div class="tab-content">
                 <div class="tab-pane active">
                     <div class="login-box-body">
-                        <p class="login-box-msg">Регистрация</p>
+                        <p class="login-box-msg">Rejestracja</p>
 
                         <form id="registration-form" method="post">
                             {% csrf_token %}
@@ -70,11 +70,11 @@
                             </div>
                             <div class="row" style="flex-wrap: wrap">
                                 <div class="col-xs-12">
-                                    <label><input type="checkbox" name="accept_terms_and_conditions" value="0">Принять <a href="#">Политику конфиденциальности</a></label>
+                                    <label><input type="checkbox" name="accept_terms_and_conditions" value="0">Zaakceptuj <a href="#">Politykę prywatności</a></label>
                                     <div id="g-recaptcha"></div>
-                                    <button type="submit" class="btn btn-primary btn-block">Зарегистророваться</button>
-                                    <a href="{% url 'authentication:login' %}" type="button" class="btn btn-secondary btn-block">Войти аккаунт</a>
-                                    <a href="{% url 'authentication:password_reset' %}" type="button" class="btn btn-secondary btn-block">Забыли пароль?</a>
+                                    <button type="submit" class="btn btn-primary btn-block">Zarejestruj się</button>
+                                    <a href="{% url 'authentication:login' %}" type="button" class="btn btn-secondary btn-block">Zaloguj się</a>
+                                    <a href="{% url 'authentication:password_reset' %}" type="button" class="btn btn-secondary btn-block">Zapomniałeś hasła?</a>
                                 </div>
                             </div>
                         </form>
@@ -113,7 +113,7 @@
             if (submit) return;
 
             const resp = grecaptcha.getResponse(widget);
-            if (!resp) { alert("Подтвердите что вы не робот"); return; }
+            if (!resp) { alert("Potwierdź, że nie jesteś robotem"); return; }
 
             submit = true;
             this.submit();
@@ -141,7 +141,7 @@
 <!--            if (submittingUser) return;-->
 
 <!--            const resp = grecaptcha.getResponse(widgetUser);-->
-<!--            if (!resp) { alert("Подтвердите что вы не робот"); return; }-->
+<!--            if (!resp) { alert("Potwierdź, że nie jesteś robotem"); return; }-->
 
 <!--            submittingUser = true;-->
 <!--            this.querySelector('button[type="submit"]').disabled = true;-->
@@ -153,7 +153,7 @@
 <!--            if (submittingAdmin) return;-->
 
 <!--            const resp = grecaptcha.getResponse(widgetAdmin);-->
-<!--            if (!resp) { alert("Подтвердите что вы не робот"); return; }-->
+<!--            if (!resp) { alert("Potwierdź, że nie jesteś robotem"); return; }-->
 
 <!--            submittingAdmin = true;-->
 <!--            this.querySelector('button[type="submit"]').disabled = true;-->

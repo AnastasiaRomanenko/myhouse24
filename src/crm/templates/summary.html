@@ -1,0 +1,202 @@
+{% extends 'crm/base.html' %}
+{% load static %}
+
+{% block content %}
+
+<div class="row">
+    <div class="col-xs-12 col-md-6 col-lg-4">
+        <div class="small-box bg-green">
+            <div class="inner">
+                <h3>{{ flat.balance|default:"0.00" }} zł</h3>
+                <p>Saldo konta</p>
+            </div>
+            <div class="icon">
+                <i class="fa fa-money"></i>
+            </div>
+            <span class="small-box-footer">&nbsp;</span>
+        </div>
+    </div>
+
+    <div class="col-xs-12 col-md-6 col-lg-4">
+        <div class="small-box bg-blue">
+            <div class="inner">
+                <h3>{{ flat.account_number|default:"Nie przypisano" }}</h3>
+                <p>Konto osobiste</p>
+            </div>
+            <div class="icon">
+                <i class="fa fa-user"></i>
+            </div>
+            <span class="small-box-footer">&nbsp;</span>
+        </div>
+    </div>
+
+    <div class="col-xs-12 col-md-6 col-lg-4">
+        <div class="small-box bg-yellow">
+            <div class="inner">
+                <h3>{{ average_expense|default:"0.00" }} zł</h3>
+                <p>Średnie miesięczne zużycie</p>
+            </div>
+            <div class="icon">
+                <i class="fa fa-pie-chart"></i>
+            </div>
+            <span class="small-box-footer">&nbsp;</span>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-xs-12">
+        <div class="box">
+            <div class="box-header with-border">
+                <h3 id="pieChartTitle" class="box-title">Diagram wydatków</h3>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    {% if has_pie_data %}
+                        <div class="col-xs-12 col-md-8">
+                            <div id="pieChartMonth-container" class="chart">
+                                <canvas id="pieChartMonth" style="height:250px"></canvas>
+                            </div>
+                            <div id="pieChartYear-container" class="chart" style="display: none;">
+                                <canvas id="pieChartYear" style="height:250px"></canvas>
+                            </div>
+                        </div>
+                        <div class="col-xs-12 col-md-4">
+                            <div class="form-group">
+                                <select class="form-control" name="pie-period">
+                                    <option value="month">Za poprzedni miesiąc</option>
+                                    <option value="year">Za bieżący rok</option>
+                                </select>
+                            </div>
+                            <div id="pieChartMonth-legend"></div>
+                            <div id="pieChartYear-legend" style="display: none;"></div>
+                        </div>
+                    {% else %}
+                        <div class="col-xs-12">
+                            <p>Niewystarczające dane do wyświetlenia statystyk</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xs-12">
+        <div class="box">
+            <div class="box-header with-border">
+                <h3 class="box-title">Diagram wydatków według miesięcy</h3>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    {% if has_bar_data %}
+                        <div class="col-xs-12">
+                            <div class="chart">
+                                <canvas id="barChart" style="height:230px"></canvas>
+                            </div>
+                            <div id="barChart-legend"></div>
+                        </div>
+                    {% else %}
+                        <div class="col-xs-12">
+                            <p>Niewystarczające dane do wyświetlenia statystyk</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'cabinet/bower_components/chart.js/Chart.js' %}"></script>
+<script>
+jQuery(function ($) {
+    // tylko jeśli są dane (inaczej canvas jest pusty)
+    {% if has_pie_data or has_bar_data %}
+
+        // przekazywane z widoku przez kontekst
+        // z Django do JS bezpiecznie, używamy filtra |safe
+
+        var PieDataMonth = {{ pie_data_month|safe|default:"[]" }};
+        var PieDataYear  = {{ pie_data_year|safe|default:"[]" }};
+
+        //-------------
+        //- PIE CHART -
+        //-------------
+        var pieOptions = {
+            segmentShowStroke    : true,
+            segmentStrokeColor   : '#fff',
+            segmentStrokeWidth   : 2,
+            percentageInnerCutout: 30, // 0 for Pie charts
+            animationSteps       : 30,
+            animationEasing      : 'linear',
+            animateRotate        : true,
+            animateScale         : false,
+            responsive           : true,
+            maintainAspectRatio  : true,
+            legendTemplate       : '<ul class="<%=name.toLowerCase()%>-legend"><% for (var i=0; i<segments.length; i++){ %><li><span style="background-color:<%=segments[i].fillColor%>"></span><%if(segments[i].label){ %><%=segments[i].label%>: <%=segments[i].value%><%}%></li><%}%></ul>'
+        };
+
+        if($('#pieChartMonth').length) {
+            var pieChartMonthCanvas = $('#pieChartMonth').get(0).getContext('2d');
+            var pieChartMonth = new Chart(pieChartMonthCanvas).Doughnut(PieDataMonth, pieOptions);
+            document.getElementById('pieChartMonth-legend').innerHTML = pieChartMonth.generateLegend();
+        }
+
+        if($('#pieChartYear').length) {
+            var pieChartYearCanvas = $('#pieChartYear').get(0).getContext('2d');
+            var pieChartYear = new Chart(pieChartYearCanvas).Doughnut(PieDataYear, pieOptions);
+            document.getElementById('pieChartYear-legend').innerHTML = pieChartYear.generateLegend();
+        }
+
+        // Przełącznik okresu (miesiąc/rok)
+        $('select[name="pie-period"]').on('change', function () {
+            var selectValue = $(this).val();
+            if (selectValue == 'month') {
+                $('#pieChartMonth-container, #pieChartMonth-legend').show();
+                $('#pieChartYear-container, #pieChartYear-legend').hide();
+            } else if (selectValue == 'year') {
+                $('#pieChartMonth-container, #pieChartMonth-legend').hide();
+                $('#pieChartYear-container, #pieChartYear-legend').show();
+            }
+        });
+
+        //-------------
+        //- BAR CHART -
+        //-------------
+        var areaChartData = {
+            labels  : {{ bar_labels|safe|default:'["sty.", "lut.", "mar.", "kwi.", "maj", "cze.", "lip.", "sie.", "wrz.", "paź.", "lis.", "gru."]' }},
+            datasets: [
+                {
+                    label               : 'Zużycie miesięczne',
+                    fillColor           : 'rgba(0, 115, 183, 1)',
+                    strokeColor         : 'rgba(0, 115, 183, 1)',
+                    data                : {{ bar_data|safe|default:'[0,0,0,0,0,0,0,0,0,0,0,0]' }}
+                }
+            ]
+        };
+
+        if($('#barChart').length) {
+            var barChartCanvas = $('#barChart').get(0).getContext('2d');
+            var barChartOptions = {
+                scaleBeginAtZero        : true,
+                scaleShowGridLines      : true,
+                scaleGridLineColor      : 'rgba(0,0,0,.05)',
+                scaleGridLineWidth      : 1,
+                scaleShowHorizontalLines: true,
+                scaleShowVerticalLines  : true,
+                barShowStroke           : true,
+                barStrokeWidth          : 2,
+                barValueSpacing         : 5,
+                barDatasetSpacing       : 1,
+                responsive              : true,
+                maintainAspectRatio     : true,
+                datasetFill             : false
+            };
+            var myBarChart = new Chart(barChartCanvas).Bar(areaChartData, barChartOptions);
+        }
+
+    {% endif %}
+});
+</script>
+{% endblock %}

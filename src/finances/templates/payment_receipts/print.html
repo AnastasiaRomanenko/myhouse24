@@ -1,0 +1,72 @@
+{% extends 'admin_panel/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="box">
+    <div class="box-header with-border">
+        <h3 class="box-title">Lista szablonów</h3>
+        <div class="box-tools">
+            <a href="{% url 'settings:receipt_templates' %}" class="btn btn-default btn-sm">
+                Konfiguracja szablonów
+            </a>
+        </div>
+    </div>
+    <div class="box-body">
+        {% if templates %}
+        <div id="template-list">
+            {% for tpl in templates %}
+            <div class="radio">
+                <label>
+                    <input type="radio" name="template_id" class="tpl-radio" value="{{ tpl.pk }}"
+                        {% if default_template and tpl.pk == default_template.pk %}checked{% endif %}>
+                    {{ tpl.name }}
+                    {% if tpl.is_default %}<small class="label label-success" style="margin-left:6px;">domyślny</small>{% endif %}
+                </label>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div style="margin-top: 24px;">
+            <a id="download-btn" href="{% url 'finances:payment_receipts_download' invoice.pk %}?template_id={{ default_template.pk }}"
+               class="btn btn-success">
+                Pobierz
+            </a>
+
+            <form id="email-form" method="post" action="{% url 'finances:payment_receipts_email' invoice.pk %}" style="display:inline;">
+                {% csrf_token %}
+                <input type="hidden" name="template_id" id="email-template-id" value="{{ default_template.pk }}">
+                <button type="submit" class="btn btn-default"
+                    {% if not invoice.flat.owner or not invoice.flat.owner.email %}
+                        disabled title="Właściciel nie ma podanego adresu e-mail"
+                    {% endif %}>
+                    Wyślij na e-mail
+                </button>
+            </form>
+        </div>
+
+        <script>
+        document.querySelectorAll('.tpl-radio').forEach(function(radio) {
+            radio.addEventListener('change', function() {
+                var tplId = this.value;
+                var receiptPk = "{{ invoice.pk }}";
+                document.getElementById('download-btn').href =
+                    '/finances/payment_receipts/' + receiptPk + '/download/?template_id=' + tplId;
+                document.getElementById('email-template-id').value = tplId;
+            });
+        });
+        </script>
+
+        {% else %}
+        <p class="text-muted">
+            Szablony nie są wgrane.
+            <a href="{% url 'settings:receipt_templates' %}">Wgraj szablon</a>
+        </p>
+        <div style="margin-top: 16px;">
+            <a href="{% url 'finances:payment_receipts_download' invoice.pk %}" class="btn btn-success">
+                Pobierz PDF
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

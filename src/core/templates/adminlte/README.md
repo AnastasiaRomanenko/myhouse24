@@ -14,7 +14,7 @@ Introduction
 ### Looking for More Templates?
 - **[Admin  Templates](http://dashboardpack.com/)** by DashboardPack
 - **[Bootstrap Templates](https://colorlib.com/wp/cat/bootstrap/)** by Colorlib
-- **[Admin Dashboards](https://colorlib.com/wp/free-bootstrap-admin-dashboard-templates/)** by varios template designers and developers based on Bootstrap, Vue, React, Angular and more.  
+- **[Admin Dashboards](https://colorlib.com/wp/free-bootstrap-admin-dashboard-templates/)** by varios template designers and developers based on Bootstrap, Vue, React, Angular and more.
 
 ## Documentation & Installation Guide
 Visit the [online documentation](https://adminlte.io/docs) for the most

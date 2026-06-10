@@ -1,0 +1,155 @@
+{% extends 'admin_panel/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="box">
+    <div class="box-body">
+        <form id="flat-form" action="{{ form_url }}" method="post">
+            {% csrf_token %}
+            {{ form.non_field_errors }}
+
+            <div class="row">
+                <div class="col-xs-12 col-sm-6">
+                    <div class="form-group field-flatform-flat required">
+                        <label class="control-label" for="id_number">Numer mieszkania</label>
+                        <input type="number" id="id_number" class="form-control" name="number" value="{{ form.number.value|default_if_none:'' }}" min="0" required>
+                        <div class="help-block text-danger">{{ form.number.errors }}</div>
+                    </div>
+
+                    <div class="form-group field-flatform-square required">
+                        <label class="control-label" for="id_area">Powierzchnia (m²)</label>
+                        <input type="number" id="id_area" class="form-control" name="area" value="{{ form.area.value|default_if_none:'' }}" step="0.01" min="0" required>
+                        <div class="help-block text-danger">{{ form.area.errors }}</div>
+                    </div>
+
+                    <div class="form-group field-flatform-house_id required">
+                        <label class="control-label" for="id_house">Budynek</label>
+                        <select id="id_house" class="form-control js-house-select" name="house" required>
+                            {% if selected_house %}
+                                <option value="{{ selected_house.id }}" selected>{{ selected_house.title }}</option>
+                            {% endif %}
+                        </select>
+                        <div class="help-block text-danger">{{ form.house.errors }}</div>
+                    </div>
+
+                    <div class="form-group field-flatform-section_id required">
+                        <label class="control-label" for="id_section">Sekcja</label>
+                        <select id="id_section" class="form-control" name="section" required>
+                            <option value="">Wybierz...</option>
+                            {% for section in sections %}
+                                <option value="{{ section.id }}" {% if form.section.value|stringformat:"s" == section.id|stringformat:"s" %}selected{% endif %}>{{ section.title }}</option>
+                            {% endfor %}
+                        </select>
+                        <div class="help-block text-danger">{{ form.section.errors }}</div>
+                    </div>
+
+                    <div class="form-group field-flatform-floor_id required">
+                        <label class="control-label" for="id_floor">Piętro</label>
+                        <select id="id_floor" class="form-control" name="floor" required>
+                            <option value="">Wybierz...</option>
+                            {% for floor in floors %}
+                                <option value="{{ floor.id }}" {% if form.floor.value|stringformat:"s" == floor.id|stringformat:"s" %}selected{% endif %}>{{ floor.title }}</option>
+                            {% endfor %}
+                        </select>
+                        <div class="help-block text-danger">{{ form.floor.errors }}</div>
+                    </div>
+                </div>
+
+                <div class="col-xs-12 col-sm-6">
+                    <div class="form-group field-flatform-user_id required">
+                        <label class="control-label" for="id_owner">Właściciel</label>
+                        <select id="id_owner" class="form-control js-owner-select" name="owner" required>
+                            {% if selected_owner %}
+                                <option value="{{ selected_owner.id }}" selected>{{ selected_owner }}</option>
+                            {% endif %}
+                        </select>
+                        <div class="help-block text-danger">{{ form.owner.errors }}</div>
+                    </div>
+
+                    <div class="form-group field-flatform-tariff_id required">
+                        <label class="control-label" for="id_tariff">Taryfa</label>
+                        <select id="id_tariff" class="form-control" name="tariff" required>
+                            <option value="">Wybierz...</option>
+                            {% for tariff in tariffs %}
+                                <option value="{{ tariff.id }}" {% if form.tariff.value|stringformat:"s" == tariff.id|stringformat:"s" %}selected{% endif %}>{{ tariff.title }}</option>
+                            {% endfor %}
+                        </select>
+                        <div class="help-block text-danger">{{ form.tariff.errors }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-xs-12 text-right">
+                    <div class="form-group">
+                        <a href="{% url 'buildings:flat_list' %}" class="btn btn-default margin-bottom-15">Anuluj</a>
+                        <input type="submit" class="btn btn-success margin-bottom-15" name="action_save" value="Zapisz">
+                        <input type="submit" class="btn btn-success margin-bottom-15 bg-green-active" name="action_save_add" value="Zapisz i dodaj nowe">
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(function () {
+    function initSelect2($element, url, placeholder) {
+        $element.select2({
+            width: '100%',
+            allowClear: true,
+            placeholder: placeholder,
+            language: 'pl',
+            ajax: {
+                url: url,
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return {
+                        term: params.term || '',
+                        page: params.page || 1
+                    };
+                },
+                processResults: function (data) {
+                    return data;
+                },
+                cache: true
+            }
+        });
+    }
+
+    function fillSimpleSelect($select, items, selectedValue) {
+        $select.empty().append($('<option>', {value: '', text: 'Wybierz...'}));
+        $.each(items, function (_, item) {
+            var option = $('<option>', {value: item.id, text: item.text});
+            if (String(item.id) === String(selectedValue || '')) {
+                option.prop('selected', true);
+            }
+            $select.append(option);
+        });
+    }
+
+    function loadHouseChildren(houseId, selectedSection, selectedFloor) {
+        if (!houseId) {
+            fillSimpleSelect($('#id_section'), [], '');
+            fillSimpleSelect($('#id_floor'), [], '');
+            return;
+        }
+
+        $.getJSON("{% url 'buildings:house_children' %}", {house_id: houseId}, function (data) {
+            fillSimpleSelect($('#id_section'), data.sections, selectedSection);
+            fillSimpleSelect($('#id_floor'), data.floors, selectedFloor);
+        });
+    }
+
+    initSelect2($('#id_house'), "{% url 'buildings:house_select2' %}", 'Wybierz...');
+    initSelect2($('#id_owner'), "{% url 'users:owner_select2' %}", 'Wybierz...');
+
+    $('#id_house').on('change', function () {
+        loadHouseChildren($(this).val(), '', '');
+    });
+});
+</script>
+{% endblock %}

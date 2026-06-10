@@ -1,0 +1,72 @@
+{% extends 'admin_panel/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="box">
+    <form id="w0" action="{% url 'users:roles_list' %}" method="post">
+        {% csrf_token %}
+
+        <div class="box-body table-responsive no-padding">
+            <table id="roles-table" class="table table-bordered table-hover table-striped" width="100%">
+                <thead>
+                    <tr>
+                        <th>Rola</th>
+                        {% for field, title in permission_columns %}
+                            <th class="text-center">{{ title }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <div class="row">
+            <div class="col-xs-12 text-right">
+                <div class="form-group margin-top-15 margin-right-15">
+                    <a href="{% url 'users:roles_list' %}" class="btn btn-default">Anuluj</a>
+                    <button type="submit" class="btn btn-success">Zapisz</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(function () {
+    $('#roles-table').DataTable({
+        processing: true,
+        serverSide: true,
+        searching: false,
+        ordering: false,
+        lengthChange: false,
+        pageLength: 50,
+        autoWidth: false,
+        scrollX: true,
+        ajax: {
+            url: "{% url 'users:roles_ajax_list' %}",
+            type: "GET"
+        },
+        columns: [
+            {data: 'role', name: 'role'}{% for field, title in permission_columns %},
+            {data: '{{ field }}', name: '{{ field }}', orderable: false, searchable: false}{% endfor %}
+        ],
+        language: {
+            processing: "Ładowanie...",
+            lengthMenu: "Pokaż _MENU_ wpisów",
+            zeroRecords: "Brak wyników",
+            info: "Wyświetlono _START_–_END_ z _TOTAL_ wpisów",
+            infoEmpty: "Brak wpisów",
+            infoFiltered: "(odfiltrowano z _MAX_ wpisów)",
+            paginate: {
+                first: "Pierwsza",
+                last: "Ostatnia",
+                next: "»",
+                previous: "«"
+            }
+        }
+    });
+});
+</script>
+{% endblock %}

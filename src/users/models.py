@@ -1,8 +1,11 @@
-from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
+
 from src.users.enums import Status
 from src.users.managers import UserManager
+
+
 # Create your models here.
 class Roles(models.Model):
     role = models.CharField(max_length=50)
@@ -23,6 +26,7 @@ class Roles(models.Model):
     has_roles = models.BooleanField(default=False)
     has_users = models.BooleanField(default=False)
     has_payment_details = models.BooleanField(default=False)
+    has_payment_items = models.BooleanField(default=False)
 
     def __str__(self) -> str:
         return self.role
@@ -31,6 +35,7 @@ class Roles(models.Model):
 class Users(AbstractUser):
 
     username = None
+    is_active = models.BooleanField(default=False)
 
     image = models.ImageField(upload_to="users/", blank=True, null=True)
 
@@ -42,16 +47,18 @@ class Users(AbstractUser):
     status = models.CharField(
         max_length=16,
         choices=Status.choices,
-        default=Status.ACTIVE,
+        default=Status.NEW,
     )
 
-    notes = models.TextField(blank=True)
+    notes = models.TextField(blank=True, null=True)
 
-    phone_number = PhoneNumberField(max_length=32, blank=True, null=True)
-    viber = PhoneNumberField(max_length=32, blank=True, null=True)
+    phone_number = PhoneNumberField(null=True, blank=True)
+    viber = PhoneNumberField(null=True, blank=True)
     telegram = models.CharField(max_length=50, blank=True, null=True)
 
     email = models.EmailField(unique=True)
+
+    totp_secret = models.CharField(max_length=64, blank=True, null=True)
 
     role = models.ForeignKey(
         Roles,

@@ -1,0 +1,148 @@
+{% extends 'crm/base.html' %}
+{% load static %}
+
+{% block content %}
+
+<div class="row">
+    <div class="col-lg-3">
+        <div class="row">
+            <div class="col-md-6 col-lg-12">
+                <div class="box">
+                    <div class="box-body box-profile">
+                        {% if request.user.image %}
+                            <img class="profile-user-img img-responsive img-circle" src="{{ request.user.image.url }}" alt="Avatar">
+                        {% else %}
+                            <img class="profile-user-img img-responsive img-circle" src="{% static 'dist/img/default-avatar.jpg' %}" alt="Avatar">
+                        {% endif %}
+
+                        <h3 class="profile-username text-center">{{ request.user.get_full_name }}</h3>
+                        <p class="text-muted text-center">Właściciel mieszkania</p>
+
+                        <ul class="list-group list-group-unbordered">
+                            <li class="list-group-item">
+                                <span>Telefon</span>
+                                <span class="pull-right">{{ request.user.phone_number|default:"-" }}</span>
+                            </li>
+                            <li class="list-group-item">
+                                <span>Viber</span>
+                                <span class="pull-right">{{ request.user.viber|default:"-" }}</span>
+                            </li>
+                            <li class="list-group-item">
+                                <span>Telegram</span>
+                                <span class="pull-right">{{ request.user.telegram|default:"-" }}</span>
+                            </li>
+                            <li class="list-group-item">
+                                <span>Email</span>
+                                <span class="pull-right">{{ request.user.email }}</span>
+                            </li>
+                        </ul>
+
+                        <a href="{% url 'crm:profile_update' %}" class="btn btn-primary btn-block">Zmień</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-12">
+                <h3 class="page-header">O mnie (notatki)</h3>
+                <div class="box">
+                    <div class="box-body box-profile">
+                        {{ request.user.notes|default:"Brak notatek"|safe }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-9">
+        <h2 class="page-header">Moje mieszkania</h2>
+
+        {% for flat in user_flats %}
+            <div class="box">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Opis mieszkania</h3>
+                </div>
+                <div class="box-body">
+                    <p><strong>{{ flat.house.title }}.</strong> {{ flat.house.address }}, m. {{ flat.number }}</p>
+
+                    <div class="row">
+                        <div class="col-xs-12 col-md-6">
+                            {% if flat.house.image1 %}
+                                <img src="{{ flat.house.image1.url }}" class="img-responsive largeImg margin-bottom-30" alt="">
+                            {% else %}
+                                <img src="{% static 'cabinet/dist/img/placeholder.jpg' %}" class="img-responsive largeImg margin-bottom-30" alt="">
+                            {% endif %}
+                        </div>
+
+                        <div class="col-xs-6 col-md-3">
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    {% if flat.house.image2 %}<img src="{{ flat.house.image2.url }}" class="img-responsive smallImg margin-bottom-30" alt="">{% endif %}
+                                </div>
+                                <div class="col-xs-12">
+                                    {% if flat.house.image3 %}<img src="{{ flat.house.image3.url }}" class="img-responsive smallImg margin-bottom-30" alt="">{% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xs-6 col-md-3">
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    {% if flat.house.image4 %}<img src="{{ flat.house.image4.url }}" class="img-responsive smallImg margin-bottom-30" alt="">{% endif %}
+                                </div>
+                                <div class="col-xs-12">
+                                    {% if flat.house.image5 %}<img src="{{ flat.house.image5.url }}" class="img-responsive smallImg margin-bottom-30" alt="">{% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th colspan="2">Opis</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th style="min-width: 200px; font-weight:normal;">Nazwa budynku</th>
+                                    <th style="font-weight:normal;">{{ flat.house.title }}</th>
+                                </tr>
+                                <tr>
+                                    <td>Adres</td>
+                                    <td>{{ flat.house.address }}</td>
+                                </tr>
+                                <tr>
+                                    <td>Nr mieszkania</td>
+                                    <td>{{ flat.number }}</td>
+                                </tr>
+                                <tr>
+                                    <td>Powierzchnia</td>
+                                    <td>{{ flat.area|default:"0.00" }} m<sup>2</sup></td>
+                                </tr>
+                                <tr>
+                                    <td>Piętro</td>
+                                    <td>{{ flat.floor.title|default:"-" }}</td>
+                                </tr>
+                                <tr>
+                                    <td>Sekcja</td>
+                                    <td>{{ flat.section.title|default:"-" }}</td>
+                                </tr>
+                                <tr>
+                                    <td>Konto osobiste</td>
+                                    <td>{{ flat.bank_book.random_number|default:"<span class='text-red'>Nie przypisano</span>"|safe }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="box">
+                <div class="box-body text-center">
+                    <p class="text-muted">Nie masz jeszcze przypisanych mieszkań.</p>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

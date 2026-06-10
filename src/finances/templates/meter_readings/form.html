@@ -1,0 +1,224 @@
+{% extends 'admin_panel/base.html' %}
+{% load static %}
+
+{% block content %}
+<form id="w0" action="{{ form_url }}" method="post">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+
+    <div class="row">
+        <div class="col-xs-12 col-md-7 col-lg-6">
+            <div class="page-header-spec">
+                <div class="form-group">
+                    <div class="input-group">
+                        <div class="input-group-addon">№</div>
+                        {{ form.random_number }}
+                    </div>
+                    <div class="help-block text-danger">{{ form.random_number.errors }}</div>
+                </div>
+
+                <span class="label-mid">z dnia</span>
+
+                <div class="form-group">
+                    <div class="input-group date">
+                        <span class="input-group-addon" title="Wybierz datę"><i class="glyphicon glyphicon-calendar"></i></span>
+                        {{ form.created_at }}
+                    </div>
+                    <div class="help-block text-danger">{{ form.created_at.errors }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="box">
+        <div class="box-body">
+            <div class="row">
+                <div class="col-xs-12 col-sm-6">
+                    <div class="form-group">
+                        <label class="control-label">Budynek</label>
+                        <select id="id_house" class="form-control" name="house">
+                            <option value="">Wybierz...</option>
+
+                            {% for house in form.fields.house.queryset %}
+                                <option value="{{ house.id }}"
+                                    {% if form.house.value|stringformat:"s" == house.id|stringformat:"s" %}
+                                        selected
+                                    {% endif %}
+                                >
+                                    {{ house.title }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                        <div class="help-block text-danger">{{ form.house.errors }}</div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">Sekcja</label>
+                        <select id="id_section" class="form-control" name="section">
+                            <option value="">Wybierz...</option>
+
+                            {% for section in sections %}
+                                <option value="{{ section.id }}">
+                                    {{ section.title }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                        <div class="help-block text-danger">{{ form.section.errors }}</div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">Piętro</label>
+                        <select id="id_floor" class="form-control" name="floor">
+                            <option value="">Wybierz...</option>
+
+                            {% for floor in floors %}
+                                <option value="{{ floor.id }}">
+                                    {{ floor.title }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                        <div class="help-block text-danger">{{ form.floor.errors }}</div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">Mieszkanie</label>
+                        <select id="id_flat" class="form-control" name="flat">
+                            <option value="">Wybierz...</option>
+
+                            {% for flat in flats %}
+                                <option value="{{ flat.id }}">
+                                    {{ flat.number }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                        <div class="help-block text-danger">{{ form.flat.errors }}</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label">Licznik</label>
+                        {{ form.meter_type }}
+                        <div class="help-block text-danger">{{ form.meter_type.errors }}</div>
+                    </div>
+                </div>
+
+                <div class="col-xs-12 col-sm-6">
+                    <div class="form-group">
+                        <label class="control-label">Status</label>
+                        {{ form.status }}
+                        <div class="help-block text-danger">{{ form.status.errors }}</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Odczyt licznika</label>
+                        {{ form.current_data }}
+                        <div class="help-block text-danger">{{ form.current_data.errors }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-xs-12 text-right">
+                    <div class="form-group">
+                        <a href="{% url 'finances:meter_readings_list' %}" class="btn btn-default margin-bottom-15">Anuluj</a>
+                        <button type="submit" class="btn btn-success margin-bottom-15" name="action_save">Zapisz</button>
+                        <button type="submit" class="btn btn-success margin-bottom-15 bg-green-active" name="action_save_add">Zapisz i dodaj nowe odczyty</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function () {
+
+    $("#id_house").change(function () {
+
+        let houseId = $(this).val();
+
+        $("#id_section").html('<option value="">Wybierz...</option>');
+        $("#id_floor").html('<option value="">Wybierz...</option>');
+        $("#id_flat").html('<option value="">Wybierz...</option>');
+
+        if (houseId) {
+
+            $.ajax({
+                url: "{% url 'finances:get_sections' %}",
+                data: {
+                    house_id: houseId
+                },
+                success: function (data) {
+
+                    data.forEach(function (section) {
+                        $("#id_section").append(
+                            `<option value="${section.id}">
+                                ${section.title}
+                            </option>`
+                        );
+                    });
+
+                }
+            });
+
+            $.ajax({
+                url: "{% url 'finances:get_floors' %}",
+                data: {
+                    house_id: houseId
+                },
+                success: function (data) {
+
+                    data.forEach(function (floor) {
+                        $("#id_floor").append(
+                            `<option value="${floor.id}">
+                                ${floor.title}
+                            </option>`
+                        );
+                    });
+
+                }
+            });
+
+        }
+
+    });
+
+
+    function loadFlats() {
+
+        let houseId = $("#id_house").val();
+        let sectionId = $("#id_section").val();
+        let floorId = $("#id_floor").val();
+
+        $("#id_flat").html('<option value="">Wybierz...</option>');
+
+        if (houseId && sectionId && floorId) {
+
+            $.ajax({
+                url: "{% url 'finances:get_flats' %}",
+                data: {
+                    house_id: houseId,
+                    section_id: sectionId,
+                    floor_id: floorId
+                },
+                success: function (data) {
+
+                    data.forEach(function (flat) {
+                        $("#id_flat").append(
+                            `<option value="${flat.id}">
+                                ${flat.number}
+                            </option>`
+                        );
+                    });
+
+                }
+            });
+
+        }
+
+    }
+
+    $("#id_section").change(loadFlats);
+    $("#id_floor").change(loadFlats);
+
+});
+</script>
+{% endblock %}

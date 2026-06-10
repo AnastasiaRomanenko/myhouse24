@@ -213,4 +213,12 @@ __marimo__/
 static/
 gallery/
 
-**/migrations
+**/migrations/**
+
+.gitignore
+
+dump.rdb
+
+.pre-commit-config.yaml
+
+**/docs/**

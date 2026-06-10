@@ -1,0 +1,50 @@
+{% extends 'crm/base.html' %}
+{% load static %}
+
+{% block page_title %}Opłata rachunku{% endblock %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item"><a href="{% url 'crm:cabinet' %}">Strona główna</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'crm:invoice_list' %}">Rachunki</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'crm:invoice_detail' invoice.pk %}">{{ invoice.random_number }}</a></li>
+    <li class="breadcrumb-item active">Opłata</li>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-6 col-md-offset-3">
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Opłata rachunku № {{ invoice.random_number }}</h3>
+            </div>
+            <form method="post">
+                {% csrf_token %}
+                <div class="box-body">
+                    <div class="callout callout-info">
+                        <p><strong>Odbiorca:</strong> {{ company_name }}</p>
+                        <p><strong>Kwota do zapłaty:</strong> {{ total_amount }} zł</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="account_number">Numer konta osobistego</label>
+                        <input type="text" class="form-control" id="account_number"
+                               name="account_number" value="{{ account_number }}" required>
+                    </div>
+
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" name="remember"
+                                   {% if request.session.saved_account_number %}checked{% endif %}>
+                            Zapamiętaj numer konta osobistego
+                        </label>
+                    </div>
+                </div>
+                <div class="box-footer">
+                    <a href="{% url 'crm:invoice_detail' invoice.pk %}" class="btn btn-default">Anuluj</a>
+                    <button type="submit" class="btn btn-primary pull-right">Dalej</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

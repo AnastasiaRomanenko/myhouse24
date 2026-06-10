@@ -1,5 +1,8 @@
 from django.db import models
+
 from src.settings.enums import Type
+
+
 # Create your models here.
 class UnitsOfMeasurement(models.Model):
     title = models.CharField(max_length=50)
@@ -11,7 +14,7 @@ class UnitsOfMeasurement(models.Model):
 class Tariffs(models.Model):
     title = models.CharField(max_length=50)
     description = models.TextField()
-    update_at = models.DateTimeField()
+    update_at = models.DateTimeField(auto_now=True)
 
     def __str__(self) -> str:
         return self.title
@@ -29,13 +32,19 @@ class Services(models.Model):
 
 
 class ServiceTariffs(models.Model):
-    service = models.ForeignKey(Services, on_delete=models.CASCADE, related_name="service_tariffs")
-    tariff = models.ForeignKey(Tariffs, on_delete=models.CASCADE, related_name="service_tariffs")
+    service = models.ForeignKey(
+        Services, on_delete=models.CASCADE, related_name="service_tariffs"
+    )
+    tariff = models.ForeignKey(
+        Tariffs, on_delete=models.CASCADE, related_name="service_tariffs"
+    )
     price = models.FloatField()
 
     class Meta:
         constraints = [
-            models.UniqueConstraint(fields=["service", "tariff"], name="uniq_service_tariff")
+            models.UniqueConstraint(
+                fields=["service", "tariff"], name="uniq_service_tariff"
+            )
         ]
 
     def __str__(self) -> str:
@@ -57,3 +66,24 @@ class PaymentItems(models.Model):
 
     def __str__(self) -> str:
         return self.name
+
+    @property
+    def is_used(self) -> bool:
+        return self.accounting_payment_item_rows.exists()
+
+
+class ReceiptTemplate(models.Model):
+    name = models.CharField(max_length=100)
+    file = models.FileField(upload_to="receipt_templates/")
+    is_default = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self) -> str:
+        return self.name
+
+    def save(self, *args, **kwargs):
+        if self.is_default:
+            ReceiptTemplate.objects.exclude(pk=self.pk).update(
+                is_default=False
+            )
+        super().save(*args, **kwargs)

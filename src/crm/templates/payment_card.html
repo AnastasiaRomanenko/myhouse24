@@ -1,0 +1,76 @@
+{% extends 'crm/base.html' %}
+{% load static %}
+
+{% block page_title %}Dane karty{% endblock %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item"><a href="{% url 'crm:cabinet' %}">Strona główna</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'crm:invoice_list' %}">Rachunki</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'crm:invoice_detail' invoice.pk %}">{{ invoice.random_number }}</a></li>
+    <li class="breadcrumb-item active">Płatność kartą</li>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-6 col-md-offset-3">
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">
+                    <img src="{% static 'dist/img/credit/visa.png' %}" alt="Visa" style="max-height:24px; vertical-align:middle; margin-right:4px;">
+                    <img src="{% static 'dist/img/credit/mastercard.png' %}" alt="MasterCard" style="max-height:24px; vertical-align:middle; margin-right:8px;">
+                    Płatność kartą
+                </h3>
+            </div>
+            <form method="post" autocomplete="off">
+                {% csrf_token %}
+                <div class="box-body">
+                    {% if errors %}
+                    <div class="alert alert-danger">
+                        <ul class="margin-bottom-0">
+                            {% for e in errors %}<li>{{ e }}</li>{% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+
+                    <div class="form-group">
+                        <label>Numer karty</label>
+                        <input type="text" class="form-control" name="card_number"
+                               placeholder="0000 0000 0000 0000" maxlength="19"
+                               inputmode="numeric" id="card-number" required>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-6">
+                            <div class="form-group">
+                                <label>Data ważności</label>
+                                <input type="text" class="form-control" name="expiry"
+                                       placeholder="MM/RR" maxlength="5" required>
+                            </div>
+                        </div>
+                        <div class="col-xs-6">
+                            <div class="form-group">
+                                <label>CVV</label>
+                                <input type="password" class="form-control" name="cvv"
+                                       placeholder="•••" maxlength="4"
+                                       inputmode="numeric" required>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="box-footer">
+                    <a href="{% url 'crm:invoice_pay_step2' invoice.pk %}" class="btn btn-default">Wstecz</a>
+                    <button type="submit" class="btn btn-success pull-right">
+                        <i class="fa fa-lock"></i> Zapłać
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('card-number').addEventListener('input', function () {
+    var v = this.value.replace(/\D/g, '').substring(0, 16);
+    this.value = v.replace(/(.{4})/g, '$1 ').trim();
+});
+</script>
+{% endblock %}

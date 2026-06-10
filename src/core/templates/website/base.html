@@ -1,0 +1,193 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <link rel="icon" type="image/png" href="{% static 'assets/favicon.png' %}">
+    <meta name="csrf-param" content="_csrf-backend">
+    <title>{% block title %}MyHouse24{% endblock %}</title>
+    <meta name="description" content="{% block meta_description %}{{ seo.description|default:'' }}{% endblock %}">
+    <meta name="keywords" content="{% block meta_keywords %}{{ seo.keywords|default:'' }}{% endblock %}">
+    <link href="{% static 'bower_components/bootstrap/dist/css/bootstrap.css' %}" rel="stylesheet">
+    <link href="{% static 'bower_components/bootstrap/dist/css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'bower_components/font-awesome/css/font-awesome.min.css' %}" rel="stylesheet">
+    <link href="{% static 'bower_components/Ionicons/css/ionicons.min.css' %}" rel="stylesheet">
+    <link href="{% static 'bower_components/jvectormap/jquery-jvectormap.css' %}" rel="stylesheet">
+    <link href="{% static 'dist/css/AdminLTE.min.css' %}" rel="stylesheet">
+    <link href="{% static 'plugins/iCheck/flat/blue.css' %}" rel="stylesheet">
+    <link href="{% static 'plugins/bootstrap-wysihtml5/bootstrap3-wysihtml5.min.css' %}" rel="stylesheet">
+    <link href="{% static 'dist/css/skins/_all-skins.min.css' %}" rel="stylesheet">
+    <link href="{% static 'dist/css/style.css' %}" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic" rel="stylesheet">
+    <link href="{% static 'dist/css/custom.css' %}" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+    <style>
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            color: #2f3640;
+            background: #fff;
+        }
+        .site-header {
+            border-bottom: 1px solid #e5e9ef;
+            background: #fff;
+            margin-bottom: 0;
+        }
+        .navbar-brand {
+            height: 64px;
+            padding: 12px 15px;
+        }
+        .navbar-brand img {
+            max-height: 40px;
+        }
+        .navbar-nav > li > a {
+            padding-top: 22px;
+            padding-bottom: 22px;
+            color: #34495e;
+            font-weight: 600;
+        }
+        .navbar-toggle {
+            margin-top: 15px;
+        }
+        .login-link {
+            margin-top: 14px;
+            margin-left: 10px;
+        }
+        main {
+            flex: 1 0 auto;
+        }
+        .box {
+            background: #fff;
+            border: 1px solid #e5e9ef;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .breadcrumbs {
+            background: #f7f9fb;
+            border-bottom: 1px solid #e5e9ef;
+            margin-bottom: 25px;
+        }
+        .breadcrumb {
+            margin: 0;
+            padding: 12px 0;
+            background: transparent;
+        }
+        .imgFloatRight {
+            float: right;
+        }
+        .service-description {
+            font-size: 16px;
+            line-height: 1.6;
+        }
+        .services .row {
+            margin-bottom: 35px;
+        }
+        .site-footer {
+            flex-shrink: 0;
+            background: #25313d;
+            color: #d7dee8;
+            padding: 24px 0;
+            margin-top: 40px;
+        }
+        .site-footer a {
+            color: #fff;
+        }
+        @media (max-width: 767px) {
+            .navbar-brand {
+                height: 56px;
+                padding-top: 9px;
+            }
+            .navbar-nav > li > a {
+                padding-top: 10px;
+                padding-bottom: 10px;
+            }
+            .login-link {
+                margin: 10px 15px 15px;
+            }
+            .imgFloatRight {
+                float: none;
+                margin-left: 0 !important;
+            }
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <nav class="navbar navbar-default navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#menuBtn" aria-expanded="false">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="/">
+                    <img src="{% static 'dist/img/logo-mini.svg' %}" padding="0" alt="logo">
+                </a>
+            </div>
+
+            <div class="collapse navbar-collapse" id="menuBtn">
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="{% url 'main:home_page' %}">Strona główna</a></li>
+                    <li><a href="{% url 'main:about_page' %}">O nas</a></li>
+                    <li><a href="https://avada-media.ua/moydom24/">Warunki zakupu</a></li>
+                    <li><a href="{% url 'main:services_page' %}">Usługi</a></li>
+                    <li><a href="{% url 'main:contacts_page' %}">Kontakty</a></li>
+                    <li><a href="{% url 'authentication:login' %}"><i class="bi bi-box-arrow-in-right"></i> Logowanie</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-xs-12 text-center">
+                    <p class="text-muted">Opracowano przez SpaceLab</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+<!-- Popper.js -->
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+        crossorigin="anonymous"></script>
+
+<!-- Bootstrap -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.min.js"
+        crossorigin="anonymous"></script>
+
+<!-- OverlayScrollbars -->
+<script src="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.11.0/browser/overlayscrollbars.browser.es6.min.js"
+        crossorigin="anonymous"></script>
+
+<script src="{% static 'bower_components/jquery/dist/jquery.min.js' %}"></script>
+<script src="{% static 'bower_components/bootstrap/dist/js/bootstrap.min.js' %}"></script>
+<script src="{% static 'bower_components/select2/dist/js/select2.full.min.js' %}"></script>
+<script src="{% static 'bower_components/select2/dist/js/i18n/pl.js' %}"></script>
+<script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+<script src="{% static 'dist/js/adminlte.js' %}"></script>
+
+<script src="{% static 'bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js' %}"></script>
+<script src="{% static 'bower_components/fastclick/lib/fastclick.js' %}"></script>
+<script src="{% static 'dist/js/adminlte.min.js' %}"></script>
+<script src="{% static 'plugins/iCheck/icheck.min.js' %}"></script>
+<script src="{% static 'plugins/bootstrap-wysihtml5/bootstrap3-wysihtml5.all.js' %}"></script>
+<script src="{% static 'plugins/bootstrap-wysihtml5/bootstrap-wysihtml5.ru-RU.js' %}"></script>
+<script src="{% static 'bower_components/jquery-sparkline/dist/jquery.sparkline.min.js' %}"></script>
+<script src="{% static 'plugins/jvectormap/jquery-jvectormap-1.2.2.min.js' %}"></script>
+<script src="{% static 'plugins/jvectormap/jquery-jvectormap-world-mill-en.js' %}"></script>
+<script src="{% static 'bower_components/jquery-slimscroll/jquery.slimscroll.min.js' %}"></script>
+<script src="{% static 'bower_components/chart.js/Chart.js' %}"></script>
+<script src="{% static 'dist/js/main.js' %}"></script>
+<script src="{% static 'dist/js/custom.js' %}"></script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

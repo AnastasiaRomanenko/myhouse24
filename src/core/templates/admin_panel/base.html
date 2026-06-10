@@ -1,12 +1,12 @@
 {% load static %}
 
 <!DOCTYPE html>
-<html lang="ru-RU" style="height: auto; min-height: 100%;">
+<html lang="pl" style="height: auto; min-height: 100%;">
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
-    <link rel="icon" type="image/png" href="https://myhouse24.demodev.cc/favicon.png">
+    <link rel="icon" type="image/png" href="{% static 'assets/favicon.png' %}">
     <meta name="csrf-param" content="_csrf-backend">
     <title>{{ page_title }}</title>
     <link href="{% static 'bower_components/bootstrap/dist/css/bootstrap.css' %}" rel="stylesheet">
@@ -26,11 +26,14 @@
     <link href="{% static 'dist/css/style.css' %}" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic" rel="stylesheet">
     <link href="{% static 'dist/css/custom.css' %}" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/jquery.dataTables.min.css">
+
     <script>
         var s2options_7ebc6538 = {"themeCss":".select2-container--default","sizeCss":"","doReset":true,"doToggle":false,"doOrder":false};
-        window.select2_0d896465 = {"minimumResultsForSearch":-1,"dropdownAutoWidth":true,"theme":"default","width":"100%","placeholder":"","language":"ru-RU"};
+        window.select2_0d896465 = {"minimumResultsForSearch":-1,"dropdownAutoWidth":true,"theme":"default","width":"100%","placeholder":"","language":"pl"};
 
-        window.kvDatepicker_1643d6f1 = {"autoclose":true,"format":"dd.mm.yyyy","language":"ru"};
+        window.kvDatepicker_1643d6f1 = {"autoclose":true,"format":"dd.mm.yyyy","language":"pl"};
     </script>
     <style type="text/css">
         .jqstooltip {
@@ -56,140 +59,195 @@
             text-align: left;
         }
     </style>
+    {% block extra_css %}
+    {% endblock %}
 </head>
 <body class="skin-black-light sidebar-mini fixed sidebar-mini-expand-feature" style="height: auto; min-height: 100%;">
-<div class="wrapper" style="height: auto; min-height: 100%;">
-    <header class="main-header">
-        <!-- Logo -->
-        <a href="#" class="logo">
-            <span class="logo-mini">
-                <img src="{% static 'dist/img/logo-mini.svg' %}" class="img-responsive" alt="">
-            </span>
-            <span class="logo-lg">
-                <img src="{% static 'dist/Img/logo.svg' %}" class="img-responsive" alt="">
-            </span>
-        </a>
-
-        <!-- Header Navbar -->
-        <nav class="navbar navbar-static-top">
-            <!-- Sidebar toggle button-->
-            <a href="#" class="sidebar-toggle" data-toggle="push-menu" role="button">
-                <span class="sr-only">Toggle navigation</span>
+    <div class="wrapper" style="height: auto; min-height: 100%;">
+        <header class="main-header">
+            <!-- Logo -->
+            <a href="#" class="logo">
+                <span class="logo-mini">
+                    <img src="{% static 'dist/img/logo-mini.svg' %}" class="img-responsive" alt="">
+                </span>
             </a>
-            <!-- Header title -->
-            <div class="header-title">Панель администратора</div>
-            <!-- Navbar Right Menu -->
-            <div class="navbar-custom-menu">
-                <ul class="nav navbar-nav">
-                    <!-- Notifications -->
-                    <!-- User Account -->
-                    <li class="dropdown user user-menu">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                            <i class="fa fa-user-circle text-purple"></i>
-                            {% if request.user.is_authenticated %}
-                            <span class="hidden-xs">
-                                {{ request.user.get_full_name|default:request.user.email }}
-                            </span>
-                            {% endif %}
-                        </a>
-                        <ul class="dropdown-menu">
-                            <!-- User image -->
-                            <li class="user-header">
-                                <!--<img src="/admin/dist/img/user2-160x160.jpg" class="img-circle" alt="Nana Nanovna">-->
-                                <span><i class="fa fa-user-circle text-purple bg-gray-light img-circle"></i></span>
-                                {% if request.user.is_authenticated %}
-                                <p>Nana Nanovna (Директор)</p>
-                                {% endif %}
-                            </li>
-                            <!-- Menu Footer-->
-                            <li class="user-footer">
-                                <div class="pull-left">
-                                    <a class="btn btn-default btn-flat" href="#">Профиль</a>                                </div>
-                                <div class="pull-right">
-                                    <a class="btn btn-default btn-flat" href="#" data-method="post">Выход</a>                                </div>
-                            </li>
-                        </ul>
-                    </li>
-                </ul>
-            </div>
-        </nav>
-    </header>
 
-    <!-- Left side column. contains the logo and sidebar -->
-    <aside class="main-sidebar">
-    <!-- sidebar -->
-        <div class="slimScrollDiv" style="position: relative; overflow: hidden; width: auto; height: 933.823532px;">
-            <section class="sidebar" style="overflow: hidden; width: auto; height: 933.823532px;">
-                <ul class="sidebar-menu tree" data-widget="tree"><li><a href="#"><i class="fa fa-line-chart"></i>  <span>Статистика</span></a></li>
-                    <li><a href="#"><i class="fa fa-dollar"></i>  <span>Касса</span></a></li>
-                    <li><a href="#"><i class="fa fa-files-o"></i>  <span>Квитанции на оплату</span></a></li>
-                    <li><a href="#"><i class="fa fa-credit-card"></i>  <span>Лицевые счета</span></a></li>
-                    <li><a href="#"><i class="fa fa-key"></i>  <span>Квартиры</span></a></li>
-                    <li class="active"><a href="/admin/user/index"><i class="fa fa-users"></i>  <span>Владельцы квартир</span></a></li>
-                    <li><a href="#"><i class="fa fa-building"></i>  <span>Дома</span></a></li>
-                    <li><a href="#"><i class="fa fa-envelope-o"></i>  <span>Сообщения</span></a></li>
-                    <li><a href="#"><i class="fa fa-wrench"></i>  <span>Заявки вызова мастера</span></a></li>
-                    <li><a href="#"><i class="fa fa-dashboard"></i>  <span>Показания счетчиков</span></a></li>
-                    <li class="treeview"><a href="#!"><i class="fa fa-desktop"></i>  <span>Управление сайтом</span> <span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span></a>
-                        <ul class="treeview-menu">
-                            <li><a href="#"><i class="fa fa-circle-o"></i>  <span>Главная страница</span></a></li>
-                            <li><a href="#"><i class="fa fa-circle-o"></i>  <span>О нас</span></a></li>
-                            <li><a href="#"><i class="fa fa-circle-o"></i>  <span>Услуги</span></a></li>
-                            <li><a href="#"><i class="fa fa-circle-o"></i>  <span>Тарифы</span></a></li>
-                            <li><a href="#"><i class="fa fa-circle-o"></i>  <span>Контакты</span></a></li>
-                         </ul>
+            <!-- Header Navbar -->
+            <nav class="navbar navbar-static-top">
+                <!-- Sidebar toggle button-->
+                <a href="#" class="sidebar-toggle" data-toggle="push-menu" role="button">
+                    <span class="sr-only">Toggle navigation</span>
+                </a>
+                <!-- Header title -->
+                <div class="header-title">Panel administracyjny</div>
+                <!-- Navbar Right Menu -->
+                <div class="navbar-custom-menu">
+                    <ul class="nav navbar-nav">
+                        <!-- Notifications -->
+                        <!-- User Account -->
+                        <li class="dropdown user user-menu">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                <i class="fa fa-user-circle text-purple"></i>
+                                {% if request.user.is_authenticated %}
+                                <span class="hidden-xs">
+                                    {{ request.user.get_full_name|default:request.user.email }}
+                                </span>
+                                {% endif %}
+                            </a>
+                            <ul class="dropdown-menu">
+                                <!-- User image -->
+                                <li class="user-header">
+                                    <img src="{% static 'dist/img/default-avatar.jpg' %} " class="img-circle" alt="admin">
+                                    {% if request.user.is_authenticated %}
+                                    <p>{{ user.get_full_name|default:"-" }}</p>
+
+                                    {% endif %}
+                                </li>
+                                <!-- Menu Footer-->
+                                <li class="user-footer">
+                                    <div class="pull-left">
+                                        <a class="btn btn-default btn-flat" href="{% url 'users:admin_profile' user.id %}">Profil</a>
+                                    </div>
+                                    <div class="pull-right">
+                                        <form action="{% url 'authentication:logout' %}" method="post">
+                                            {% csrf_token %}
+                                            <button class="btn btn-default btn-flat" type="submit">Wyloguj</button>
+                                        </form>
+                                    </div>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+        </header>
+
+        <!-- Left side column. contains the logo and sidebar -->
+        <aside class="main-sidebar">
+        <!-- sidebar -->
+            <div class="slimScrollDiv" style="position: relative; overflow: hidden; width: auto; height: 933.823532px;">
+                <section class="sidebar" style="overflow: hidden; width: auto; height: 933.823532px;">
+                    <ul class="sidebar-menu tree" data-widget="tree">
+                        {% if request.user.role.has_statistics %}
+                        <li><a href="{% url 'finances:statistics' %}"><i class="fa fa-line-chart"></i>  <span>Statystyki</span></a></li>
+                        {% endif %}
+
+                        {% if request.user.role.has_cash_register %}
+                        <li><a href="{% url 'finances:accounting_list' %}"><i class="fa fa-dollar"></i>  <span>Kasa</span></a></li>
+                        {% endif %}
+
+                        {% if request.user.role.has_cash_register %}
+                        <li><a href="{% url 'finances:payment_receipts_list' %}"><i class="fa fa-files-o"></i>  <span>Rachunki do zapłaty</span></a></li>
+                        {% endif %}
+
+                        {% if request.user.role.has_bank_books %}
+                        <li><a href="{% url 'finances:bank_books_list' %}"><i class="fa fa-credit-card"></i>  <span>Konta osobiste</span></a></li>
+                        {% endif %}
+
+                        {% if request.user.role.has_flats %}
+                        <li><a href="{% url 'buildings:flat_list' %}"><i class="fa fa-key"></i>  <span>Mieszkania</span></a></li>
+                        {% endif %}
+
+                        {% if request.user.role.has_flats_owners %}
+                        <li><a href="{% url 'users:owner_list' %}"><i class="fa fa-users"></i>  <span>Właściciele mieszkań</span></a></li>
+                        {% endif %}
+
+                        {% if request.user.role.has_houses %}
+                        <li><a href="{% url 'buildings:house_list' %}"><i class="fa fa-building"></i>  <span>Budynki</span></a></li>
+                        {% endif %}
+
+                        {% if request.user.role.has_messages %}
+                        <li><a href="{% url 'finances:messages_list' %}"><i class="fa fa-envelope-o"></i>  <span>Wiadomości</span></a></li>
+                        {% endif %}
+
+                        {% if request.user.role.has_requests %}
+                        <li><a href="{% url 'finances:requests_list' %}"><i class="fa fa-wrench"></i>  <span>Zgłoszenia serwisowe</span></a></li>
+                        {% endif %}
+
+                        {% if request.user.role.has_meter_readings %}
+                        <li><a href="{% url 'finances:meter_readings_list' %}"><i class="fa fa-dashboard"></i>  <span>Odczyty liczników</span></a></li>
+                        {% endif %}
+
+                        {% if request.user.role.has_site_management %}
+                        <li class="treeview"><a href="#!"><i class="fa fa-desktop"></i>  <span>Zarządzanie stroną</span> <span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span></a>
+                            <ul class="treeview-menu">
+                                <li><a href="{% url 'main:main_update' %}"><i class="fa fa-circle-o"></i>  <span>Strona główna</span></a></li>
+                                <li><a href="{% url 'main:about_update' %}"><i class="fa fa-circle-o"></i>  <span>O nas</span></a></li>
+                                <li><a href="{% url 'main:services_update' %}"><i class="fa fa-circle-o"></i>  <span>Usługi</span></a></li>
+                                <li><a href="{% url 'main:contact_update' %}"><i class="fa fa-circle-o"></i>  <span>Kontakty</span></a></li>
+                             </ul>
+                        </li>
+                        {% endif %}
+
+                        {% if request.user.role.has_services or request.user.role.has_tariffs or request.user.role.has_roles or request.user.role.has_users or request.user.role.has_payment_details %}
+                        <li class="treeview"><a href="#!"><i class="fa fa-cogs"></i>  <span>Ustawienia systemu</span> <span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span></a>
+                            <ul class="treeview-menu">
+                                {% if request.user.role.has_services %}
+                                    <li><a href="{% url 'settings:services_update' %}"><i class="fa fa-briefcase"></i><span>Usługi</span></a></li>
+                                {% endif %}
+
+                                {% if request.user.role.has_tariffs %}
+                                    <li><a href="{% url 'settings:tariffs_list' %}"><i class="fa fa-money"></i><span>Taryfy</span></a></li>
+                                {% endif %}
+
+                                {% if request.user.role.has_roles and request.user.is_superuser %}
+                                    <li><a href="{% url 'users:roles_list' %}"><i class="fa fa-user"></i><span>Role</span></a></li>
+                                {% endif %}
+
+                                {% if request.user.role.has_users %}
+                                    <li><a href="{% url 'users:admin_list' %}"><i class="fa fa-user-plus"></i><span>Użytkownicy</span></a></li>
+                                {% endif %}
+
+                                {% if request.user.role.has_payment_details %}
+                                    <li><a href="{% url 'settings:payment_details' %}"><i class="fa fa-credit-card"></i><span>Dane płatnicze</span></a></li>
+                                {% endif %}
+                                {% if request.user.role.has_payment_items %}
+                                    <li><a href="{% url 'settings:payment_items_list' %}"><i class="fa fa-list-ol"></i><span>Pozycje płatności</span></a></li>
+                                {% endif %}
+                                {% if request.user.role.has_payment_details %}
+                                    <li><a href="{% url 'settings:receipt_templates' %}"><i class="fa fa-file-text-o"></i><span>Szablony rachunków</span></a></li>
+                                {% endif %}
+                            </ul>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </section>
+                <div class="slimScrollBar" style="background: rgb(0, 0, 0); width: 7px; position: absolute; top: -9.926514px; opacity: 0.4; display: none; border-radius: 7px; z-index: 99; right: 1px; height: 953.750292px;">
+
+                </div>
+                <div class="slimScrollRail" style="width: 7px; height: 100%; position: absolute; top: 0px; display: none; border-radius: 7px; background: rgb(51, 51, 51); opacity: 0.2; z-index: 90; right: 1px;">
+
+                </div>
+            </div>
+            <!-- /.sidebar -->
+        </aside>
+        <div class="content-wrapper" style="min-height: 903.823529px;">
+            <section class="content-header">
+            <h1>{% block page_title %}{{ page_title|default:"Panel administracyjny" }}{% endblock %}</h1>
+                <ul class="breadcrumb">
+                    {% block breadcrumbs %}
+                    <li class="breadcrumb-item"><a href="{% url 'finances:statistics' %}"><i class="fa fa-home"></i><span>Strona główna</span></a></li>
+
+                    {% if breadcrumbs %}
+                    {% for crumb in breadcrumbs %}
+                    <li class="breadcrumb-item">
+                        <a href="{{ crumb.url }}">{{ crumb.title }}</a>
                     </li>
-                    <li class="treeview"><a href="#!"><i class="fa fa-cogs"></i>  <span>Настройки системы</span> <span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span></a>
-                        <ul class="treeview-menu">
-                            <li><a href="#"><i class="fa fa-briefcase"></i>  <span>Услуги</span></a></li>
-                            <li><a href="#"><i class="fa fa-money"></i>  <span>Тарифы</span></a></li>
-                            <li><a href="/#"><i class="fa fa-user"></i>  <span>Роли</span></a></li>
-                            <li><a href="#"><i class="fa fa-user-plus"></i>  <span>Пользователи</span></a></li>
-                            <li><a href="#"><i class="fa fa-credit-card"></i>  <span>Платежные реквизиты</span></a></li>
-                            <li><a href="#"><i class="fa fa-list-ol"></i>  <span>Статьи платежей</span></a></li>
-                        </ul>
-                    </li>
+                    {% endfor %}
+                    {% endif %}
+                    {% endblock %}
                 </ul>
             </section>
-            <div class="slimScrollBar" style="background: rgb(0, 0, 0); width: 7px; position: absolute; top: -9.926514px; opacity: 0.4; display: none; border-radius: 7px; z-index: 99; right: 1px; height: 953.750292px;">
 
-            </div>
-            <div class="slimScrollRail" style="width: 7px; height: 100%; position: absolute; top: 0px; display: none; border-radius: 7px; background: rgb(51, 51, 51); opacity: 0.2; z-index: 90; right: 1px;">
-
-            </div>
+            <section class="content">
+                {% block content %}{% endblock %}
+            </section>
         </div>
-        <!-- /.sidebar -->
-    </aside>
-    <div class="content-wrapper" style="min-height: 903.823529px;">
-        <section class="content-header">
-        <h1>{% block page_title %}{{ page_title|default:"Панель администратора" }}{% endblock %}</h1>
-                    <ul class="breadcrumb">
-                        {% block breadcrumbs %}
-                        <li class="breadcrumb-item"><a href="#">Главная</a></li>
-                        {% if breadcrumbs %}
-                        {% for crumb in breadcrumbs %}
-                        <li class="breadcrumb-item">
-                            <a href="{{ crumb.url }}">{{ crumb.title }}</a>
-                        </li>
-                        {% endfor %}
-                        {% endif %}
-                        {% endblock %}
-                    </ul>
-        </section>
 
-    <section class="content">
-
-        <div class="row">
-            {% block content %}{% endblock %}
-        </div>
-    </section>
-</div>
-
-<footer class="main-footer">
-    Разработано <a href="https://avada-media.ua">AVADA-MEDIA</a>. На базе системы управления <a href="https://avadacrm.com/uk/portfolio/myhome24/">"МойДом24"</a>.
-    Документация API доступна <a href="https://myhouse24.demodev.cc/frontend/web/doc/">по ссылке</a>.
-</footer>
-</div>
+        <footer class="main-footer">
+            Opracowano przez SpaceLab.
+        </footer>
+    </div>
 
 <!-- Popper.js -->
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
@@ -203,22 +261,14 @@
 <script src="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.11.0/browser/overlayscrollbars.browser.es6.min.js"
         crossorigin="anonymous"></script>
 
-<!-- AdminLTE -->
-<script src="{% static 'dist/js/adminlte.js' %}"></script>
-<!--<script>-->
-<!--    // Автоматическое скрытие сообщений через 5 секунд-->
-<!--    $(function () {-->
-<!--        setTimeout(function () {-->
-<!--            $('.alert-dismissible').alert('close');-->
-<!--        }, 5000);-->
-<!--    });-->
-<!--</script>-->
-<script src="{% static 'bower_components/bootstrap/dist/js/bootstrap.min.js' %}"></script>
-<script src="{% static 'bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js' %}"></script>
-<script src="{% static 'bower_components/fastclick/lib/fastclick.js' %}"></script>
-<script src="{% static 'dist/js/adminlte.min.js' %}"></script>
 <script src="{% static 'bower_components/jquery/dist/jquery.min.js' %}"></script>
 <script src="{% static 'bower_components/bootstrap/dist/js/bootstrap.min.js' %}"></script>
+<script src="{% static 'bower_components/select2/dist/js/select2.full.min.js' %}"></script>
+<script src="{% static 'bower_components/select2/dist/js/i18n/pl.js' %}"></script>
+<script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+
+<script src="{% static 'bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js' %}"></script>
+<script src="{% static 'bower_components/fastclick/lib/fastclick.js' %}"></script>
 <script src="{% static 'dist/js/adminlte.min.js' %}"></script>
 <script src="{% static 'plugins/iCheck/icheck.min.js' %}"></script>
 <script src="{% static 'plugins/bootstrap-wysihtml5/bootstrap3-wysihtml5.all.js' %}"></script>
@@ -230,6 +280,7 @@
 <script src="{% static 'bower_components/chart.js/Chart.js' %}"></script>
 <script src="{% static 'dist/js/main.js' %}"></script>
 <script src="{% static 'dist/js/custom.js' %}"></script>
+
 {% block extra_js %}{% endblock %}
 
 </body>

@@ -1,0 +1,146 @@
+{% extends 'admin_panel/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="row">
+    <div class="col-xs-12">
+        <div class="pull-right margin-bottom">
+            <a class="btn btn-success" href="{% url 'finances:meter_readings_create' %}">
+                Dodaj odczyt
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-xs-12">
+        <div class="box">
+            <div class="box-header with-border">
+                <h3 class="box-title"></h3>
+                <div class="box-tools">
+                    <button type="button" id="clear-filters" class="btn btn-default btn-sm">
+                        <span class="hidden-xs">Wyczyść</span><i class="fa fa-eraser visible-xs" aria-hidden="true"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div id="w0" class="grid-view">
+                <div class="box-body table-responsive no-padding">
+                    <table id="meter-readings-table" class="table table-bordered table-hover table-striped linkedRow" width="100%">
+                        <thead>
+                            <tr>
+                                <th style="min-width: 200px">Budynek</th>
+                                <th style="min-width: 160px">Sekcja</th>
+                                <th style="width: 110px; min-width: 110px">Nr mieszkania</th>
+                                <th>Licznik</th>
+                                <th style="width: 90px; min-width: 90px">Odczyty</th>
+                                <th style="width: 90px; min-width: 90px">Jedn. miary</th>
+                                <th style="width: 80px; min-width: 80px">&nbsp;</th>
+                            </tr>
+                            <tr class="filters">
+                                <th><input type="text" class="form-control form-control-sm dt-filter" data-name="house"></th>
+                                <th><input type="text" class="form-control form-control-sm dt-filter" data-name="section"></th>
+                                <th><input type="text" class="form-control form-control-sm dt-filter" data-name="flat_number"></th>
+                                <th><input type="text" class="form-control form-control-sm dt-filter" data-name="meter_type"></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+                <div class="box-footer clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(function () {
+    var urlParams = new URLSearchParams(window.location.search);
+    window._meterFlatId = urlParams.get('flat_id') || '';
+
+    $('[data-toggle="tooltip"]').tooltip();
+
+    var table = $('#meter-readings-table').DataTable({
+        processing: true,
+        serverSide: true,
+        searching: false,
+        lengthChange: true,
+        pageLength: 25,
+        orderCellsTop: true,
+        autoWidth: false,
+        ajax: {
+            url: "{% url 'finances:meter_readings_ajax_list' %}",
+            type: "GET",
+            data: function (d) {
+                d.house = $('[data-name="house"]').val();
+                d.section = $('[data-name="section"]').val();
+                d.flat_number = $('[data-name="flat_number"]').val();
+                d.meter_type = $('[data-name="meter_type"]').val();
+                d.flat_id = window._meterFlatId || '';
+            }
+        },
+        order: [[2, 'desc']],
+        columns: [
+            {data: 'house', name: 'house', orderable: false, searchable: false},
+            {data: 'section', name: 'section', orderable: false, searchable: false},
+            {data: 'flat', name: 'flat'},
+            {data: 'meter_type', name: 'meter_type'},
+            {data: 'current_data', name: 'current_data'},
+            {data: 'unit', name: 'unit', orderable: false, searchable: false},
+            {data: 'actions', name: 'actions', orderable: false, searchable: false}
+        ],
+        createdRow: function (row, data) {
+            if (data.row_href) {
+                $(row).attr('data-href', data.row_href);
+                $(row).attr('data-key', data.id);
+                $(row).css('cursor', 'pointer');
+            }
+        },
+        drawCallback: function () {
+            $('[data-toggle="tooltip"]').tooltip();
+        },
+        language: {
+            processing: "Ładowanie...",
+            lengthMenu: "Pokaż _MENU_ rekordów",
+            zeroRecords: "Nic nie znaleziono",
+            info: "Pokazano od _START_ do _END_ z _TOTAL_ rekordów",
+            infoEmpty: "Brak rekordów",
+            infoFiltered: "(przefiltrowano z _MAX_ rekordów)",
+            paginate: {
+                first: "Pierwsza",
+                last: "Ostatnia",
+                next: "»",
+                previous: "«"
+            }
+        }
+    });
+
+    var reloadTable = function () {
+        table.ajax.reload(null, true);
+    };
+
+    var debounceTimer = null;
+    $(document).on('input', '.dt-filter[type="text"]', function () {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(reloadTable, 400);
+    });
+
+    $(document).on('change', 'select.dt-filter', reloadTable);
+
+    $('#clear-filters').on('click', function () {
+        $('.dt-filter').val('');
+        reloadTable();
+    });
+
+    $(document).on('click', '#meter-readings-table tbody tr[data-href]', function (e) {
+        if ($(e.target).closest('a, button, form').length) return;
+        window.location.href = $(this).data('href');
+    });
+});
+</script>
+{% endblock %}

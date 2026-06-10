@@ -1,0 +1,155 @@
+{% extends 'admin_panel/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="row">
+    <div class="col-xs-12 col-md-7 col-lg-6">
+        <div class="page-header-spec">
+            <div class="form-group">
+                <div class="input-group date">
+                    <div class="input-group-addon">№</div>
+                    <div class="form-control pull-right">{{ invoice.random_number }}</div>
+                </div>
+            </div>
+            <span class="label-mid">z dnia</span>
+            <div class="form-group">
+                <div class="input-group date">
+                    <div class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></div>
+                    <div class="form-control pull-right">{{ invoice.date_from|date:"d.m.Y" }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="box">
+    <div class="box-header with-border">
+        <h3 class="box-title">Podgląd rachunku</h3>
+        <div class="box-tools">
+            <a href="{% url 'finances:payment_receipts_print' invoice.id %}" class="btn btn-default btn-sm">
+                <i class="fa fa-print"></i> <span class="hidden-xs">Drukuj</span>
+            </a>
+            <a href="{% url 'finances:payment_receipts_update' invoice.id %}" class="btn btn-primary btn-sm">
+                <span class="hidden-xs">Edytuj rachunek</span><i class="fa fa-pencil visible-xs" aria-hidden="true"></i>
+            </a>
+            <form method="post" action="{% url 'finances:payment_receipts_delete' invoice.id %}" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-default btn-sm" onclick="return confirm('Usuń rachunek?');">
+                    <span class="hidden-xs">Usuń</span><i class="fa fa-trash visible-xs" aria-hidden="true"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+    <div class="box-body">
+        <table class="table table-bordered table-striped table-view">
+            <tbody>
+                <tr>
+                    <td>Zaksięgowanie</td>
+                    <td>
+                        {% if invoice.completed %}
+                            <small class="label label-success">Zaksięgowano</small>
+                        {% else %}
+                            <small class="label label-default">Nie zaksięgowano</small>
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <td>Status</td>
+                    <td>
+                        {% if invoice.status == 'paid' %}
+                            <small class="label label-success">{{ invoice.get_status_display }}</small>
+                        {% elif invoice.status == 'partially paid' %}
+                            <small class="label label-warning">{{ invoice.get_status_display }}</small>
+                        {% else %}
+                            <small class="label label-danger">{{ invoice.get_status_display }}</small>
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <td>Okres</td>
+                    <td>{{ invoice.period_from|date:"d.m.Y" }} - {{ invoice.period_to|date:"d.m.Y" }}</td>
+                </tr>
+                <tr>
+                    <td>Właściciel</td>
+                    <td>
+                        {% if invoice.flat.owner %}
+                            <a href="{% url 'users:owner_profile' invoice.flat.owner.id %}">{{ invoice.flat.owner.get_full_name|default:invoice.flat.owner.email }}</a>
+                        {% else %}-{% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <td>Konto osobiste</td>
+                    <td>
+                        {% if invoice.bank_book %}
+                            <a href="{% url 'finances:bank_books_detail' invoice.bank_book.id %}">{{ invoice.bank_book.random_number }}</a>
+                        {% else %}-{% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <td>Telefon</td>
+                    <td>{{ invoice.flat.owner.phone_number|default:"" }}</td>
+                </tr>
+                <tr>
+                    <td>Budynek</td>
+                    <td>
+                        {% if invoice.flat.house %}
+                            <a href="{% url 'buildings:house_detail' invoice.flat.house.id %}">{{ invoice.flat.house.title }}</a>
+                        {% else %}-{% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <td>Mieszkanie</td>
+                    <td>
+                        {% if invoice.flat %}
+                            <a href="{% url 'buildings:flat_detail' invoice.flat.id %}">{{ invoice.flat.number }}</a>
+                        {% else %}-{% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <td>Sekcja</td>
+                    <td>{{ invoice.flat.section.title|default:"-" }}</td>
+                </tr>
+                <tr>
+                    <td>Taryfa</td>
+                    <td>{{ invoice.tariff.title|default:"-" }}</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="table-responsive no-padding margin-top-15">
+            <table class="table table-bordered table-striped">
+                <thead>
+                    <tr>
+                        <th style="width: 40px; min-width: 40px;">#</th>
+                        <th>Usługa</th>
+                        <th style="width: 80px; min-width: 80px;">Jedn. miary</th>
+                        <th>Cena za jedn., zł</th>
+                        <th>Ilość</th>
+                        <th>Wartość, zł</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for line in lines %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ line.service.title }}</td>
+                        <td>{{ line.service.unit_of_measurement.title }}</td>
+                        <td>{{ line.price }}</td>
+                        <td>{{ line.amount }}</td>
+                        <td>{{ line.price|floatformat:2 }} × {{ line.amount }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="6" class="text-center">Brak usług</td></tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="5"></td>
+                        <td><b>Razem: {{ total_amount }}</b></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

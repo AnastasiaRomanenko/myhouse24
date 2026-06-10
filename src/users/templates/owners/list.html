@@ -3,136 +3,224 @@
 
 {% block content %}
 
-<div class="container mt-4">
-    {% if data %}
+<div class="row">
+    <div class="col-xs-12">
+        <div class="btn-group pull-right margin-bottom">
+            <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Wybierz akcję
+                <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu">
+                <li>
+                    <a href="{% url 'users:owner_create' %}">Dodaj właściciela mieszkania</a>
+                </li>
+                <li>
+                    <a href="#">Wyślij wiadomość do dłużników</a>
+                </li>
+                <li>
+                    <a href="{% url 'users:owner_invite' %}">Wyślij zaproszenie</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+<div class="row">
     <div class="col-xs-12">
         <div class="box">
             <div class="box-header with-border">
                 <h3 class="box-title"></h3>
                 <div class="box-tools">
-                    <a href="#" class="btn btn-default btn-sm">
-                        <span class="hidden-xs">Очистить</span><i class="fa fa-eraser visible-xs" aria-hidden="true"></i>
+                    <a href="{% url 'users:owner_list' %}" id="clear-filters" class="btn btn-default btn-sm">
+                        <span class="hidden-xs">Wyczyść</span><i class="fa fa-eraser visible-xs" aria-hidden="true"></i>
                     </a>
                 </div>
             </div>
 
             <div id="w0" class="grid-view">
                 <div class="box-body table-responsive no-padding">
-                    <table id="myTable" class="table table-bordered table-hover table-striped linkedRow">
+                    <table id="owner-table" class="table table-bordered table-hover table-striped linkedRow">
                         <thead>
                             <tr>
                                 <th>ID</th>
-                                <th><a href="?sort=name">ФИО</a></th>
-                                <th>Телефон</th>
+                                <th><a href="?sort=full_name">Imię i nazwisko</a></th>
+                                <th>Telefon</th>
                                 <th>Email</th>
-                                <th>Дом</th>
-                                <th>Квартира</th>
-                                <th><a href="?sort=name">Добавлен</a></th>
-                                <th>Статус</th>
-                                <th>Есть долг</th>
-                                <th></th>
-                                <th style="width: 114px; min-width: 114px">&nbsp;</th>
+                                <th>Budynek</th>
+                                <th>Mieszkanie</th>
+                                <th><a href="?sort=date_joined">Dodano</a></th>
+                                <th>Status</th>
+                                <th>Dług</th>
+                                <th style="width: 129px; min-width: 129px">&nbsp;</th>
                             </tr>
                             <tr id="w0-filters" class="filters">
                                 <form method="GET">
-                                    <td><input type="number" class="form-control" name="name" value="{{ request.GET.id }}"></td>
-                                    <td><input type="text" class="form-control" name="name" value="{{ request.GET.name }}"></td>
-                                    <td><input type="text" class="form-control" name="phone" value="{{ request.GET.phone }}"></td>
-                                    <td><input type="text" class="form-control" name="email" value="{{ request.GET.email }}"></td>
-                                    <td> </td>
-                                    <td> </td>
-                                    <td><input type="text" class="form-control" name="flat" value="{{ request.GET.flat }}"></td>
-                                    <td><input type="date" class="form-control" name="date_joined" value="{{ request.GET.date_joined }}"></td>
-                                    <td>
-                                        <select class="form-control" name="status">
+                                    <th>
+                                        <input type="text" class="form-control form-control-sm dt-filter" data-name="external_id">
+                                    </th>
+                                    <th>
+                                        <input type="text" class="form-control form-control-sm dt-filter" data-name="full_name">
+                                    </th>
+                                    <th>
+                                        <input type="text" class="form-control form-control-sm dt-filter" data-name="phone_number">
+                                    </th>
+                                    <th>
+                                        <input type="text" class="form-control form-control-sm dt-filter" data-name="email">
+                                    </th>
+                                    <th>
+                                        <select id="owner-house-filter" class="form-control form-control-sm dt-filter" data-name="house">
                                             <option value=""></option>
-                                            <option value="active" {% if request.GET.status == 'active' %}selected{% endif %}>Активен</option>
-                                            <option value="new" {% if request.GET.status == 'new' %}selected{% endif %}>Новый</option>
-                                            <option value="disabled" {% if request.GET.status == 'disabled' %}selected{% endif %}>Отключен</option>
                                         </select>
-                                    </td>
-                                    <td>&nbsp;</td>
+                                    </th>
+                                    <th>
+                                        <input type="text" class="form-control form-control-sm dt-filter" data-name="flat">
+                                    </th>
+                                    <th>
+                                        <input type="text" class="form-control form-control-sm dt-filter" data-name="date_joined">
+                                    </th>
+                                    <th>
+                                        <select class="form-control form-control-sm dt-filter" data-name="status">
+                                            <option value=""></option>
+                                            <option value="active">Aktywny</option>
+                                            <option value="new">Nowy</option>
+                                            <option value="inactive">Nieaktywny</option>
+                                        </select>
+                                    </th>
+                                    <th>
+                                        <input type="text" class="form-control form-control-sm dt-filter" data-name="dept">
+                                    </th>
+                                    <th></th>
                                 </form>
                             </tr>
                         </thead>
-                        <tbody>
-                            {% for user in data %}
-                                <tr data-href="#" data-key="{{ user.id }}">
-                                    <td>{{ user.external_id }}</td>
-                                    <td>{{ user.first_name|default:"-" }} {{ user.last_name|default:"-" }} {{ user.patronimic_name|default:"-" }}</td>
-                                    <td>{{ user.phone_number|default:"-" }}</td>
-                                    <td>{{ user.email }}</td>
-                                    <td>{{ user.houses|default:"-" }}</td>
-                                    <td>{{ user.flats|default:"-" }}</td>
-                                    <td>{{ user.date_joined|default:"-" }}</td>
-                                    <td>
-                                        {% if user.status == 'active' %}
-                                            <small class="label label-success">Активен</small>
-                                        {% elif user.status == 'new' %}
-                                            <small class="label label-warning">Новый</small>
-                                        {% else %}
-                                            <small class="label label-danger">Отключен</small>
-                                        {% endif %}
-                                    </td>
-                                    <td>{{ user.has_dept|default:"-" }}</td>
-
-                                    <td>
-                                        <a href="#" class="btn btn-default btn-sm"><i class="fa fa-envelope"></i></a>
-                                        <a href="#" class="btn btn-default btn-sm"><i class="fa fa-pen"></i></a>
-                                        <form method="POST" action="#" style="display: inline;">
-                                            {% csrf_token %}
-                                            <button type="submit" class="btn btn-default btn-sm"
-                                                    onclick="return confirm('Вы уверены, что хотите удалить этот элемент?');">
-                                                <i class="fa fa-trash"></i>
-                                            </button>
-                                        </form>
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
+                        <tbody></tbody>
                     </table>
                 </div>
             </div>
         </div>
-        {% else %}
-        <p>No users yet.</p>
-        {% endif %}
     </div>
 </div>
 {% endblock %}
 {% block extra_js %}
 <script>
-jQuery(function () {
-    jQuery('#myTable').DataTable({
-        order: [[1, 'desc']],
-        pageLength: 50,
-        lengthChange: false,
-        searching: true,
-        paging: true,
-        info: false,
-        autoWidth: false
+    $(function () {
+        $('[data-toggle="tooltip"]').tooltip();
+
+        var table = $('#owner-table').DataTable({
+            processing: true,
+            serverSide: true,
+            searching: false,
+            lengthChange: true,
+            pageLength: 25,
+            orderCellsTop: true,
+            autoWidth: false,
+            ajax: {
+                url: "{% url 'users:owner_ajax_list' %}",
+                type: "GET",
+                data: function (d) {
+                    d.external_id = $('[data-name="external_id"]').val();
+                    d.full_name = $('[data-name="full_name"]').val();
+                    d.phone_number = $('[data-name="phone_number"]').val();
+                    d.email = $('[data-name="email"]').val();
+                    d.house = $('[data-name="house"]').val();
+                    d.flat = $('[data-name="flat"]').val();
+                    d.date_joined = $('[data-name="date_joined"]').val();
+                    d.status = $('[data-name="status"]').val();
+                    d.dept = $('[data-name="dept"]').val();
+                    d.actions = $('[data-name="actions"]').val();
+                }
+            },
+            order: [[0, 'asc']],
+            columns: [
+                {data: 'external_id', name: 'external_id'},
+                {data: 'full_name', name: 'full_name'},
+                {data: 'phone_number', name: 'phone_number'},
+                {data: 'email', name: 'email'},
+                {data: 'house', name: 'house'},
+                {data: 'flat', name: 'flat'},
+                {data: 'date_joined', name: 'date_joined'},
+                {data: 'status', name: 'status'},
+                {data: 'dept', name: 'dept'},
+                {data: 'actions', name: 'actions'},
+            ],
+            createdRow: function (row, data) {
+                if (data.row_href) {
+                    $(row).attr('data-href', data.row_href);
+                    $(row).attr('data-key', data.id);
+                    $(row).css('cursor', 'pointer');
+                }
+            },
+            drawCallback: function () {
+                $('[data-toggle="tooltip"]').tooltip();
+            },
+            language: {
+                processing: "Ładowanie...",
+                lengthMenu: "Pokaż _MENU_ wpisów",
+                zeroRecords: "Brak wyników",
+                info: "Wyświetlono _START_–_END_ z _TOTAL_ wpisów",
+                infoEmpty: "Brak wpisów",
+                infoFiltered: "(odfiltrowano z _MAX_ wpisów)",
+                paginate: {
+                    first: "Pierwsza",
+                    last: "Ostatnia",
+                    next: "»",
+                    previous: "«"
+                }
+            }
+        });
+
+        var reloadTable = function () {
+            table.ajax.reload(null, true);
+        };
+
+        $('#owner-house-filter').select2({
+            width: '100%',
+            allowClear: true,
+            placeholder: '',
+            language: 'ru',
+            ajax: {
+                url: "{% url 'buildings:house_select2' %}",
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return {
+                        term: params.term || '',
+                        page: params.page || 1
+                    };
+                },
+                processResults: function (data) {
+                    return data;
+                },
+                cache: true
+            }
+        });
+
+        var debounceTimer = null;
+        $(document).on('input', '.dt-filter[type="text"]', function () {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(function () {
+                reloadTable();
+            }, 400);
+        });
+
+        $(document).on('change', 'select.dt-filter', function () {
+            reloadTable();
+        });
+
+        $('#clear-filters').on('click', function (e) {
+            e.preventDefault();
+            $('.dt-filter').each(function () {
+                $(this).val('');
+                if ($(this).is('select')) {
+                    $(this).trigger('change.select2');
+                }
+            });
+            reloadTable();
+        });
+
+        $(document).on('click', '#owner-table tbody tr[data-href]', function (e) {
+            if ($(e.target).closest('a, button, form').length) return;
+            window.location.href = $(this).data('href');
+        });
     });
-});
 </script>
-<script>
-    jQuery(function ($) {
-        if (jQuery('#usersearch-searchhouse').data('select2')) { jQuery('#usersearch-searchhouse').select2('destroy'); }
-        jQuery.when(jQuery('#usersearch-searchhouse').select2(select2_0d896465)).done(initS2Loading('usersearch-searchhouse','s2options_7ebc6538'));
-
-        jQuery.fn.kvDatepicker.dates={};
-        if (jQuery('#usersearch-searchcreateddate').data('kvDatepicker')) { jQuery('#usersearch-searchcreateddate').kvDatepicker('destroy'); }
-        jQuery('#usersearch-searchcreateddate').kvDatepicker(kvDatepicker_1643d6f1);
-
-        if (jQuery('#usersearch-status').data('select2')) { jQuery('#usersearch-status').select2('destroy'); }
-        jQuery.when(jQuery('#usersearch-status').select2(select2_0d896465)).done(initS2Loading('usersearch-status','s2options_7ebc6538'));
-
-        if (jQuery('#usersearch-searchhasdebt').data('select2')) { jQuery('#usersearch-searchhasdebt').select2('destroy'); }
-        jQuery.when(jQuery('#usersearch-searchhasdebt').select2(select2_0d896465)).done(initS2Loading('usersearch-searchhasdebt','s2options_7ebc6538'));
-
-        jQuery('#w0').yiiGridView({"filterUrl":"\/admin\/user\/index","filterSelector":"#w0-filters input, #w0-filters select"});
-    });
-</script>
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"
-        integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
 {% endblock %}
-

@@ -1,0 +1,62 @@
+{% extends 'crm/base.html' %}
+{% load static %}
+
+{% block page_title %}Metoda płatności{% endblock %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item"><a href="{% url 'crm:cabinet' %}">Strona główna</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'crm:invoice_list' %}">Rachunki</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'crm:invoice_detail' invoice.pk %}">{{ invoice.random_number }}</a></li>
+    <li class="breadcrumb-item active">Metoda płatności</li>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-6 col-md-offset-3">
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Wybierz metodę płatności</h3>
+            </div>
+            <form method="post">
+                {% csrf_token %}
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-xs-6">
+                            <label class="payment-method-option" style="cursor:pointer; width:100%; text-align:center; border:2px solid #ddd; border-radius:6px; padding:20px; display:block;" id="opt-card">
+                                <input type="radio" name="payment_method" value="card" style="display:none;">
+                                <img src="{% static 'dist/img/visa.png' %}" alt="Visa"
+                                     style="max-height:30px; margin-bottom:4px;">
+                                <img src="{% static 'dist/img/MasterCard.png' %}" alt="MasterCard"
+                                     style="max-height:30px; margin-bottom:4px;">
+                                <br><span>Visa / MasterCard</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="box-footer">
+                    <a href="{% url 'crm:invoice_pay_step1' invoice.pk %}" class="btn btn-default">Wstecz</a>
+                    <button type="submit" class="btn btn-primary pull-right">Dalej</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+.payment-method-option.selected { border-color: #3c8dbc !important; background: #f0f8ff; }
+</style>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    var opts = document.querySelectorAll('.payment-method-option');
+    opts.forEach(function (label) {
+        var radio = label.querySelector('input[type=radio]');
+        if (radio.checked) label.classList.add('selected');
+        label.addEventListener('click', function () {
+            opts.forEach(function (l) { l.classList.remove('selected'); });
+            label.classList.add('selected');
+            radio.checked = true;
+        });
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,241 @@
+{% extends 'admin_panel/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="row">
+    <div class="col-xs-12 col-lg-9">
+        <div class="row">
+            <div class="col-xs-12 col-md-4">
+                <div class="small-box bg-green overflow-hidden">
+                    <div class="inner">
+                        <h3>{{ cashbox_state|default:"0.00" }} zł</h3>
+                        <p>Stan kasy</p>
+                    </div>
+                    <div class="icon"><i class="fa fa-dollar"></i></div>
+                </div>
+            </div>
+            <div class="col-xs-12 col-md-4">
+                <div class="small-box bg-blue overflow-hidden">
+                    <div class="inner">
+                        <h3>{{ accounts_balance|default:"0.00" }} zł</h3>
+                        <p>Saldo kont</p>
+                    </div>
+                    <div class="icon"><i class="fa fa-dollar"></i></div>
+                </div>
+            </div>
+            <div class="col-xs-12 col-md-4">
+                <div class="small-box bg-red overflow-hidden">
+                    <div class="inner">
+                        <h3>{{ accounts_debt|default:"0.00" }} zł</h3>
+                        <p>Zadłużenie kont</p>
+                    </div>
+                    <div class="icon"><i class="fa fa-dollar"></i></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xs-12 col-lg-3">
+        <div class="pull-right margin-bottom">
+            <div class="btn-group">
+                <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Wybierz akcję <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a href="{% url 'finances:accounting_income' %}">Utwórz przychód</a></li>
+                    <li><a href="{% url 'finances:accounting_expense' %}">Utwórz wydatek</a></li>
+                    <li><a href="{% url 'finances:accounting_export' %}">Eksportuj do Excel</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-xs-12">
+        <div class="box">
+            <div class="box-header with-border">
+                <h3 class="box-title"></h3>
+                <div class="box-tools">
+                    <button id="clear-filters" type="button" class="btn btn-default btn-sm">
+                        <span class="hidden-xs">Wyczyść</span><i class="fa fa-eraser visible-xs" aria-hidden="true"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div id="w0" class="grid-view">
+                <div class="box-body table-responsive no-padding">
+                    <table id="accounting-table" class="table table-bordered table-hover table-striped linkedRow" width="100%">
+                        <thead>
+                            <tr>
+                                <th style="width: 125px; min-width: 125px">№</th>
+                                <th style="width: 125px; min-width: 125px">Data</th>
+                                <th style="width: 120px; min-width: 120px">Status</th>
+                                <th>Typ płatności</th>
+                                <th style="min-width: 200px">Właściciel</th>
+                                <th style="min-width: 160px">Konto osobiste</th>
+                                <th>Przychód/wydatek</th>
+                                <th style="width: 110px; min-width: 110px">Kwota (zł)</th>
+                                <th style="width: 80px; min-width: 80px">&nbsp;</th>
+                            </tr>
+                            <tr id="w0-filters" class="filters">
+                                <th><input type="text" class="form-control form-control-sm dt-filter" data-name="uid"></th>
+                                <th><input type="text" class="form-control form-control-sm dt-filter" data-name="date" placeholder="dd.mm.rrrr"></th>
+                                <th>
+                                    <select class="form-control form-control-sm dt-filter" data-name="status">
+                                        <option value=""></option>
+                                        <option value="completed">Zaksięgowano</option>
+                                        <option value="pending">Nie zaksięgowano</option>
+                                    </select>
+                                </th>
+                                <th>
+                                    <select id="acc-purpose-filter" class="form-control form-control-sm dt-filter" data-name="purpose">
+                                        <option value=""></option>
+                                    </select>
+                                </th>
+                                <th>
+                                    <select id="acc-owner-filter" class="form-control form-control-sm dt-filter" data-name="user_id">
+                                        <option value=""></option>
+                                    </select>
+                                </th>
+                                <th><input type="text" class="form-control form-control-sm dt-filter" data-name="account_uid"></th>
+                                <th>
+                                    <select class="form-control form-control-sm dt-filter" data-name="type">
+                                        <option value=""></option>
+                                        <option value="income">Przychód</option>
+                                        <option value="expense">Wydatek</option>
+                                    </select>
+                                </th>
+                                <th></th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+                <div class="box-footer clearfix"></div>
+            </div>
+
+            <div class="box-footer">
+                <div>Zaksięgowany przychód: <span class="text-bold">{{ total_income|default:"0.00" }} zł</span></div>
+                <div>Zaksięgowany wydatek: <span class="text-bold">{{ total_expense|default:"0.00" }} zł</span></div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(function () {
+    $('[data-toggle="tooltip"]').tooltip();
+
+    function initSelect2($element, url, placeholder) {
+        $element.select2({
+            width: '100%',
+            allowClear: true,
+            placeholder: placeholder,
+            language: 'pl',
+            ajax: {
+                url: url,
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return {term: params.term || '', page: params.page || 1};
+                },
+                processResults: function (data) {
+                    return data;
+                },
+                cache: true
+            }
+        });
+    }
+
+    initSelect2($('#acc-purpose-filter'), "{% url 'finances:payment_item_select2' %}", '');
+    initSelect2($('#acc-owner-filter'), "{% url 'users:owner_select2' %}", '');
+
+    var urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('account_uid')) {
+        $('[data-name="account_uid"]').val(urlParams.get('account_uid'));
+    }
+
+    var table = $('#accounting-table').DataTable({
+        processing: true,
+        serverSide: true,
+        searching: false,
+        lengthChange: true,
+        pageLength: 25,
+        orderCellsTop: true,
+        autoWidth: false,
+        ajax: {
+            url: "{% url 'finances:accounting_ajax_list' %}",
+            type: "GET",
+            data: function (d) {
+                d.uid = $('[data-name="uid"]').val();
+                d.date = $('[data-name="date"]').val();
+                d.status = $('[data-name="status"]').val();
+                d.purpose = $('[data-name="purpose"]').val();
+                d.user_id = $('[data-name="user_id"]').val();
+                d.account_uid = $('[data-name="account_uid"]').val();
+                d.type = $('[data-name="type"]').val();
+            }
+        },
+        order: [[1, 'desc']],
+        columns: [
+            {data: 'random_number', name: 'random_number'},
+            {data: 'created_at', name: 'created_at'},
+            {data: 'completed', name: 'completed', orderable: false, searchable: false},
+            {data: 'payment_item', name: 'payment_item', orderable: false, searchable: false},
+            {data: 'owner', name: 'owner', orderable: false, searchable: false},
+            {data: 'bank_book', name: 'bank_book', orderable: false, searchable: false},
+            {data: 'type', name: 'type', orderable: false, searchable: false},
+            {data: 'amount', name: 'amount'},
+            {data: 'actions', name: 'actions', orderable: false, searchable: false}
+        ],
+        createdRow: function (row, data) {
+            if (data.row_href) {
+                $(row).attr('data-href', data.row_href);
+                $(row).css('cursor', 'pointer');
+            }
+        },
+        drawCallback: function () {
+            $('[data-toggle="tooltip"]').tooltip();
+        },
+        language: {
+            processing: "Ładowanie...",
+            lengthMenu: "Pokaż _MENU_ rekordów",
+            zeroRecords: "Nic nie znaleziono",
+            info: "Pokazano od _START_ do _END_ z _TOTAL_ rekordów",
+            infoEmpty: "Brak rekordów",
+            infoFiltered: "(przefiltrowano z _MAX_ rekordów)",
+            paginate: {first: "Pierwsza", last: "Ostatnia", next: "»", previous: "«"}
+        }
+    });
+
+    var reloadTable = function () {
+        table.ajax.reload(null, true);
+    };
+
+    var debounceTimer = null;
+    $(document).on('input', '.dt-filter[type="text"]', function () {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(reloadTable, 400);
+    });
+    $(document).on('change', 'select.dt-filter', reloadTable);
+
+    $('#clear-filters').on('click', function () {
+        $('.dt-filter').each(function () {
+            $(this).val('');
+            if ($(this).is('select')) {
+                $(this).trigger('change.select2');
+            }
+        });
+        reloadTable();
+    });
+
+    $(document).on('click', '#accounting-table tbody tr[data-href]', function (e) {
+        if ($(e.target).closest('a, button, form, input, select, .select2-container').length) return;
+        window.location.href = $(this).data('href');
+    });
+});
+</script>
+{% endblock %}

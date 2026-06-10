@@ -1,0 +1,225 @@
+{% extends 'admin_panel/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="row">
+    <div class="col-xs-12">
+        <div class="pull-right margin-bottom">
+            <a class="btn btn-success" href="{% url 'buildings:flat_create' %}">Dodaj mieszkanie</a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-xs-12">
+        <div class="box">
+            <div class="box-header with-border">
+                <h3 class="box-title"></h3>
+                <div class="box-tools">
+                    <button id="clear-filters" type="button" class="btn btn-default btn-sm">
+                        <span class="hidden-xs">Wyczyść</span><i class="fa fa-eraser visible-xs" aria-hidden="true"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div id="w0" class="grid-view">
+                <div class="box-body table-responsive no-padding">
+                    <table id="flats-table" class="table table-bordered table-hover table-striped linkedRow">
+                        <thead>
+                            <tr>
+                                <th style="width: 120px; min-width: 120px">Nr mieszkania</th>
+                                <th style="min-width: 200px">Budynek</th>
+                                <th style="width: 160px; min-width: 65px">Sekcja</th>
+                                <th style="width: 160px; min-width: 65px">Piętro</th>
+                                <th style="min-width: 200px">Właściciel</th>
+                                <th style="width: 120px; min-width: 120px">Saldo (zł)</th>
+                                <th style="width: 92px; min-width: 92px">&nbsp;</th>
+                            </tr>
+                            <tr id="w0-filters" class="filters">
+                                <th><input type="text" class="form-control form-control-sm dt-filter" data-name="number"></th>
+                                <th>
+                                    <select id="flat-house-filter" class="form-control form-control-sm dt-filter" data-name="house_id">
+                                        <option value=""></option>
+                                    </select>
+                                </th>
+                                <th>
+                                    <select id="flat-section-filter" class="form-control form-control-sm dt-filter" data-name="section_id">
+                                        <option value="">Wybierz budynek</option>
+                                    </select>
+                                </th>
+                                <th>
+                                    <select id="flat-floor-filter" class="form-control form-control-sm dt-filter" data-name="floor_id">
+                                        <option value="">Wybierz budynek</option>
+                                    </select>
+                                </th>
+                                <th>
+                                    <select id="flat-owner-filter" class="form-control form-control-sm dt-filter" data-name="owner_id">
+                                        <option value=""></option>
+                                    </select>
+                                </th>
+                                <th>
+                                    <select class="form-control form-control-sm dt-filter" data-name="has_debt">
+                                        <option value=""></option>
+                                        <option value="1">Jest dług</option>
+                                        <option value="0">Brak długu</option>
+                                    </select>
+                                </th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(function () {
+    $('[data-toggle="tooltip"]').tooltip();
+
+    function initSelect2($element, url, placeholder) {
+        $element.select2({
+            width: '100%',
+            allowClear: true,
+            placeholder: placeholder,
+            language: 'pl',
+            ajax: {
+                url: url,
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return {
+                        term: params.term || '',
+                        page: params.page || 1
+                    };
+                },
+                processResults: function (data) {
+                    return data;
+                },
+                cache: true
+            }
+        });
+    }
+
+    function fillSimpleSelect($select, items, emptyText) {
+        $select.empty().append($('<option>', {value: '', text: emptyText}));
+        $.each(items, function (_, item) {
+            $select.append($('<option>', {value: item.id, text: item.text}));
+        });
+        $select.val('').trigger('change.select2');
+    }
+
+    function loadHouseChildren(houseId) {
+        if (!houseId) {
+            fillSimpleSelect($('#flat-section-filter'), [], 'Wybierz budynek');
+            fillSimpleSelect($('#flat-floor-filter'), [], 'Wybierz budynek');
+            return;
+        }
+
+        $.getJSON("{% url 'buildings:house_children' %}", {house_id: houseId}, function (data) {
+            fillSimpleSelect($('#flat-section-filter'), data.sections, 'Wybierz...');
+            fillSimpleSelect($('#flat-floor-filter'), data.floors, 'Wybierz...');
+        });
+    }
+
+    initSelect2($('#flat-house-filter'), "{% url 'buildings:house_select2' %}", '');
+    initSelect2($('#flat-owner-filter'), "{% url 'users:owner_select2' %}", '');
+
+    var table = $('#flats-table').DataTable({
+        processing: true,
+        serverSide: true,
+        searching: false,
+        lengthChange: true,
+        pageLength: 25,
+        orderCellsTop: true,
+        autoWidth: false,
+        ajax: {
+            url: "{% url 'buildings:flat_ajax_list' %}",
+            type: "GET",
+            data: function (d) {
+                d.number = $('[data-name="number"]').val();
+                d.house_id = $('[data-name="house_id"]').val();
+                d.section_id = $('[data-name="section_id"]').val();
+                d.floor_id = $('[data-name="floor_id"]').val();
+                d.owner_id = $('[data-name="owner_id"]').val();
+                d.has_debt = $('[data-name="has_debt"]').val();
+            }
+        },
+        order: [[0, 'asc']],
+        columns: [
+            {data: 'number', name: 'number'},
+            {data: 'house', name: 'house'},
+            {data: 'section', name: 'section'},
+            {data: 'floor', name: 'floor'},
+            {data: 'owner', name: 'owner'},
+            {data: 'balance', name: 'balance'},
+            {data: 'actions', name: 'actions', orderable: false, searchable: false}
+        ],
+        createdRow: function (row, data) {
+            if (data.row_href) {
+                $(row).attr('data-href', data.row_href);
+                $(row).attr('data-key', data.id);
+                $(row).css('cursor', 'pointer');
+            }
+        },
+        drawCallback: function () {
+            $('[data-toggle="tooltip"]').tooltip();
+        },
+        language: {
+            processing: "Ładowanie...",
+            lengthMenu: "Pokaż _MENU_ rekordów",
+            zeroRecords: "Nic nie znaleziono",
+            info: "Pokazano od _START_ do _END_ z _TOTAL_ rekordów",
+            infoEmpty: "Brak rekordów",
+            infoFiltered: "(przefiltrowano z _MAX_ rekordów)",
+            paginate: {
+                first: "Pierwsza",
+                last: "Ostatnia",
+                next: "»",
+                previous: "«"
+            }
+        }
+    });
+
+    var reloadTable = function () {
+        table.ajax.reload(null, true);
+    };
+
+    var debounceTimer = null;
+    $(document).on('input', '.dt-filter[type="text"]', function () {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(function () {
+            reloadTable();
+        }, 400);
+    });
+
+    $(document).on('change', 'select.dt-filter', function () {
+        reloadTable();
+    });
+
+    $('#flat-house-filter').on('change', function () {
+        loadHouseChildren($(this).val());
+    });
+
+    $('#clear-filters').on('click', function () {
+        $('.dt-filter').each(function () {
+            $(this).val('');
+            if ($(this).is('select')) {
+                $(this).trigger('change.select2');
+            }
+        });
+        loadHouseChildren('');
+        reloadTable();
+    });
+
+    $(document).on('click', '#flats-table tbody tr[data-href]', function (e) {
+        if ($(e.target).closest('a, button, form, input, select, .select2-container').length) return;
+        window.location.href = $(this).data('href');
+    });
+});
+</script>
+{% endblock %}

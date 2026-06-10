@@ -1,0 +1,113 @@
+{% extends 'crm/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="row">
+    <div class="col-xs-12">
+        <div class="box">
+            <div class="box-header with-border">
+                <h3 class="box-title"></h3>
+                <div class="box-tools">
+                    <button type="button" id="clear-filters" class="btn btn-default btn-sm">
+                        Wyczyść
+                    </button>
+                </div>
+            </div>
+
+            <div class="box-body table-responsive no-padding">
+                <table id="invoices-table" class="table table-bordered table-hover table-striped" width="100%">
+                    <thead>
+                        <tr>
+                            <th>№</th>
+                            <th>Data</th>
+                            <th>Status</th>
+                            <th>Kwota</th>
+                        </tr>
+                        <tr class="filters">
+                            <th></th>
+                            <th><input type="text" class="form-control input-sm dt-filter" data-name="date" placeholder="dd.mm.rrrr"></th>
+                            <th>
+                                <select class="form-control input-sm dt-filter" data-name="status">
+                                    <option value=""></option>
+                                    <option value="paid">Opłacona</option>
+                                    <option value="partially_paid">Częściowo opłacona</option>
+                                    <option value="unpaid">Nieopłacona</option>
+                                </select>
+                            </th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(function () {
+    var flatId = "{{ flat_pk|default:'' }}";
+
+    var table = $('#invoices-table').DataTable({
+        processing: true,
+        serverSide: true,
+        searching: false,
+        lengthChange: true,
+        pageLength: 10,
+        orderCellsTop: true,
+        autoWidth: false,
+        ajax: {
+            url: "{% url 'crm:invoice_ajax' %}",
+            type: "GET",
+            data: function (d) {
+                d.flat_id = flatId;
+                d.date = $('[data-name="date"]').val();
+                d.status = $('[data-name="status"]').val();
+            }
+        },
+        order: [[1, 'desc']],
+        columns: [
+            {data: 'random_number', name: 'random_number'},
+            {data: 'date_from', name: 'date_from'},
+            {data: 'status', name: 'status', orderable: false, searchable: false},
+            {data: 'amount', name: 'amount', orderable: false, searchable: false}
+        ],
+        createdRow: function (row, data) {
+            if (data.row_href) {
+                $(row).attr('data-href', data.row_href);
+                $(row).css('cursor', 'pointer');
+            }
+        },
+        language: {
+            processing: "Ładowanie...",
+            lengthMenu: "Pokaż _MENU_ wpisów",
+            zeroRecords: "Brak wyników",
+            info: "Wyświetlono _START_–_END_ z _TOTAL_ wpisów",
+            infoEmpty: "Brak wpisów",
+            infoFiltered: "(odfiltrowano z _MAX_ wpisów)",
+            paginate: {first: "Pierwsza", last: "Ostatnia", next: "»", previous: "«"}
+        }
+    });
+
+    var reloadTable = function () { table.ajax.reload(null, true); };
+
+    var debounceTimer = null;
+    $(document).on('input', '.dt-filter[type="text"]', function () {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(reloadTable, 400);
+    });
+    $(document).on('change', 'select.dt-filter', reloadTable);
+
+    $('#clear-filters').on('click', function () {
+        $('.dt-filter').val('');
+        reloadTable();
+    });
+
+    $(document).on('click', '#invoices-table tbody tr[data-href]', function () {
+        window.location.href = $(this).data('href');
+    });
+});
+</script>
+{% endblock %}

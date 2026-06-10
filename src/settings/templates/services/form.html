@@ -1,0 +1,279 @@
+{% extends 'admin_panel/base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<style>
+    input[name$="-DELETE"] {
+        display: none;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="box">
+    <div class="box-body">
+        <form action="{% url 'settings:services_update' %}" method="post">
+            {% csrf_token %}
+
+            {{ services_formset.management_form }}
+            {{ units_formset.management_form }}
+
+            {% if services_formset.non_form_errors %}
+                <div class="alert alert-danger">
+                    {{ services_formset.non_form_errors }}
+                </div>
+            {% endif %}
+
+            {% if units_formset.non_form_errors %}
+                <div class="alert alert-danger">
+                    {{ units_formset.non_form_errors }}
+                </div>
+            {% endif %}
+
+            <div class="row">
+                <div class="col-xs-12 col-lg-8">
+                    <div class="nav-tabs-custom">
+                        <ul class="nav nav-tabs">
+                            <li class="active">
+                                <a href="#tab_service" data-toggle="tab">Usługi</a>
+                            </li>
+                            <li>
+                                <a href="#tab_serviceunit" data-toggle="tab">Jednostki miary</a>
+                            </li>
+                        </ul>
+
+                        <div class="tab-content">
+                            <div class="tab-pane active" id="tab_service">
+                                <div id="services-formset">
+                                    {% for form in services_formset %}
+                                    <div class="row service-form-row" style="margin-bottom: 16px; border-bottom: 1px solid #eee; padding-bottom: 12px;">
+                                        {{ form.id }}
+                                        {{ form.DELETE }}
+
+                                        <div class="col-xs-12 col-sm-7">
+                                            <div class="form-group">
+                                                {{ form.title.label_tag }}
+                                                {{ form.title }}
+                                                {% if form.title.errors %}
+                                                    <div class="text-danger">{{ form.title.errors }}</div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+
+                                        <div class="col-xs-12 col-sm-5">
+                                            <div class="form-group">
+                                                {{ form.unit_of_measurement.label_tag }}
+                                                <div class="input-group">
+                                                    {{ form.unit_of_measurement }}
+                                                    <span class="input-group-btn">
+                                                        <button type="button"
+                                                                class="btn btn-default delete-service-btn"
+                                                                data-checkbox-id="{{ form.DELETE.id_for_label }}">
+                                                            <i class="fa fa-trash"></i>
+                                                        </button>
+                                                    </span>
+                                                </div>
+                                                {% if form.unit_of_measurement.errors %}
+                                                    <div class="text-danger">{{ form.unit_of_measurement.errors }}</div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+
+                                        <div class="col-xs-12">
+                                            <div class="checkbox" style="margin-top: 0; margin-bottom: 16px;">
+                                                <label for="{{ form.show.id_for_label }}" style="font-weight: 700;">
+                                                    {{ form.show }} Pokazuj w licznikach
+                                                </label>
+                                            </div>
+
+                                            {% if form.show.errors %}
+                                                <div class="text-danger">{{ form.show.errors }}</div>
+                                            {% endif %}
+                                        </div>
+
+                                        {% if form.non_field_errors %}
+                                            <div class="col-xs-12">
+                                                <div class="text-danger">{{ form.non_field_errors }}</div>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    {% endfor %}
+                                </div>
+
+                                <button type="button" id="add-service-form" class="btn btn-default">
+                                    Dodaj
+                                </button>
+                            </div>
+
+                            <div class="tab-pane" id="tab_serviceunit">
+                                <div id="units-formset">
+                                    {% for form in units_formset %}
+                                        <div class="row unit-form-row" style="margin-bottom: 16px; border-bottom: 1px solid #eee; padding-bottom: 12px;">
+                                            {{ form.id }}
+                                            {{ form.DELETE }}
+
+                                            <div class="col-xs-12">
+                                                <div class="form-group">
+                                                    {{ form.title.label_tag }}
+                                                    <div class="input-group">
+                                                        {{ form.title }}
+                                                        <span class="input-group-btn">
+                                                            <button type="button"
+                                                                    class="btn btn-default delete-unit-btn"
+                                                                    data-checkbox-id="{{ form.DELETE.id_for_label }}">
+                                                                <i class="fa fa-trash"></i>
+                                                            </button>
+                                                        </span>
+                                                    </div>
+
+                                                    {% if form.title.errors %}
+                                                        <div class="text-danger">{{ form.title.errors }}</div>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+
+                                            {% if form.non_field_errors %}
+                                                <div class="col-xs-12">
+                                                    <div class="text-danger">{{ form.non_field_errors }}</div>
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    {% endfor %}
+                                </div>
+
+                                <button type="button" id="add-unit-form" class="btn btn-default">
+                                    Dodaj
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-xs-12 text-center">
+                    <a href="{% url 'settings:services_update' %}" class="btn btn-default">Anuluj</a>
+                    <button type="submit" class="btn btn-success">Zapisz</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+jQuery(function ($) {
+    const servicePrefix = "{{ services_formset.prefix }}";
+    const unitPrefix = "{{ units_formset.prefix }}";
+
+    $(document).on("click", ".delete-unit-btn", function () {
+        const checkboxId = $(this).data("checkbox-id");
+        $("#" + checkboxId).prop("checked", true);
+        $(this).closest(".unit-form-row").hide();
+    });
+
+    $(document).on("click", ".delete-service-btn", function () {
+        const checkboxId = $(this).data("checkbox-id");
+        $("#" + checkboxId).prop("checked", true);
+        $(this).closest(".service-form-row").hide();
+    });
+
+    $("#add-unit-form").on("click", function () {
+        const totalForms = $("#id_" + unitPrefix + "-TOTAL_FORMS");
+        const index = parseInt(totalForms.val(), 10);
+
+        const html = `
+            <div class="row unit-form-row" style="margin-bottom: 16px; border-bottom: 1px solid #eee; padding-bottom: 12px;">
+                <input type="hidden" name="${unitPrefix}-${index}-id" id="id_${unitPrefix}-${index}-id">
+                <input type="checkbox" name="${unitPrefix}-${index}-DELETE" id="id_${unitPrefix}-${index}-DELETE" style="display:none;">
+
+                <div class="col-xs-12">
+                    <div class="form-group">
+                        <label for="id_${unitPrefix}-${index}-title">Jedn. miary</label>
+                        <div class="input-group">
+                            <input type="text"
+                                   name="${unitPrefix}-${index}-title"
+                                   class="form-control"
+                                   id="id_${unitPrefix}-${index}-title">
+
+                            <span class="input-group-btn">
+                                <button type="button"
+                                        class="btn btn-default delete-unit-btn"
+                                        data-checkbox-id="id_${unitPrefix}-${index}-DELETE">
+                                    <i class="fa fa-trash"></i>
+                                </button>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        $("#units-formset").append(html);
+        totalForms.val(index + 1);
+    });
+
+    $("#add-service-form").on("click", function () {
+        const totalForms = $("#id_" + servicePrefix + "-TOTAL_FORMS");
+        const index = parseInt(totalForms.val(), 10);
+
+        const html = `
+            <div class="row service-form-row" style="margin-bottom: 16px; border-bottom: 1px solid #eee; padding-bottom: 12px;">
+                <input type="hidden" name="${servicePrefix}-${index}-id" id="id_${servicePrefix}-${index}-id">
+                <input type="checkbox" name="${servicePrefix}-${index}-DELETE" id="id_${servicePrefix}-${index}-DELETE" style="display:none;">
+
+                <div class="col-xs-12 col-sm-7">
+                    <div class="form-group">
+                        <label for="id_${servicePrefix}-${index}-title">Usługa</label>
+                        <input type="text"
+                               name="${servicePrefix}-${index}-title"
+                               class="form-control"
+                               id="id_${servicePrefix}-${index}-title">
+                    </div>
+                </div>
+
+                <div class="col-xs-12 col-sm-5">
+                    <div class="form-group">
+                        <label for="id_${servicePrefix}-${index}-unit_of_measurement">Jedn. miary</label>
+                        <div class="input-group">
+                            <select name="${servicePrefix}-${index}-unit_of_measurement"
+                                    class="form-control"
+                                    id="id_${servicePrefix}-${index}-unit_of_measurement">
+                                <option value="">Wybierz...</option>
+                                {% for unit in units %}
+                                    <option value="{{ unit.pk }}">{{ unit.title|escapejs }}</option>
+                                {% endfor %}
+                            </select>
+                            <span class="input-group-btn">
+                                <button type="button"
+                                        class="btn btn-default delete-unit-btn"
+                                        data-checkbox-id="id_${servicePrefix}-${index}-DELETE">
+                                    <i class="fa fa-trash"></i>
+                                </button>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xs-12">
+                    <div class="form-group" style="margin-top: 0; margin-bottom: 16px;">
+                        <label>
+                            <input type="checkbox"
+                                   name="${servicePrefix}-${index}-show"
+                                   id="id_${servicePrefix}-${index}-show"
+                                   checked>
+                            Pokazuj w licznikach
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+        `;
+
+        $("#services-formset").append(html);
+        totalForms.val(index + 1);
+    });
+});
+</script>
+{% endblock %}

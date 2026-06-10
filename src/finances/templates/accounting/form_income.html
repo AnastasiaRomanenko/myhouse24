@@ -1,0 +1,124 @@
+{% extends 'admin_panel/base.html' %}
+{% load static %}
+
+{% block content %}
+<form id="w0" action="{{ form_url }}" method="post">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+
+    <div class="row">
+        <div class="col-xs-12 col-md-7 col-lg-6">
+            <div class="page-header-spec">
+                <div class="form-group">
+                    <div class="input-group">
+                        <div class="input-group-addon">№</div>
+                        {{ form.random_number }}
+                    </div>
+                    <div class="help-block text-danger">{{ form.random_number.errors }}</div>
+                </div>
+                <span class="label-mid">z dnia</span>
+                <div class="form-group">
+                    <div class="input-group date">
+                        <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+                        {{ form.created_at }}
+                    </div>
+                    <div class="help-block text-danger">{{ form.created_at.errors }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="box">
+        <div class="box-body">
+            <div class="row">
+                <div class="col-xs-12 col-sm-6 col-sm-offset-6">
+                    <label>{{ form.completed }} Zaksięgowano</label>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-xs-12 col-sm-6">
+                    <div class="form-group">
+                        <label class="control-label">Właściciel mieszkania</label>
+                        {{ form.owner }}
+                        <div class="help-block text-danger">{{ form.owner.errors }}</div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">Konto osobiste</label>
+                        {{ form.bank_book }}
+                        <div class="help-block text-danger">{{ form.bank_book.errors }}</div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">Pozycja</label>
+                        {{ form.payment_item }}
+                        <div class="help-block text-danger">{{ form.payment_item.errors }}</div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">Kwota</label>
+                        {{ form.amount }}
+                        <div class="help-block text-danger">{{ form.amount.errors }}</div>
+                    </div>
+                </div>
+                <div class="col-xs-12 col-sm-6">
+                    <div class="form-group">
+                        <label class="control-label">Menedżer</label>
+                        {{ form.manager }}
+                        <div class="help-block text-danger">{{ form.manager.errors }}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="form-group">
+                        <label class="control-label">Komentarz</label>
+                        {{ form.comment }}
+                        <div class="help-block text-danger">{{ form.comment.errors }}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-12 text-right">
+                    <div class="form-group">
+                        <a href="{% url 'finances:accounting_list' %}" class="btn btn-default margin-bottom-15">Anuluj</a>
+                        <button type="submit" class="btn btn-success margin-bottom-15" name="action_save">Zapisz</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(function () {
+    function initSelect2($element, url) {
+        $element.select2({
+            width: '100%',
+            allowClear: true,
+            placeholder: 'Wybierz...',
+            language: 'pl',
+            ajax: {
+                url: url,
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return {term: params.term || '', page: params.page || 1};
+                },
+                processResults: function (data) { return data; },
+                cache: true
+            }
+        });
+    }
+
+    initSelect2($('#id_owner'), "{% url 'users:owner_select2' %}");
+    initSelect2($('#id_bank_book'), "{% url 'finances:bank_book_select2' %}");
+    $('#id_payment_item').select2({width: '100%', language: 'pl', ajax: {
+        url: "{% url 'finances:payment_item_select2' %}", dataType: 'json', delay: 250,
+        data: function (params) { return {term: params.term || '', page: params.page || 1, type: 'income'}; },
+        processResults: function (data) { return data; }, cache: true
+    }});
+    initSelect2($('#id_manager'), "{% url 'finances:manager_select2' %}");
+});
+</script>
+{% endblock %}

@@ -1,0 +1,78 @@
+{% extends 'crm/base.html' %}
+{% load static %}
+
+{% block page_title %}Rachunek {{ invoice.random_number }}{% endblock %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item"><a href="{% url 'crm:cabinet' %}">Strona główna</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'crm:invoice_list' %}">Rachunki</a></li>
+    <li class="breadcrumb-item active">{{ invoice.random_number }}</li>
+{% endblock %}
+
+{% block content %}
+<div class="box">
+    <div class="box-header with-border">
+        <h3 class="box-title">Rachunek nr {{ invoice.random_number }}</h3>
+    </div>
+    <div class="box-body">
+        <table class="table table-bordered table-striped">
+            <tbody>
+                <tr><td>Data</td><td>{{ invoice.date_from|date:"d.m.Y" }}</td></tr>
+                <tr><td>Status</td><td>{{ invoice.get_status_display }}</td></tr>
+                <tr><td>Okres</td><td>{{ invoice.period_from|date:"d.m.Y" }} — {{ invoice.period_to|date:"d.m.Y" }}</td></tr>
+                <tr><td>Mieszkanie</td><td>{{ invoice.flat.house.title }}, m. {{ invoice.flat.number }}</td></tr>
+                <tr><td>Taryfa</td><td>{{ invoice.tariff.title|default:"-" }}</td></tr>
+                <tr><td>Konto osobiste</td><td>{{ invoice.bank_book.random_number|default:"-" }}</td></tr>
+            </tbody>
+        </table>
+
+        <div class="table-responsive no-padding margin-top-15">
+            <table class="table table-bordered table-striped">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Usługa</th>
+                        <th>Jedn. miary</th>
+                        <th>Cena za jedn., zł</th>
+                        <th>Ilość</th>
+                        <th>Wartość, zł</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for line in lines %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ line.service.title }}</td>
+                            <td>{{ line.service.unit_of_measurement.title }}</td>
+                            <td>{{ line.price }}</td>
+                            <td>{{ line.amount }}</td>
+                            <td>{{ line.price|floatformat:2 }} × {{ line.amount }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="6" class="text-center text-muted">Brak usług</td></tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="5"></td>
+                        <td><b>Razem: {{ total_amount }}</b></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+    <div class="box-footer">
+        <a href="{% url 'crm:invoice_download' invoice.pk %}" class="btn btn-warning">
+            <i class="fa fa-file-excel-o"></i> Pobierz XLSX
+        </a>
+        <button type="button" class="btn btn-info" onclick="window.print();">
+            <i class="fa fa-print"></i> Drukuj
+        </button>
+        {% if invoice.status != 'paid' %}
+        <a href="{% url 'crm:invoice_pay_step1' invoice.pk %}" class="btn btn-success">
+            <i class="fa fa-credit-card"></i> Zapłać
+        </a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

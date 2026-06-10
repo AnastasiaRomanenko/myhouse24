@@ -1,0 +1,82 @@
+{% extends 'admin_panel/base.html' %}
+{% load static %}
+
+{% block title %}Zgłoszenie nr{{ request_obj.id }}{% endblock %}
+
+{% block content %}
+<div class="box">
+    <div class="box-header with-border">
+        <h3 class="box-title">Zgłoszenie nr{{ request_obj.id }}</h3>
+        <div class="box-tools">
+            <a href="{% url 'finances:requests_update' request_obj.id %}" class="btn btn-primary btn-sm">
+                <span class="hidden-xs">Edytuj</span><i class="fa fa-pencil visible-xs" aria-hidden="true"></i>
+            </a>
+        </div>
+    </div>
+    <div class="box-body">
+        <div class="row">
+            <div class="col-xs-12 col-lg-6">
+                <table class="table table-bordered table-striped table-view">
+                    <tbody>
+                        <tr>
+                            <td>Preferowany czas</td>
+                            <td>{{ request_obj.date_time|date:"d.m.Y - H:i"|default:"-" }}</td>
+                        </tr>
+                        <tr>
+                            <td>Opis</td>
+                            <td>{{ request_obj.description }}</td>
+                        </tr>
+                        <tr>
+                            <td>Mieszkanie</td>
+                            <td>
+                                {% if request_obj.flat %}
+                                    <a href="{% url 'buildings:flat_detail' request_obj.flat.id %}">{{ request_obj.flat }}</a>
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Budynek</td>
+                            <td>{{ request_obj.flat.house.title|default:"-" }}</td>
+                        </tr>
+                        <tr>
+                            <td>Właściciel</td>
+                            <td>
+                                {% if request_obj.owner %}
+                                    <a href="{% url 'users:owner_profile' request_obj.owner.id %}">{{ request_obj.owner.get_full_name|default:request_obj.owner.email }}</a>
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Telefon</td>
+                            <td>{{ request_obj.owner.phone_number|default:"-" }}</td>
+                        </tr>
+                        <tr>
+                            <td>Specjalista</td>
+                            <td>{{ request_obj.worker.get_full_name|default:request_obj.worker.email|default:"-" }}</td>
+                        </tr>
+                        <tr>
+                            <td>Status</td>
+                            <td><small class="label label-default">{{ request_obj.get_status_display }}</small></td>
+                        </tr>
+                        <tr>
+                            <td>Komentarz</td>
+                            <td>{{ request_obj.comment|default:"-"|safe }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <form action="{% url 'finances:requests_delete' request_obj.id %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-default" onclick="return confirm('Usuń?');">
+                        <i class="fa fa-trash"></i> Usuń
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,100 @@
+{% extends 'admin_panel/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="box">
+    <div class="box-header with-border">
+        <h3 class="box-title">Szczegóły mieszkania</h3>
+        <div class="box-tools">
+            <a href="{% url 'buildings:flat_update' flat.id %}" class="btn btn-primary btn-sm">
+                <span class="hidden-xs">Edytuj mieszkanie</span><i class="fa fa-pencil visible-xs" aria-hidden="true"></i>
+            </a>
+        </div>
+    </div>
+
+    <div class="box-body">
+        <div class="row">
+            <div class="col-xs-12">
+                <table class="table table-bordered table-striped table-view">
+                    <tbody>
+                        <tr>
+                            <td>Konto osobiste</td>
+                            <td>
+                                {% if bank_book %}
+                                    {{ bank_book.random_number }}
+                                {% else %}
+                                    nie podano
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Numer mieszkania</td>
+                            <td>{{ flat.number }}</td>
+                        </tr>
+                        <tr>
+                            <td>Powierzchnia</td>
+                            <td>{{ flat.area|floatformat:2 }} m<sup>2</sup></td>
+                        </tr>
+                        <tr>
+                            <td>Budynek</td>
+                            <td>
+                                {% if flat.house %}
+                                    <a href="{% url 'buildings:house_detail' flat.house.id %}">{{ flat.house.title }}</a>
+                                {% else %}
+                                    nie podano
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Sekcja</td>
+                            <td>{{ flat.section.title|default:"nie podano" }}</td>
+                        </tr>
+                        <tr>
+                            <td>Piętro</td>
+                            <td>{{ flat.floor.title|default:"nie podano" }}</td>
+                        </tr>
+                        <tr>
+                            <td>Właściciel</td>
+                            <td>
+                                {% if flat.owner %}
+                                    <a href="{% url 'users:owner_profile' flat.owner.id %}">{{ flat.owner }}</a>
+                                {% else %}
+                                    nie podano
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Taryfa</td>
+                            <td>
+                                {% if flat.tariff %}
+                                    <a href="{% url 'settings:tariffs_detail' flat.tariff.id %}">{{ flat.tariff.title }}</a>
+                                {% else %}
+                                    nie podano
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Saldo</td>
+                            <td>
+                                {% if balance < 0 %}
+                                    <span class="text-red">{{ balance|floatformat:2 }}</span>
+                                {% elif balance > 0 %}
+                                    <span class="text-green">{{ balance|floatformat:2 }}</span>
+                                {% else %}
+                                    <span>{{ balance|floatformat:2 }}</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="margin-top-15">
+                    <p><a href="#">Zobacz odczyty liczników</a></p>
+                    <p><a href="#">Zobacz przychody</a></p>
+                    <p><a href="#">Zobacz rachunki</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

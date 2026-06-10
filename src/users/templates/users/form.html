@@ -1,0 +1,130 @@
+{% extends 'admin_panel/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="box">
+    <div class="box-body">
+        <form id="w0" method="post">
+            {% csrf_token %}
+
+            <div class="row">
+                <div class="col-xs-12 col-md-6">
+                    <div class="form-group field-useradminform-firstname">
+                        <label class="control-label" for="useradminform-firstname">Imię</label>
+                        <input type="text" id="useradminform-firstname" class="form-control" name="first_name" maxlength="255" value="{{ form.first_name.value|default:'' }}">
+                        <div class="help-block text-danger">{{ form.first_name.errors }}</div>
+                    </div>
+
+                    <div class="form-group field-useradminform-lastname">
+                        <label class="control-label" for="useradminform-lastname">Nazwisko</label>
+                        <input type="text" id="useradminform-lastname" class="form-control" name="last_name" maxlength="255" value="{{ form.last_name.value|default:'' }}">
+                        <div class="help-block text-danger">{{ form.last_name.errors }}</div>
+                    </div>
+
+                    <div class="form-group field-useradminform-phone-number">
+                        <label class="control-label" for="useradminform-phone-number">Telefon</label>
+                        <input type="text" id="useradminform-phone-number" class="form-control" name="phone_number" maxlength="255" value="{{ form.phone_number.value|default:'' }}">
+                        <div class="help-block text-danger">{{ form.phone_number.errors }}</div>
+                    </div>
+
+                    <div class="form-group field-useradminform-role">
+                        <label class="control-label" for="useradminform-role">Rola</label>
+                        <select id="useradminform-role" class="form-control" name="role">
+                            {% for role in roles %}
+                                <option value="{{ role.id }}" {% if form.role.value == role.id %}selected{% endif %}>{{ role.role }}</option>
+                            {% empty %}
+                                <option value=""></option>
+                                <option value="Dyrektor">Dyrektor</option>
+                                <option value="Zarządca">Zarządca</option>
+                                <option value="Księgowy">Księgowy</option>
+                                <option value="Elektryk">Elektryk</option>
+                                <option value="Hydraulik">Hydraulik</option>
+                            {% endfor %}
+                        </select>
+                        <div class="help-block text-danger">{{ form.role.errors }}</div>
+                    </div>
+
+                    <div class="form-group field-useradminform-status">
+                        <label class="control-label" for="useradminform-status">Status</label>
+                        <select id="useradminform-status" class="form-control" name="status">
+                            <option value="active" {% if form.status.value == 'active' %}selected{% endif %}>Aktywny</option>
+                            <option value="new" {% if form.status.value == 'new' or not form.status.value %}selected{% endif %}>Nowy</option>
+                            <option value="inactive" {% if form.status.value == 'inactive' %}selected{% endif %}>Nieaktywny</option>
+                        </select>
+                        <div class="help-block text-danger">{{ form.status.errors }}</div>
+                    </div>
+                </div>
+
+                <div class="col-xs-12 col-md-6">
+                    <div class="form-group field-useradminform-username required">
+                        <label class="control-label" for="useradminform-username">E-mail (login)</label>
+                        <input type="email" id="useradminform-username" class="form-control" name="email" maxlength="255" required value="{{ form.email.value|default:'' }}">
+                        <div class="help-block text-danger">{{ form.email.errors }}</div>
+                    </div>
+
+                    <div class="form-group field-useradminform-password1">
+                        <label class="control-label" for="useradminform-password1">Hasło</label>
+                        <div class="input-group">
+                            <input type="password" id="useradminform-password1" class="form-control pass-value" name="password1" maxlength="255">
+                            <span class="input-group-btn">
+                                <button class="btn btn-default" type="button" id="generatePassBtn">
+                                    Generuj
+                                </button>
+                                <button type="button" class="btn btn-primary" id="showPass">
+                                    <i class="fa fa-eye" aria-hidden="true"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div class="help-block text-danger">{{ form.password1.errors }}</div>
+                    </div>
+
+                    <div class="form-group field-useradminform-password2">
+                        <label class="control-label" for="useradminform-password2">Powtórz hasło</label>
+                        <input type="password" id="useradminform-password2" class="form-control pass-value" name="password2" maxlength="255">
+                        <div class="help-block text-danger">{{ form.password2.errors }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-xs-12 text-right">
+                    <a href="{% url 'users:admin_list' %}" class="btn btn-default">Anuluj</a>
+                    <button type="submit" class="btn btn-success">Zapisz</button>
+                </div>
+            </div>
+
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    // i wypełnienie obu pól
+    $('#generatePassBtn').on('click', function() {
+        // (długość 8 znaków)
+        var pass = Math.random().toString(36).slice(-8);
+        $('.pass-value').val(pass);
+
+        // wygenerowane hasło użytkownikowi
+        $('#useradminform-password1').attr('type', 'text');
+        $('#showPass i').removeClass('fa-eye').addClass('fa-eye-slash');
+    });
+
+    // Pokaż/Ukryj hasło
+    $('#showPass').on('click', function() {
+        var passInput = $('#useradminform-password1');
+        var icon = $(this).find('i');
+
+        if (passInput.attr('type') === 'password') {
+            passInput.attr('type', 'text');
+            icon.removeClass('fa-eye').addClass('fa-eye-slash');
+        } else {
+            passInput.attr('type', 'password');
+            icon.removeClass('fa-eye-slash').addClass('fa-eye');
+        }
+    });
+});
+</script>
+{% endblock %}

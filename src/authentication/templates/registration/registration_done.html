@@ -1,11 +1,11 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="ru-RU">
+<html lang="pl">
 <head>
     <meta charset="UTF-8"/>
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
-    <link rel="icon" type="image/png" href="https://myhouse24.demodev.cc/favicon.png">
-    <title>Вход</title>
+    <link rel="icon" type="image/png" href="{% static 'assets/favicon.png' %}">
+    <title>Rejestracja</title>
     <link href="{% static 'bower_components/bootstrap/dist/css/bootstrap.min.css' %}" rel="stylesheet">
     <link href="{% static 'bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css' %}" rel="stylesheet">
     <link href="{% static 'bower_components/font-awesome/css/font-awesome.min.css' %}" rel="stylesheet">
@@ -25,14 +25,14 @@
         <div class="login-box">
             <div class="login-logo">
                 <a href="#">
-                    <img src="https://myhouse24.demodev.cc/logo.svg" alt="logo">
+                    <img src="{% static 'dist/img/logo-mini.svg' %}" alt="logo">
                 </a>
             </div>
             <div class="nav-tabs-custom">
                 <div class="tab-content">
                     <div class="box-body">
-                        <p class="box-msg">Мы отправили вам по электронной почте инструкции по для активации аккаунта. Вы должны получить их в ближайшее время.</p>
-                        <p class="box-msg">Если вы не получили письмо, пожалуйста, проверьте папку «Спам».</p>
+                        <p class="box-msg">Wysłaliśmy Ci e-mailem instrukcje dotyczące aktywacji konta. Powinieneś je otrzymać wkrótce.</p>
+                        <p class="box-msg">Jeśli nie otrzymałeś e-maila, sprawdź folder „Spam".</p>
                     </div>
                 </div>
             </div>

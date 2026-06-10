@@ -1,7 +1,105 @@
 from django.urls import path
-from . import views
 
+from src.settings.views import (
+    payment_details,
+    payment_items,
+    receipt_templates,
+    services,
+    tariffs,
+)
 
 app_name = "settings"
 
-urlpatterns = []
+urlpatterns = [
+    path(
+        "services/",
+        services.ServicesUpdateView.as_view(),
+        name="services_update",
+    ),
+    path(
+        "tariffs/",
+        tariffs.TariffsListView.as_view(),
+        name="tariffs_list",
+    ),
+    path(
+        "tariffs/ajax",
+        tariffs.TariffsAjaxDatatableView.as_view(),
+        name="tariffs_ajax_list",
+    ),
+    path(
+        "tariffs/create",
+        tariffs.TariffsCreateView.as_view(),
+        name="tariffs_create",
+    ),
+    path(
+        "tariffs/<int:pk>/detail",
+        tariffs.TariffsDetailView.as_view(),
+        name="tariffs_detail",
+    ),
+    path(
+        "tariffs/<int:pk>/services/ajax",
+        tariffs.TariffServicesAjaxDatatableView.as_view(),
+        name="tariff_services_ajax_list",
+    ),
+    path(
+        "tariffs/<int:pk>/update",
+        tariffs.TariffsUpdateView.as_view(),
+        name="tariffs_update",
+    ),
+    path(
+        "tariffs/<int:pk>/delete",
+        tariffs.TariffsDeleteView.as_view(),
+        name="tariffs_delete",
+    ),
+    path(
+        "payment_details/",
+        payment_details.PaymentDetailsView.as_view(),
+        name="payment_details",
+    ),
+    path(
+        "payment_items/",
+        payment_items.PaymentItemsListView.as_view(),
+        name="payment_items_list",
+    ),
+    path(
+        "payment_items/ajax",
+        payment_items.PaymentItemsAjaxDatatableView.as_view(),
+        name="payment_items_ajax_list",
+    ),
+    path(
+        "payment_items/create/",
+        payment_items.PaymentItemsCreateView.as_view(),
+        name="payment_items_create",
+    ),
+    path(
+        "payment_items/<int:pk>/update/",
+        payment_items.PaymentItemsUpdateView.as_view(),
+        name="payment_items_update",
+    ),
+    path(
+        "payment_items/<int:pk>/delete/",
+        payment_items.PaymentItemsDeleteView.as_view(),
+        name="payment_items_delete",
+    ),
+    # Receipt templates
+    path(
+        "receipt_templates/",
+        receipt_templates.ReceiptTemplatesView.as_view(),
+        name="receipt_templates",
+    ),
+    path(
+        "receipt_templates/<int:pk>/set_default/",
+        receipt_templates.ReceiptTemplateSetDefaultView.as_view(),
+        name="receipt_template_set_default",
+    ),
+    path(
+        "receipt_templates/<int:pk>/download/",
+        receipt_templates.ReceiptTemplateDownloadView.as_view(),
+        name="receipt_template_download",
+    ),
+    path(
+        "receipt_templates/<int:pk>/delete/",
+        receipt_templates.ReceiptTemplateDeleteView.as_view(),
+        name="receipt_template_delete",
+    ),
+]

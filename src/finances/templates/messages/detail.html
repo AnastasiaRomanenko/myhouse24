@@ -1,0 +1,42 @@
+{% extends 'admin_panel/base.html' %}
+{% load static %}
+
+{% block title %}Wiadomość{% endblock %}
+
+{% block content %}
+<div class="box">
+    <div class="box-header with-border">
+        <h3 class="box-title"></h3>
+        <div class="box-tools">
+            <a href="{% url 'finances:messages_update' message.id %}" class="btn btn-primary btn-sm">
+                <span class="hidden-xs">Edytuj</span><i class="fa fa-pencil visible-xs" aria-hidden="true"></i>
+            </a>
+        </div>
+    </div>
+
+    <div class="box-body no-padding">
+        <div class="mailbox-read-info">
+            <h3>{{ message.title }}</h3>
+            <h5>
+                Odbiorcy:
+                {% if message.to_debtors %}
+                    Właścicielom z zadłużeniem
+                {% else %}
+                    {{ message.flat|default:"-" }}
+                {% endif %}
+            </h5>
+        </div>
+        <div class="mailbox-read-message">
+            {{ message.description|safe }}
+        </div>
+    </div>
+    <div class="box-footer">
+        <form action="{% url 'finances:messages_delete' message.id %}" method="post" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-default" onclick="return confirm('Usuń?');">
+                <i class="fa fa-trash-o"></i> Usuń
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

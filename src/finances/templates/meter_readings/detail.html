@@ -1,0 +1,104 @@
+{% extends 'admin_panel/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="row">
+    <div class="col-xs-12 col-md-7 col-lg-6">
+        <div class="page-header-spec">
+            <div class="form-group">
+                <div class="input-group date">
+                    <div class="input-group-addon">№</div>
+                    <div class="form-control pull-right">{{ meter_reading.random_number }}</div>
+                </div>
+            </div>
+            <span class="label-mid">z dnia</span>
+            <div class="form-group">
+                <div class="input-group date">
+                    <div class="input-group-addon">
+                        <i class="glyphicon glyphicon-calendar"></i>
+                    </div>
+                    <div class="form-control pull-right">{{ meter_reading.created_at|date:"d.m.Y" }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="box">
+    <div class="box-header with-border">
+        <h3 class="box-title"></h3>
+        <div class="box-tools">
+            <a href="{% url 'finances:meter_readings_update' meter_reading.id %}" class="btn btn-primary btn-sm">
+                <span class="hidden-xs">Edytuj odczyt</span><i class="fa fa-pencil visible-xs" aria-hidden="true"></i>
+            </a>
+        </div>
+    </div>
+    <div class="box-body">
+        <div class="row">
+            <div class="col-xs-12 col-lg-4">
+                <table class="table table-bordered table-striped table-view">
+                    <tbody>
+                        <tr>
+                            <td>Licznik</td>
+                            <td>{{ meter_reading.meter_type.title }}</td>
+                        </tr>
+                        <tr>
+                            <td>Budynek</td>
+                            <td>
+                                {% if meter_reading.flat.house %}
+                                    <a href="{% url 'buildings:house_detail' meter_reading.flat.house.id %}">{{ meter_reading.flat.house.title }}</a>
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Sekcja</td>
+                            <td>{{ meter_reading.flat.section.title|default:"-" }}</td>
+                        </tr>
+                        <tr>
+                            <td>Mieszkanie</td>
+                            <td>
+                                {% if meter_reading.flat %}
+                                    <a href="{% url 'buildings:flat_detail' meter_reading.flat.id %}">{{ meter_reading.flat.number }}</a>
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Użytkownik</td>
+                            <td>
+                                {% if meter_reading.flat.owner %}
+                                    <a href="{% url 'users:owner_profile' meter_reading.flat.owner.id %}">{{ meter_reading.flat.owner.get_full_name|default:meter_reading.flat.owner.email }}</a>
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Bieżące odczyty</td>
+                            <td>{{ meter_reading.current_data }}</td>
+                        </tr>
+                        <tr>
+                            <td>Jedn. miary</td>
+                            <td>{{ meter_reading.meter_type.unit_of_measurement.title|default:"-" }}</td>
+                        </tr>
+                        <tr>
+                            <td>Status</td>
+                            <td><small class="label label-default">{{ meter_reading.get_status_display }}</small></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <form action="{% url 'finances:meter_readings_delete' meter_reading.id %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-default" onclick="return confirm('Usuń?');">
+                        <i class="fa fa-trash"></i> Usuń
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

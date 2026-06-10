@@ -1,0 +1,142 @@
+{% extends 'admin_panel/base.html' %}
+{% load static %}
+
+{% block title %}Wiadomości{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-xs-12">
+        <div class="pull-right margin-bottom">
+            <a class="btn btn-success" href="{% url 'finances:messages_create' %}">Wyślij wiadomość</a>
+        </div>
+    </div>
+</div>
+
+<div class="box">
+    <div class="box-header with-border">
+        <h3 class="box-title"></h3>
+        <div class="box-tools pull-right">
+            <button type="button" id="clear-filters" class="btn btn-default btn-sm">
+                <span class="hidden-xs">Wyczyść</span>
+                <i class="fa fa-eraser visible-xs" aria-hidden="true"></i>
+            </button>
+        </div>
+    </div>
+
+    <div class="box-body no-padding">
+        <div id="w0" class="grid-view">
+            <div class="mailbox-controls">
+                <button type="button" class="btn btn-default btn-sm checkbox-toggle" title="Zaznacz wszystkie">
+                    <i class="fa fa-square-o"></i>
+                </button>
+            </div>
+
+            <div class="table-responsive mailbox-messages">
+                <table id="messages-table" class="table table-hover table-striped linkedRow" width="100%">
+                    <thead>
+                        <tr>
+                            <th style="width: 40px">&nbsp;</th>
+                            <th style="min-width: 200px">Odbiorcy</th>
+                            <th style="min-width: 200px">Temat</th>
+                            <th>Treść</th>
+                            <th style="width: 85px; min-width: 85px">&nbsp;</th>
+                        </tr>
+                        <tr class="filters">
+                            <th></th>
+                            <th colspan="3">
+                                <input type="text" class="form-control form-control-sm dt-filter" data-name="search" placeholder="Szukaj">
+                            </th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(function () {
+    $('[data-toggle="tooltip"]').tooltip();
+
+    var table = $('#messages-table').DataTable({
+        processing: true,
+        serverSide: true,
+        searching: false,
+        lengthChange: true,
+        pageLength: 25,
+        orderCellsTop: true,
+        autoWidth: false,
+        ajax: {
+            url: "{% url 'finances:messages_ajax_list' %}",
+            type: "GET",
+            data: function (d) {
+                d.search = $('[data-name="search"]').val();
+            }
+        },
+        order: [[2, 'asc']],
+        columns: [
+            {data: 'selection', name: 'selection', orderable: false, searchable: false},
+            {data: 'recipient', name: 'recipient', orderable: false, searchable: false},
+            {data: 'title', name: 'title'},
+            {data: 'description', name: 'description'},
+            {data: 'actions', name: 'actions', orderable: false, searchable: false}
+        ],
+        createdRow: function (row, data) {
+            if (data.row_href) {
+                $(row).attr('data-href', data.row_href);
+                $(row).attr('data-key', data.id);
+                $(row).css('cursor', 'pointer');
+            }
+        },
+        drawCallback: function () {
+            $('[data-toggle="tooltip"]').tooltip();
+        },
+        language: {
+            processing: "Ładowanie...",
+            lengthMenu: "Pokaż _MENU_ rekordów",
+            zeroRecords: "Nic nie znaleziono",
+            info: "Pokazano od _START_ do _END_ z _TOTAL_ rekordów",
+            infoEmpty: "Brak rekordów",
+            infoFiltered: "(przefiltrowano z _MAX_ rekordów)",
+            paginate: {
+                first: "Pierwsza",
+                last: "Ostatnia",
+                next: "»",
+                previous: "«"
+            }
+        }
+    });
+
+    var debounceTimer = null;
+    $(document).on('input', '.dt-filter[type="text"]', function () {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(function () {
+            table.ajax.reload(null, true);
+        }, 400);
+    });
+
+    $('#clear-filters').on('click', function () {
+        $('.dt-filter').val('');
+        table.ajax.reload(null, true);
+    });
+
+    $('.checkbox-toggle').on('click', function () {
+        var checked = !$(this).data('checked');
+        $('#messages-table tbody input[type="checkbox"]').prop('checked', checked);
+        $('.checkbox-toggle > .fa')
+            .toggleClass('fa-check-square-o', checked)
+            .toggleClass('fa-square-o', !checked);
+        $(this).data('checked', checked);
+    });
+
+    $(document).on('click', '#messages-table tbody tr[data-href]', function (e) {
+        if ($(e.target).closest('a, button, form, input').length) return;
+        window.location.href = $(this).data('href');
+    });
+});
+</script>
+{% endblock %}

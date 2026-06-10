@@ -1,0 +1,47 @@
+{% extends 'admin_panel/base.html' %}
+{% load static %}
+
+{% block title %}Nowa pozycja{% endblock %}
+
+{% block content %}
+<div class="box">
+    <div class="box-body">
+        <form id="w0" method="post">
+            {% csrf_token %}
+
+            <div class="row">
+                <div class="col-xs-12 col-lg-7">
+                    <div class="form-group field-transactionpurpose-name required">
+                        <label class="control-label" for="transactionpurpose-name">Nazwa</label>
+                        <input type="text" id="transactionpurpose-name" class="form-control" name="name" value="{{ purpose.name|default:'' }}" aria-required="true" required>
+                        <div class="help-block text-danger">{{ form.name.errors }}</div>
+                    </div>
+
+                    <div class="form-group field-transactionpurpose-type">
+                        <label class="control-label" for="transactionpurpose-type">Przychód/Wydatek</label>
+                        <select id="transactionpurpose-type" class="form-control" name="type">
+                            <option value="income" {% if purpose.type == 'income' %}selected{% endif %}>Przychód</option>
+                            <option value="expense" {% if purpose.type == 'expense' %}selected{% endif %}>Zużycie</option>
+                        </select>
+                        <div class="help-block text-danger">{{ form.type.errors }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-xs-12 text-right">
+                    <div class="form-group">
+                        {% if purpose %}
+                        <a href="{% url 'settings:payment_items_update' purpose.id %}" class="btn btn-default">Anuluj</a>
+                        {% else %}
+                        <a href="{% url 'settings:payment_items_create' %}" class="btn btn-default">Anuluj</a>
+                        {% endif %}
+                        <button type="submit" class="btn btn-success">Zapisz</button>
+                    </div>
+                </div>
+            </div>
+
+        </form>
+    </div>
+</div>
+{% endblock %}

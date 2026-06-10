@@ -1,0 +1,99 @@
+{% extends 'website/base.html' %}
+{% load static %}
+
+{% block title %}{{ seo.title|default:"Nasze usługi" }}{% endblock %}
+{% block meta_description %}{{ seo.description|default:"" }}{% endblock %}
+{% block meta_keywords %}{{ seo.keywords|default:"" }}{% endblock %}
+
+{% block content %}
+<div class="breadcrumbs">
+    <div class="container">
+        <div class="row">
+            <div class="col-xs-12">
+                <ol class="breadcrumb">
+                    <li><a href="{% url 'main:home_page' %}">Strona główna</a></li>
+                    <li class="active">Usługi</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="services">
+    <div class="container">
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="page-header">
+                    <h3>Nasze usługi</h3>
+                </div>
+            </div>
+        </div>
+
+        {% for service in services %}
+            <div class="row">
+                <div class="col-xs-12 col-md-7">
+                    {% if service.image %}
+                        <img src="{{ service.image.url }}" class="img-responsive img-thumbnail" alt="{{ service.title }}">
+                    {% else %}
+                        <img src="{% static 'img/placeholder.jpg' %}" class="img-responsive img-thumbnail" alt="Brak zdjęcia">
+                    {% endif %}
+                </div>
+                <div class="col-xs-12 col-md-5">
+                    <div class="page-header">
+                        <h3>{{ service.title }}</h3>
+                    </div>
+                    <div class="service-description">
+                        {{ service.description|safe }}
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="row">
+                <div class="col-xs-12 text-center">
+                    <p>Brak dostępnych usług.</p>
+                </div>
+            </div>
+        {% endfor %}
+
+    </div>
+</div>
+
+{% if is_paginated %}
+<div class="paginations">
+    <div class="container">
+        <div class="row">
+            <div class="col-xs-12 text-center">
+                <nav aria-label="Page navigation">
+                    <ul class="pagination">
+                        {% if page_obj.has_previous %}
+                            <li class="prev">
+                                <a href="?page={{ page_obj.previous_page_number }}">&laquo;</a>
+                            </li>
+                        {% else %}
+                            <li class="prev disabled"><span>&laquo;</span></li>
+                        {% endif %}
+
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                                <li class="active"><span>{{ num }}</span></li>
+                            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                <li><a href="?page={{ num }}">{{ num }}</a></li>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if page_obj.has_next %}
+                            <li class="next">
+                                <a href="?page={{ page_obj.next_page_number }}">&raquo;</a>
+                            </li>
+                        {% else %}
+                            <li class="next disabled"><span>&raquo;</span></li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% endblock %}

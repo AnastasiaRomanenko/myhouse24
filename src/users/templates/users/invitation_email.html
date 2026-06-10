@@ -1,0 +1,23 @@
+<p>
+    Witaj w MyHouse24, {{ user.email }}!
+</p>
+
+<p>
+    Aby potwierdzić konto, kliknij poniższy link:
+</p>
+
+<p>
+    <a href="{{ protocol }}://{{ domain }}{% url 'users:set_password' uidb64=uid token=token %}">
+        Potwierdź konto
+    </a>
+</p>
+
+<p>
+    Jeśli kliknięcie nie działa, skopiuj i wklej URL do przeglądarki:
+    <br>{{ protocol }}://{{ domain }}{% url 'users:set_password' uidb64=uid token=token %}
+</p>
+
+<p>
+    Z poważaniem,
+    <br>Zespół MyHouse24
+</p>

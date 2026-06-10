@@ -1,0 +1,516 @@
+{% extends 'admin_panel/base.html' %}
+{% load static %}
+
+{% block content %}
+<form id="receipt-form" action="{{ form_url }}" method="post">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+
+    <div class="row">
+        <div class="col-xs-12 col-md-7 col-lg-6">
+            <div class="page-header-spec">
+                <div class="form-group">
+                    <div class="input-group">
+                        <div class="input-group-addon">№</div>
+                        {{ form.random_number }}
+                    </div>
+                    <div class="help-block text-danger">{{ form.random_number.errors }}</div>
+                </div>
+                <span class="label-mid">z dnia</span>
+                <div class="form-group">
+                    <div class="input-group date">
+                        <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+                        {{ form.date_from }}
+                    </div>
+                    <div class="help-block text-danger">{{ form.date_from.errors }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="box">
+        <div class="box-body">
+            <div class="row">
+                <div class="col-xs-12 col-sm-6">
+
+                    <div class="form-group">
+                        <label class="control-label">Budynek</label>
+                        <select id="id_house" name="house" class="form-control">
+                            <option value="">Wybierz...</option>
+                            {% for house in form.fields.house.queryset %}
+                                <option value="{{ house.id }}"
+                                    {% if selected_house and selected_house.id == house.id %}selected{% endif %}>
+                                    {{ house.title }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label">Sekcja</label>
+                        <select id="id_section" name="section" class="form-control">
+                            <option value="">Wybierz...</option>
+                            {% for section in sections %}
+                                <option value="{{ section.id }}"
+                                    {% if selected_section and selected_section.id == section.id %}selected{% endif %}>
+                                    {{ section.title }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label">Piętro</label>
+                        <select id="id_floor" name="floor" class="form-control">
+                            <option value="">Wybierz...</option>
+                            {% for floor in floors %}
+                                <option value="{{ floor.id }}"
+                                    {% if selected_floor and selected_floor.id == floor.id %}selected{% endif %}>
+                                    {{ floor.title }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label">Mieszkanie</label>
+                        <select id="id_flat" name="flat" class="form-control">
+                            <option value="">Wybierz...</option>
+                            {% if selected_flat %}
+                                <option value="{{ selected_flat.id }}" selected>{{ selected_flat.number }}</option>
+                            {% endif %}
+                        </select>
+                        <div class="help-block text-danger">{{ form.flat.errors }}</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label">Konto osobiste</label>
+                        {{ form.bank_book }}
+                        <div class="help-block text-danger">{{ form.bank_book.errors }}</div>
+                    </div>
+
+                    <div id="owner-info" class="form-group">
+                        <p class="text-muted">Właściciel: <span id="owner-name">{{ owner_name }}</span></p>
+                        <p class="text-muted">Telefon: <span id="owner-phone">{{ owner_phone }}</span></p>
+                    </div>
+
+                    <div class="form-group">
+                        <label><input type="checkbox" name="completed" {% if form.completed.value %}checked{% endif %}> Zaksięgowano</label>
+                        <div class="help-block text-danger">{{ form.completed.errors }}</div>
+                    </div>
+                </div>
+
+                <div class="col-xs-12 col-sm-6">
+                    <div class="form-group">
+                        <label class="control-label">Status</label>
+                        {{ form.status }}
+                        <div class="help-block text-danger">{{ form.status.errors }}</div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">Taryfa</label>
+                        {{ form.tariff }}
+                        <div class="help-block text-danger">{{ form.tariff.errors }}</div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-6">
+                            <div class="form-group">
+                                <label class="control-label">Okres od</label>
+                                {{ form.period_from }}
+                                <div class="help-block text-danger">{{ form.period_from.errors }}</div>
+                            </div>
+                        </div>
+                        <div class="col-xs-6">
+                            <div class="form-group">
+                                <label class="control-label">Okres do</label>
+                                {{ form.period_to }}
+                                <div class="help-block text-danger">{{ form.period_to.errors }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {# Services table #}
+            <div class="row">
+                <div class="col-xs-12">
+                    {{ formset.management_form }}
+                    {{ formset.non_form_errors }}
+                    <div class="table-responsive no-padding">
+                        <table class="table table-bordered table-hover" id="services-table">
+                            <thead>
+                                <tr>
+                                    <th style="min-width: 200px;">Usługa</th>
+                                    <th style="min-width: 100px;">Zużycie</th>
+                                    <th style="min-width: 100px;">Jedn. miary</th>
+                                    <th style="min-width: 140px;">Cena za jedn., zł</th>
+                                    <th style="min-width: 130px;">Wartość, zł</th>
+                                    <th style="width: 60px;">Usuń</th>
+                                </tr>
+                            </thead>
+                            <tbody id="service-rows">
+                                {% for sform in formset %}
+                                <tr class="service-row">
+                                    {{ sform.id }}
+                                    {% if sform.instance.pk %}{{ sform.DELETE.as_hidden }}{% endif %}
+                                    <td>
+                                        {{ sform.service }}
+                                        <div class="help-block text-danger">{{ sform.service.errors }}</div>
+                                    </td>
+                                    <td>
+                                        {{ sform.amount }}
+                                        <div class="help-block text-danger">{{ sform.amount.errors }}</div>
+                                    </td>
+                                    <td class="svc-unit">
+                                        {% if sform.instance.pk and sform.instance.service_id %}
+                                            {{ sform.instance.service.unit_of_measurement.title|default:"" }}
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {{ sform.price }}
+                                        <div class="help-block text-danger">{{ sform.price.errors }}</div>
+                                    </td>
+                                    <td class="svc-total text-right">
+                                        {% if sform.instance.pk %}
+                                            {{ sform.instance.price|floatformat:2 }}
+                                        {% else %}
+                                            0.00
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-center">
+                                        {% if not sform.instance.pk %}
+                                            <button type="button" class="btn btn-default btn-sm remove-row"><i class="fa fa-trash"></i></button>
+                                        {% else %}
+                                            <label>{{ sform.DELETE }}</label>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="6">
+                                        <button type="button" class="btn btn-default" id="add-service">Dodaj usługę</button>
+                                        <button type="button" class="btn btn-default" id="set-tariff-services">Ustaw wszystkie usługi według taryfy</button>
+                                        <button type="button" class="btn btn-info" id="fill-meter-readings" title="Wypełnij zużycie z ostatnich odczytów liczników dla wybranego mieszkania">
+                                            <i class="fa fa-tachometer"></i> Dodaj odczyty liczników
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="4" class="text-right"><strong>Razem:</strong></td>
+                                    <td id="grand-total" class="text-right"><strong>0.00 zł</strong></td>
+                                    <td></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            {# Meter readings table #}
+            <div class="row" style="margin-top: 20px;">
+                <div class="col-xs-12">
+                    <h4>Odczyty liczników</h4>
+                    <div class="table-responsive no-padding">
+                        <table class="table table-bordered table-hover table-striped" id="meter-readings-table">
+                            <thead>
+                                <tr>
+                                    <th>№</th>
+                                    <th>Status</th>
+                                    <th>Data</th>
+                                    <th>Miesiąc</th>
+                                    <th>Budynek</th>
+                                    <th>Sekcja</th>
+                                    <th>Nr mieszkania</th>
+                                    <th>Licznik</th>
+                                    <th>Odczyty</th>
+                                    <th>Jedn. miary</th>
+                                </tr>
+                            </thead>
+                            <tbody id="meter-readings-body">
+                                {% for mr in meter_readings %}
+                                <tr>
+                                    <td>{{ mr.random_number }}</td>
+                                    <td>{{ mr.get_status_display }}</td>
+                                    <td>{{ mr.created_at|date:"d.m.Y" }}</td>
+                                    <td>{{ mr.created_at|date:"m.Y" }}</td>
+                                    <td>{% if mr.flat_id and mr.flat.house_id %}{{ mr.flat.house.title }}{% else %}-{% endif %}</td>
+                                    <td>{% if mr.flat_id and mr.flat.section_id %}{{ mr.flat.section.title }}{% else %}-{% endif %}</td>
+                                    <td>{% if mr.flat_id %}{{ mr.flat.number }}{% else %}-{% endif %}</td>
+                                    <td>{% if mr.meter_type_id %}{{ mr.meter_type.title }}{% else %}-{% endif %}</td>
+                                    <td>{{ mr.current_data }}</td>
+                                    <td>{% if mr.meter_type_id and mr.meter_type.unit_of_measurement_id %}{{ mr.meter_type.unit_of_measurement.title }}{% else %}-{% endif %}</td>
+                                </tr>
+                                {% empty %}
+                                <tr><td colspan="10" class="text-center text-muted">Brak odczytów liczników</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row" style="margin-top: 20px;">
+                <div class="col-xs-12 text-right">
+                    <div class="form-group">
+                        <a href="{% url 'finances:payment_receipts_list' %}" class="btn btn-default">Anuluj</a>
+                        <button type="submit" class="btn btn-success">Zapisz</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<template id="empty-service-row">
+    <tr class="service-row">
+        {{ formset.empty_form.id }}
+        <td>{{ formset.empty_form.service }}<div class="help-block text-danger"></div></td>
+        <td>{{ formset.empty_form.amount }}<div class="help-block text-danger"></div></td>
+        <td class="svc-unit"></td>
+        <td>{{ formset.empty_form.price }}<div class="help-block text-danger"></div></td>
+        <td class="svc-total text-right">0.00</td>
+        <td class="text-center">
+            <button type="button" class="btn btn-default btn-sm remove-row"><i class="fa fa-trash"></i></button>
+        </td>
+    </tr>
+</template>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(function () {
+    function plainSelect2($el) {
+        $el.select2({width: '100%', allowClear: true, placeholder: 'Wybierz...', language: 'ru'});
+    }
+
+    // ---- Cascading house → section → floor → flat ----
+    $('#id_house').select2({width: '100%', allowClear: true, placeholder: 'Wybierz...', language: 'ru'});
+    $('#id_section').select2({width: '100%', allowClear: true, placeholder: 'Wybierz...', language: 'ru'});
+    $('#id_floor').select2({width: '100%', allowClear: true, placeholder: 'Wybierz...', language: 'ru'});
+    $('#id_flat').select2({width: '100%', allowClear: true, placeholder: 'Wybierz...', language: 'ru'});
+
+    function loadChildren(houseId) {
+        $('#id_section').html('<option value="">Wybierz...</option>').trigger('change.select2');
+        $('#id_floor').html('<option value="">Wybierz...</option>').trigger('change.select2');
+        $('#id_flat').html('<option value="">Wybierz...</option>').trigger('change.select2');
+        if (!houseId) return;
+        $.get("{% url 'buildings:house_children' %}", {house_id: houseId}, function(data) {
+            data.sections.forEach(function(s) {
+                $('#id_section').append('<option value="' + s.id + '">' + s.text + '</option>');
+            });
+            data.floors.forEach(function(f) {
+                $('#id_floor').append('<option value="' + f.id + '">' + f.text + '</option>');
+            });
+        });
+    }
+
+    function loadFlats() {
+        var house = $('#id_house').val();
+        var section = $('#id_section').val();
+        var floor = $('#id_floor').val();
+        $('#id_flat').html('<option value="">Wybierz...</option>').trigger('change.select2');
+        if (!house || !section || !floor) return;
+        $.get("{% url 'finances:get_flats' %}", {house_id: house, section_id: section, floor_id: floor}, function(data) {
+            data.forEach(function(f) {
+                $('#id_flat').append('<option value="' + f.id + '">' + f.number + '</option>');
+            });
+        });
+    }
+
+    $('#id_house').on('change', function() { loadChildren($(this).val()); });
+    $('#id_section, #id_floor').on('change', loadFlats);
+
+    // When flat changes, load meter readings
+    $('#id_flat').on('change', function() {
+        var flatId = $(this).val();
+        if (!flatId) {
+            $('#meter-readings-body').html('<tr><td colspan="10" class="text-center text-muted">Brak odczytów liczników</td></tr>');
+            return;
+        }
+        $.get("{% url 'finances:flat_meter_readings' %}", {flat_id: flatId}, function(data) {
+            var rows = '';
+            if (data.readings.length === 0) {
+                rows = '<tr><td colspan="10" class="text-center text-muted">Brak odczytów liczników</td></tr>';
+            } else {
+                data.readings.forEach(function(r) {
+                    rows += '<tr><td>' + r.random_number + '</td><td>' + r.status + '</td><td>' +
+                        r.created_at + '</td><td>' + r.month + '</td><td>' + r.house + '</td><td>' +
+                        r.section + '</td><td>' + r.flat_number + '</td><td>' + r.meter_type +
+                        '</td><td>' + r.current_data + '</td><td>' + r.unit + '</td></tr>';
+                });
+            }
+            $('#meter-readings-body').html(rows);
+        });
+    });
+
+    // ---- Bank book select2 + owner info ----
+    $('#id_bank_book').select2({width: '100%', allowClear: true, placeholder: 'Wybierz...', language: 'ru',
+        ajax: {
+            url: "{% url 'finances:bank_book_select2' %}",
+            dataType: 'json', delay: 250,
+            data: function(p) { return {term: p.term || '', page: p.page || 1}; },
+            processResults: function(d) { return d; }, cache: true
+        }
+    });
+
+    $('#id_bank_book').on('change', function() {
+        var bbId = $(this).val();
+        if (!bbId) {
+            $('#owner-name').text('nie wybrano');
+            $('#owner-phone').text('nie wybrano');
+            return;
+        }
+        $.get("{% url 'finances:bank_book_owner_info' 0 %}".replace('/0/', '/' + bbId + '/'), function(data) {
+            $('#owner-name').text(data.owner);
+            $('#owner-phone').text(data.phone);
+        });
+    });
+
+    plainSelect2($('#id_tariff'));
+    plainSelect2($('#id_status'));
+
+    // ---- Service rows ----
+    var serviceUnitUrl = "{% url 'finances:service_unit' %}";
+    var totalFormsInput = $('#id_lines-TOTAL_FORMS');
+
+    function initServiceRow($row) {
+        var $svc = $row.find('.service-select');
+        $svc.select2({width: '100%', allowClear: true, placeholder: 'Wybierz...', language: 'ru'});
+        $svc.on('change', function() {
+            var svcId = $(this).val();
+            var $tr = $(this).closest('tr');
+            if (!svcId) {
+                $tr.find('.svc-unit').text('');
+                return;
+            }
+            $.get(serviceUnitUrl, {service_id: svcId}, function(data) {
+                $tr.find('.svc-unit').text(data.unit || '');
+            });
+            recalcRow($tr);
+        });
+        $row.find('.svc-price, .svc-amount').on('input', function() {
+            recalcRow($(this).closest('tr'));
+        });
+    }
+
+    function recalcRow($tr) {
+        var price = parseFloat($tr.find('.svc-price').val()) || 0;
+        var amount = parseFloat($tr.find('.svc-amount').val()) || 0;
+        $tr.find('.svc-total').text((price * amount).toFixed(2));
+        recalcTotal();
+    }
+
+    function recalcTotal() {
+        var total = 0;
+        $('#service-rows .service-row:visible').each(function() {
+            total += parseFloat($(this).find('.svc-total').text()) || 0;
+        });
+        $('#grand-total').html('<strong>' + total.toFixed(2) + ' zł</strong>');
+    }
+
+    $('.service-row').each(function() { initServiceRow($(this)); });
+    recalcTotal();
+
+    $('#add-service').on('click', function() {
+        var index = parseInt(totalFormsInput.val(), 10);
+        var html = $('#empty-service-row').html().replace(/__prefix__/g, index);
+        var $row = $(html);
+        $('#service-rows').append($row);
+        initServiceRow($row);
+        totalFormsInput.val(index + 1);
+        recalcTotal();
+    });
+
+    $(document).on('click', '.remove-row', function() {
+        $(this).closest('tr').remove();
+        recalcTotal();
+    });
+
+    // ---- Uzupełnij zużycie z ostatnich odczytów liczników ----
+    $('#fill-meter-readings').on('click', function() {
+        var flatId = $('#id_flat').val();
+        if (!flatId) {
+            alert('Najpierw wybierz mieszkanie.');
+            return;
+        }
+        $.get("{% url 'finances:flat_meter_readings' %}", {flat_id: flatId}, function(data) {
+            if (!data.readings || data.readings.length === 0) {
+                alert('Brak odczytów liczników dla wybranego mieszkania.');
+                return;
+            }
+            // Build map: service_id → latest current_data
+            // Readings already ordered by -created_at, so first occurrence wins
+            var serviceData = {};
+            data.readings.forEach(function(r) {
+                if (r.meter_type_id && !(r.meter_type_id in serviceData)) {
+                    serviceData[r.meter_type_id] = r.current_data;
+                }
+            });
+            var filled = 0;
+            $('#service-rows .service-row').each(function() {
+                var $row = $(this);
+                var svcId = $row.find('.service-select').val();
+                if (svcId && serviceData.hasOwnProperty(parseInt(svcId))) {
+                    $row.find('.svc-amount').val(serviceData[parseInt(svcId)]);
+                    recalcRow($row);
+                    filled++;
+                }
+            });
+            if (filled === 0) {
+                alert('Żadna z dodanych usług nie odpowiada odczytom liczników.');
+            } else {
+                recalcTotal();
+            }
+        });
+    });
+
+    // ---- Set all services from tariff ----
+    $('#set-tariff-services').on('click', function() {
+        var tariffId = $('#id_tariff').val();
+        if (!tariffId) {
+            alert('Najpierw wybierz taryfę.');
+            return;
+        }
+        $.get("{% url 'finances:tariff_services' %}", {tariff_id: tariffId}, function(data) {
+            // Django requires all forms at indices < INITIAL_FORMS to have a valid pk.
+            // We cannot reuse those indices for new rows.
+            // Strategy:
+            //   • Initial (already-saved) rows → keep in DOM but hide + mark DELETE=on
+            //   • Extra (unsaved) rows added this session → remove entirely
+            //   • New rows from tariff → add starting at the INITIAL_FORMS index
+            var initialCount = parseInt($('#id_lines-INITIAL_FORMS').val(), 10) || 0;
+
+            $('#service-rows .service-row').each(function(i) {
+                var $row = $(this);
+                if (i < initialCount) {
+                    // Mark the DELETE checkbox/hidden input as checked so Django deletes this line
+                    $row.find('input[type="checkbox"][name$="-DELETE"]').prop('checked', true);
+                    $row.find('input[type="hidden"][name$="-DELETE"]').val('on');
+                    $row.hide();
+                } else {
+                    $row.remove();
+                }
+            });
+
+            // Start new rows right after the (now-hidden) initial rows
+            totalFormsInput.val(initialCount);
+
+            data.services.forEach(function(svc) {
+                var index = parseInt(totalFormsInput.val(), 10);
+                var html = $('#empty-service-row').html().replace(/__prefix__/g, index);
+                var $row = $(html);
+                $row.find('.service-select').append('<option value="' + svc.id + '" selected>' + svc.title + '</option>');
+                $row.find('.svc-price').val(svc.price.toFixed(2));
+                $row.find('.svc-unit').text(svc.unit);
+                $row.find('.svc-total').text(svc.price.toFixed(2));
+                $('#service-rows').append($row);
+                initServiceRow($row);
+                totalFormsInput.val(index + 1);
+            });
+            recalcTotal();
+        });
+    });
+});
+</script>
+{% endblock %}

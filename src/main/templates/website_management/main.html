@@ -1,0 +1,236 @@
+{% extends 'admin_panel/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="box">
+    <div class="box-header with-border">
+        <div class="box-tools">
+            <a href="#" class="btn btn-default btn-sm updateSeoFiles">
+                <span class="hidden-xs">Aktualizuj robots i sitemap</span><i class="fa fa-refresh visible-xs" aria-hidden="true"></i>
+            </a>
+        </div>
+    </div>
+    <div class="box-body">
+        <form id="w0" action="{% url 'main:main_update' %}" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <h3 class="page-header">Slider</h3>
+            <div class="row site-main-slider">
+                <div class="col-md-4">
+                    <h4>Slajd 1</h4>
+                    {% if form.instance.slide1 %}
+                        <img width="375" height="210" src="{{ form.instance.slide1.url }}" alt="slide1">
+                    {% else %}
+                        <img src="{% static 'assets/empty_placeholder.jpeg' %}" width="375" height="210" alt="Slajd nie załadowany">
+                    {% endif %}
+                    <div class="form-group">
+                        <label class="control-label">Zalecany rozmiar: (1920x800)</label>
+                        {{ form.slide1 }}
+                        <span class="text-danger">{{ form.slide1.errors }}</span>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <h4>Slajd 2</h4>
+                    {% if form.instance.slide2 %}
+                        <img width="375" height="210" src="{{ form.instance.slide2.url }}" alt="slide2">
+                    {% else %}
+                        <img src="{% static 'assets/empty_placeholder.jpeg' %}" width="375" height="210" alt="Slajd nie załadowany">
+                    {% endif %}
+                    <div class="form-group">
+                        <label class="control-label">Zalecany rozmiar: (1920x800)</label>
+                        {{ form.slide2 }}
+                        <span class="text-danger">{{ form.slide2.errors }}</span>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <h4>Slajd 3</h4>
+                    {% if form.instance.slide3 %}
+                        <img width="375" height="210" src="{{ form.instance.slide3.url }}" alt="slide3">
+                    {% else %}
+                        <img src="{% static 'assets/empty_placeholder.jpeg' %}" width="375" height="210" alt="Slajd nie załadowany">
+                    {% endif %}
+                    <div class="form-group">
+                        <label class="control-label">Zalecany rozmiar: (1920x800)</label>
+                        {{ form.slide3 }}
+                        <span class="text-danger">{{ form.slide3.errors }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <h3 class="page-header">Krótkie informacje</h3>
+                    <div class="form-group">
+                        <label class="control-label">Krótkie informacje</label>
+                        {{ form.title }}
+                        <span class="text-danger">{{ form.title.errors }}</span>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">Krótki opis</label>
+                        {{ form.description }}
+                        <span class="text-danger">{{ form.description.errors }}</span>
+                    </div>
+                    <div class="checkbox">
+                        <label>{{ form.show_app_links }} Pokaż linki do aplikacji</label>
+                        <span class="text-danger">{{ form.show_app_links.errors }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row near-img" id="blocks-container">
+                <div class="col-xs-12">
+                    <h3 class="page-header">W naszym sąsiedztwie</h3>
+                </div>
+                {{ block_formset.management_form }}
+                {{ block_formset.non_form_errors }}
+                {% for block in block_formset %}
+                    <div class="col-md-4 site-block-form">
+                        {% for hidden in block.hidden_fields %}{{ hidden }}{% endfor %}
+                        <h4>
+                            Blok {{ forloop.counter }}
+                            <a href="#" class="pull-right text-red form-row-remove-btn" title="Usuń">
+                                <i class="fa fa-trash"></i>
+                            </a>
+                        </h4>
+                        {% if block.instance.image %}
+                            <img width="375" height="210" src="{{ block.instance.image.url }}" alt="{{ block.instance.title }}" class="margin-bottom-15">
+                        {% else %}
+                            <img src="{% static 'assets/empty_placeholder.jpeg' %}" width="375" height="210" alt="Zdjęcie nie załadowane" class="margin-bottom-15">
+                        {% endif %}
+                        <div class="form-group">
+                            <label class="control-label">Zalecany rozmiar: (1000x600)</label>
+                            {{ block.image }}
+                            <span class="text-danger">{{ block.image.errors }}</span>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label">Nagłówek bloku</label>
+                            {{ block.title }}
+                            <span class="text-danger">{{ block.title.errors }}</span>
+                        </div>
+                        <div class="form-group margin-bottom-30">
+                            <label class="control-label">Opis</label>
+                            {{ block.description }}
+                            <span class="text-danger">{{ block.description.errors }}</span>
+                        </div>
+                        {% if block.DELETE %}
+                            <div class="hidden">{{ block.DELETE }}</div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+
+            <div class="row">
+                <div class="col-xs-12 text-center margin-bottom-15">
+                    <button type="button" class="btn btn-success form-row-add-block-btn">
+                        <i class="fa fa-plus"></i> Dodaj blok
+                    </button>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <h3 class="page-header">Ustawienia SEO</h3>
+                    <div class="form-group">
+                        <label class="control-label">Nagłówek</label>
+                        {{ seo_block.title }}
+                        <span class="text-danger">{{ seo_block.title.errors }}</span>
+                    </div>
+                    <div class="form-group">
+                        <label>Opis</label>
+                        {{ seo_block.description }}
+                        <span class="text-danger">{{ seo_block.description.errors }}</span>
+                    </div>
+                    <div class="form-group">
+                        <label>Słowa kluczowe</label>
+                        {{ seo_block.keywords }}
+                        <span class="text-danger">{{ seo_block.keywords.errors }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-xs-12 text-center">
+                    <div class="form-group">
+                        <a href="{% url 'main:main_update' %}" class="btn btn-default">Anuluj</a>
+                        <button type="submit" class="btn btn-success">Zapisz</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="empty-block-form" style="display: none;">
+                <div class="col-md-4 site-block-form">
+                    {% for hidden in block_formset.empty_form.hidden_fields %}{{ hidden }}{% endfor %}
+                    <h4>
+                        Blok
+                        <a href="#" class="pull-right text-red form-row-remove-btn" title="Usuń">
+                            <i class="fa fa-trash"></i>
+                        </a>
+                    </h4>
+                    <img src="{% static 'assets/empty_placeholder.jpeg' %}" width="520" height="300" alt="Zdjęcie nie załadowane" class="margin-bottom-15">
+                    <div class="form-group">
+                        <label class="control-label">Zalecany rozmiar: (1000x600)</label>
+                        {{ block_formset.empty_form.image }}
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">Nagłówek bloku</label>
+                        {{ block_formset.empty_form.title }}
+                    </div>
+                    <div class="form-group margin-bottom-30">
+                        <label class="control-label">Opis</label>
+                        {{ block_formset.empty_form.description }}
+                    </div>
+                    {% if block_formset.empty_form.DELETE %}
+                        <div class="hidden">{{ block_formset.empty_form.DELETE }}</div>
+                    {% endif %}
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(function () {
+    function initEditors($scope) {
+        $scope.find("textarea.compose-textarea").not('#empty-block-form textarea').wysihtml5({
+            locale: 'ru-RU',
+            toolbar: {
+                "font-styles": true,
+                "emphasis": true,
+                "lists": true,
+                "html": false,
+                "link": false,
+                "image": false,
+                "color": false,
+                "blockquote": false,
+                "fa": true,
+                "size": 'none'
+            }
+        });
+    }
+
+    initEditors($(document));
+
+    $('.form-row-add-block-btn').on('click', function (e) {
+        e.preventDefault();
+        var totalFormsInput = $('#id_blocks-TOTAL_FORMS');
+        var index = parseInt(totalFormsInput.val(), 10);
+        var html = $('#empty-block-form').html().replace(/__prefix__/g, index);
+        $('#blocks-container').append(html);
+        totalFormsInput.val(index + 1);
+        initEditors($('#blocks-container .site-block-form').last());
+    });
+
+    $(document).on('click', '.form-row-remove-btn', function (e) {
+        e.preventDefault();
+        if (!confirm('Usuń?')) return;
+        var $row = $(this).closest('.site-block-form');
+        $row.find('input[type="checkbox"][name$="-DELETE"]').prop('checked', true);
+        $row.hide();
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,100 @@
+{% extends "admin_panel/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="col-xs-12">
+        <div class="box">
+            <div class="box-header with-border">
+                <h3 class="box-title"></h3>
+                <div class="box-tools">
+                    <a href="#" target="_blank" class="btn btn-default btn-sm">
+                        <i class="fa fa-external-link"></i> Przejdź do panelu
+                    </a>
+                    <a href="{% url 'users:owner_update' owner.id %}" class="btn btn-primary btn-sm">
+                        <span class="hidden-xs">Edytuj profil</span><i class="fa fa-pencil visible-xs" aria-hidden="true"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-xs-12">
+
+                        <div class="userAvatar">
+                            {% if owner.image %}
+                                <img class="img-circle" src="{{ owner.image.url }}" width="160px" height="160px" alt="{{ owner.get_full_name }}">
+                            {% else %}
+                                <img class="img-circle" src="{% static 'dist/img/default-avatar.jpg' %}"  width="160px" height="160px" alt="Avatar nie załadowany">
+                            {% endif %}
+                        </div>
+                        <br>
+
+                        <div class="table-responsive no-padding">
+                            <table class="table table-bordered table-striped table-view">
+                                <tbody>
+                                    <tr>
+                                        <td>Status</td>
+                                        <td>
+                                            {% if owner.status == 'active' %}
+                                                <small class="label label-success">Aktywny</small>
+                                            {% elif owner.status == 'new' %}
+                                                <small class="label label-warning">Nowy</small>
+                                            {% else %}
+                                                <small class="label label-danger">Nieaktywny</small>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>ID</td>
+                                        <td>{{ owner.external_id|default:"0" }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Nazwisko</td>
+                                        <td>{{ owner.last_name|default:"-" }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Imię</td>
+                                        <td>{{ owner.first_name|default:"-" }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Patronimik</td>
+                                        <td>{{ owner.patronimic_name|default:"-" }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Data urodzenia</td>
+                                        <td>{{ owner.date_of_birth|date:"d.m.Y" }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>O właścicielu (notatki)</td>
+                                        <td>{{ owner.notes|default:"-" }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Telefon</td>
+                                        <td>{{ owner.phone_number|default:"-" }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Viber</td>
+                                        <td>{{ owner.viber|default:"-" }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Telegram</td>
+                                        <td>{{ owner.telegram|default:"-" }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Email</td>
+                                        <td>{{ owner.email|default:"-" }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+
+{% endblock %}

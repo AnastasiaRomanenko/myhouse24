@@ -1,0 +1,138 @@
+{% extends 'admin_panel/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="box">
+    <form id="w0" action="{{ form_url }}" method="post">
+        {% csrf_token %}
+        <div class="box-body">
+            {{ form.non_field_errors }}
+
+            <div class="form-group">
+                {{ form.title }}
+                <div class="help-block text-danger">{{ form.title.errors }}</div>
+            </div>
+
+            <div class="form-group">
+                {{ form.description }}
+                <div class="help-block text-danger">{{ form.description.errors }}</div>
+            </div>
+
+            <div class="row">
+                <div class="col-xs-12 col-md-6">
+                    <h4>Komu wysłać:</h4>
+                    <div class="checkbox">
+                        <label>{{ form.to_debtors }} Właścicielom z zadłużeniem</label>
+                        <div class="help-block text-danger">{{ form.to_debtors.errors }}</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label">Budynek</label>
+                        <select id="msg-house" class="form-control"></select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label">Sekcja</label>
+                        <select id="msg-section" class="form-control"></select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label">Piętro</label>
+                        <select id="msg-floor" class="form-control"></select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label">Mieszkanie</label>
+                        <select id="id_flat" name="flat" class="form-control">
+                            {% if form.flat.value %}
+                                <option value="{{ form.instance.flat.id }}" selected>{{ form.instance.flat.number }}</option>
+                            {% endif %}
+                        </select>
+                        <div class="help-block text-danger">{{ form.flat.errors }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="box-footer">
+                <a href="{% url 'finances:messages_list' %}" class="btn btn-default">Anuluj</a>
+                <div class="pull-right">
+                    <button type="submit" class="btn btn-success">
+                        <i class="fa fa-envelope-o"></i> Zapisz
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(function () {
+    $("textarea.compose-textarea").wysihtml5({
+        locale: 'pl',
+        toolbar: {
+            "font-styles": true,
+            "emphasis": true,
+            "lists": true,
+            "html": false,
+            "link": false,
+            "image": false,
+            "color": false,
+            "blockquote": false,
+            "fa": true,
+            "size": 'none'
+        }
+    });
+
+    function select2Ajax($el, url, placeholder, extraData) {
+        $el.select2({
+            width: '100%',
+            allowClear: true,
+            placeholder: placeholder,
+            language: 'pl',
+            ajax: {
+                url: url,
+                dataType: 'json',
+                delay: 250,
+                data: function(params) {
+                    var d = {term: params.term || '', page: params.page || 1};
+                    if (extraData) $.extend(d, extraData());
+                    return d;
+                },
+                processResults: function(data) { return data; },
+                cache: true
+            }
+        });
+    }
+
+    select2Ajax($('#msg-house'), "{% url 'buildings:house_select2' %}", 'Budynek...');
+
+    select2Ajax($('#msg-section'), "{% url 'buildings:section_select2' %}", 'Sekcja...', function() {
+        return {house_id: $('#msg-house').val() || ''};
+    });
+
+    select2Ajax($('#msg-floor'), "{% url 'buildings:floor_select2' %}", 'Piętro...', function() {
+        return {house_id: $('#msg-house').val() || ''};
+    });
+
+    select2Ajax($('#id_flat'), "{% url 'buildings:flat_select2' %}", 'Mieszkanie...', function() {
+        return {
+            house_id: $('#msg-house').val() || '',
+            section_id: $('#msg-section').val() || '',
+            floor_id: $('#msg-floor').val() || ''
+        };
+    });
+
+    $('#msg-house').on('change', function() {
+        $('#msg-section').val(null).trigger('change');
+        $('#msg-floor').val(null).trigger('change');
+        $('#id_flat').val(null).trigger('change');
+    });
+
+    $('#msg-section, #msg-floor').on('change', function() {
+        $('#id_flat').val(null).trigger('change');
+    });
+});
+</script>
+{% endblock %}

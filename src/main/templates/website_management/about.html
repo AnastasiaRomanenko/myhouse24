@@ -1,0 +1,302 @@
+{% extends 'admin_panel/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="row">
+    <div class="col-xs-12">
+        <div class="box">
+            <div class="box-header with-border">
+                <h3 class="box-title">Edycja strony "O nas"</h3>
+            </div>
+
+            <div class="box-body">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+
+                    <h3 class="page-header">Informacje</h3>
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="form-group">
+                                <label>Nagłówek</label>
+                                {{ form.title }}
+                                <span class="text-danger">{{ form.title.errors }}</span>
+                            </div>
+                            <div class="form-group">
+                                <label>Krótki opis</label>
+                                {{ form.description }}
+                                <span class="text-danger">{{ form.description.errors }}</span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <h4>Zdjęcie dyrektora</h4>
+                            {% if form.instance.director_photo %}
+                                <div style="margin-bottom: 15px;">
+                                    <img src="{{ form.instance.director_photo.url }}" class="img-responsive img-thumbnail" style="max-height: 250px;" alt="Zdjęcie dyrektora">
+                                </div>
+                            {% endif %}
+                            <div class="form-group">
+                                <label>Zalecany rozmiar: (250x310)</label>
+                                {{ form.director_photo }}
+                                <span class="text-danger">{{ form.director_photo.errors }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h3 class="page-header">Fotogaleria</h3>
+                    <div class="row" id="main-gallery-container">
+                        {{ main_gallery_formset.management_form }}
+
+                        {% for img_form in main_gallery_formset %}
+                            <div class="col-xs-6 col-sm-3 col-md-2 text-center" style="margin-bottom: 20px;">
+                                {% for hidden in img_form.hidden_fields %}{{ hidden }}{% endfor %}
+
+                                {% if img_form.instance.image %}
+                                    <img src="{{ img_form.instance.image.url }}" alt="Zdjęcie" class="img-thumbnail margin-bottom-15" style="height: 120px; width: 100%; object-fit: cover;">
+                                {% else %}
+                                    <div style="height: 120px; background: #f4f4f4; border: 1px dashed #ccc; margin-bottom: 15px; display: flex; align-items: center; justify-content: center;">
+                                        <span class="text-muted">Nowe zdjęcie</span>
+                                    </div>
+                                {% endif %}
+
+                                {{ img_form.image }}
+
+                                {% if img_form.DELETE %}
+                                    <div class="checkbox text-danger margin-top-10">
+                                        <label>{{ img_form.DELETE }} <i class="fa fa-trash"></i> Usuń</label>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <button type="button" id="btn-add-main-photo" class="btn btn-success margin-bottom-15">
+                                <i class="fa fa-plus"></i> Dodaj zdjęcie
+                            </button>
+                        </div>
+                    </div>
+
+                    <h3 class="page-header" style="margin-top: 40px;">Dodatkowe informacje</h3>
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <div class="form-group">
+                                <label>Nagłówek</label>
+                                {{ form.additional_title }}
+                                <span class="text-danger">{{ form.additional_title.errors }}</span>
+                            </div>
+                            <div class="form-group">
+                                <label>Krótki opis</label>
+                                {{ form.additional_description }}
+                                <span class="text-danger">{{ form.additional_description.errors }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h3 class="page-header">Dodatkowa galeria zdjęć</h3>
+                    <div class="row" id="add-gallery-container">
+                        {{ add_gallery_formset.management_form }}
+
+                        {% for img_form in add_gallery_formset %}
+                            <div class="col-xs-6 col-sm-3 col-md-2 text-center" style="margin-bottom: 20px;">
+                                {% for hidden in img_form.hidden_fields %}{{ hidden }}{% endfor %}
+
+                                {% if img_form.instance.image %}
+                                    <img src="{{ img_form.instance.image.url }}" alt="Zdjęcie" class="img-thumbnail margin-bottom-15" style="height: 120px; width: 100%; object-fit: cover;">
+                                {% else %}
+                                    <div style="height: 120px; background: #f4f4f4; border: 1px dashed #ccc; margin-bottom: 15px; display: flex; align-items: center; justify-content: center;">
+                                        <span class="text-muted">Nowe zdjęcie</span>
+                                    </div>
+                                {% endif %}
+
+                                {{ img_form.image }}
+
+                                {% if img_form.DELETE %}
+                                    <div class="checkbox text-danger margin-top-10">
+                                        <label>{{ img_form.DELETE }} <i class="fa fa-trash"></i> Usuń</label>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <button type="button" id="btn-add-extra-photo" class="btn btn-success margin-bottom-15">
+                                <i class="fa fa-plus"></i> Dodaj zdjęcie
+                            </button>
+                        </div>
+                    </div>
+
+                    <h3 class="page-header" style="margin-top: 40px;">Dokumenty</h3>
+                    <div id="documents-container">
+                        {{ document_formset.management_form }}
+
+                        {% for doc_form in document_formset %}
+                            <div class="row document-form" style="margin-bottom: 10px;">
+                                {% for hidden in doc_form.hidden_fields %}{{ hidden }}{% endfor %}
+                                <div class="col-xs-12 col-sm-5">
+                                    <div class="form-group">
+                                        <label>Nazwa</label>
+                                        {{ doc_form.title }}
+                                        <span class="text-danger">{{ doc_form.title.errors }}</span>
+                                    </div>
+                                </div>
+                                <div class="col-xs-12 col-sm-5">
+                                    <div class="form-group">
+                                        <label>Plik</label>
+                                        {% if doc_form.instance.document %}
+                                            <div class="margin-bottom-5">
+                                                <a href="{{ doc_form.instance.document.url }}" target="_blank">
+                                                    <i class="fa fa-file"></i> {{ doc_form.instance.title }}
+                                                </a>
+                                            </div>
+                                        {% endif %}
+                                        {{ doc_form.document }}
+                                        <span class="text-danger">{{ doc_form.document.errors }}</span>
+                                    </div>
+                                </div>
+                                <div class="col-xs-12 col-sm-2">
+                                    {% if doc_form.DELETE %}
+                                        <div class="checkbox text-danger" style="margin-top: 25px;">
+                                            <label>{{ doc_form.DELETE }} <i class="fa fa-trash"></i> Usuń</label>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <button type="button" id="btn-add-document" class="btn btn-success margin-bottom-15">
+                                <i class="fa fa-plus"></i> Dodaj dokument
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="empty-document" style="display: none;">
+                        <div class="row document-form" style="margin-bottom: 10px;">
+                            {% for hidden in document_formset.empty_form.hidden_fields %}{{ hidden }}{% endfor %}
+                            <div class="col-xs-12 col-sm-5">
+                                <div class="form-group">
+                                    <label>Nazwa</label>
+                                    {{ document_formset.empty_form.title }}
+                                </div>
+                            </div>
+                            <div class="col-xs-12 col-sm-5">
+                                <div class="form-group">
+                                    <label>Plik</label>
+                                    {{ document_formset.empty_form.document }}
+                                </div>
+                            </div>
+                            <div class="col-xs-12 col-sm-2"></div>
+                        </div>
+                    </div>
+
+                    <h3 class="page-header" style="margin-top: 40px;">Ustawienia SEO</h3>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="control-label">Nagłówek</label>
+                                {{ seo_block.title }}
+                                <span class="text-danger">{{ seo_block.title.errors }}</span>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label">Opis</label>
+                                {{ seo_block.description }}
+                                <span class="text-danger">{{ seo_block.description.errors }}</span>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label">Słowa kluczowe</label>
+                                {{ seo_block.keywords }}
+                                <span class="text-danger">{{ seo_block.keywords.errors }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row" style="margin-top: 30px;">
+                        <div class="col-xs-12 text-center">
+                            <div class="form-group">
+                                <a href="{% url 'main:about_update' %}" class="btn btn-default">Anuluj</a>
+                                <button type="submit" class="btn btn-primary">Zapisz</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="empty-main-gallery" style="display: none;">
+    <div class="col-xs-6 col-sm-3 col-md-2 text-center" style="margin-bottom: 20px;">
+        {% for hidden in main_gallery_formset.empty_form.hidden_fields %}{{ hidden }}{% endfor %}
+        <div style="height: 120px; background: #e8f5e9; border: 1px dashed #4caf50; margin-bottom: 15px; display: flex; align-items: center; justify-content: center;">
+            <span class="text-success"><i class="fa fa-camera"></i> Nowe zdjęcie</span>
+        </div>
+        {{ main_gallery_formset.empty_form.image }}
+    </div>
+</div>
+
+<div id="empty-add-gallery" style="display: none;">
+    <div class="col-xs-6 col-sm-3 col-md-2 text-center" style="margin-bottom: 20px;">
+        {% for hidden in add_gallery_formset.empty_form.hidden_fields %}{{ hidden }}{% endfor %}
+        <div style="height: 120px; background: #e8f5e9; border: 1px dashed #4caf50; margin-bottom: 15px; display: flex; align-items: center; justify-content: center;">
+            <span class="text-success"><i class="fa fa-camera"></i> Nowe zdjęcie</span>
+        </div>
+        {{ add_gallery_formset.empty_form.image }}
+    </div>
+</div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+
+        function setupGalleryFormset(buttonId, containerId, emptyTemplateId, totalFormsInputId) {
+            const addBtn = document.getElementById(buttonId);
+            const container = document.getElementById(containerId);
+            const emptyTemplate = document.getElementById(emptyTemplateId).innerHTML;
+            const totalFormsInput = document.getElementById(totalFormsInputId);
+
+            addBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const currentFormCount = parseInt(totalFormsInput.value);
+                const newFormHtml = emptyTemplate.replace(/__prefix__/g, currentFormCount);
+                container.insertAdjacentHTML('beforeend', newFormHtml);
+                totalFormsInput.value = currentFormCount + 1;
+            });
+        }
+
+        setupGalleryFormset('btn-add-main-photo', 'main-gallery-container', 'empty-main-gallery', 'id_main_gallery-TOTAL_FORMS');
+
+        setupGalleryFormset('btn-add-extra-photo', 'add-gallery-container', 'empty-add-gallery', 'id_add_gallery-TOTAL_FORMS');
+
+        document.getElementById('btn-add-document').addEventListener('click', function(e) {
+            e.preventDefault();
+            var totalInput = document.getElementById('id_documents-TOTAL_FORMS');
+            var count = parseInt(totalInput.value);
+            var template = document.getElementById('empty-document').innerHTML;
+            var newHtml = template.replace(/__prefix__/g, count);
+            document.getElementById('documents-container').insertAdjacentHTML('beforeend', newHtml);
+            totalInput.value = count + 1;
+        });
+    });
+
+    $(function () {
+    $("textarea.compose-textarea").wysihtml5({
+        locale: 'ru-RU',
+        toolbar: {
+            "font-styles": true,
+            "emphasis": true,
+            "lists": true,
+            "html": false,
+            "link": false,
+            "image": false,
+            "color": false,
+            "blockquote": false,
+            "fa": true,
+            "size": 'none'
+        }
+    });
+});
+</script>
+{% endblock %}

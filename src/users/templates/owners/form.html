@@ -1,0 +1,163 @@
+{% extends 'admin_panel/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="box">
+    <div class="box-body">
+        <form id="w0" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="row">
+                <div class="col-xs-12 col-sm-6">
+                    <div class="userAvatar">
+                        {% if form.instance.image %}
+                            <img class="img-circle" width="160" height="160" src="{{ form.instance.image.url }}" alt="{{ form.get_full_name }}">
+                        {% else %}
+                            <img class="img-circle" src="{% static 'assets/empty_placeholder.jpeg' %}" width="160" height="160px" alt="Avatar nie załadowany">
+                        {% endif %}<br>
+                        <label class="control-label" for="ownerform-image">Zmień zdjęcie</label>
+                        <input type="file" id="ownerform-image" name="image" accept="image/*">
+                    </div>
+                </div>
+                <div class="col-xs-12 col-sm-6">
+                    <div class="form-group field-ownerform-status">
+                        <label class="control-label" for="{{ form.status.id_for_label }}">Status</label>
+                        {{ form.status }}
+                        <div class="help-block text-danger">{{ form.status.errors }}</div>
+                    </div>
+
+                    <div class="form-group field-ownerform-uid">
+                        <label class="control-label" for="ownerform-uid">ID</label>
+                        <input type="text" id="ownerform-uid" class="form-control" name="external_id" value="{{ form.external_id.value|default:'' }}">
+                        <div class="help-block text-danger">{{ form.external_id.errors }}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-12 col-sm-6">
+                    <div class="form-group field-ownerform-lastname">
+                        <label class="control-label" for="ownerform-lastname">Nazwisko</label>
+                        <input type="text" id="ownerform-lastname" class="form-control" name="last_name" value="{{ form.last_name.value|default:'' }}">
+                        <div class="help-block">{{ form.last_name.errors }}</div>
+                    </div>
+                    <div class="form-group field-ownerform-firstname">
+                        <label class="control-label" for="ownerform-firstname">Imię</label>
+                        <input type="text" id="ownerform-firstname" class="form-control" name="first_name" value="{{ form.first_name.value|default:'' }}">
+                        <div class="help-block">{{ form.first_name.errors }}</div>
+                    </div>
+                    <div class="form-group field-ownerform-middlename">
+                        <label class="control-label" for="ownerform-middlename">Patronimik</label>
+                        <input type="text" id="ownerform-middlename" class="form-control" name="patronimic_name" value="{{ form.patronimic_name.value|default:'' }}">
+                        <div class="help-block">{{ form.patronimic_name.errors }}</div>
+                    </div>
+                    <div class="form-group field-ownerform-birthdate">
+                        <label class="control-label" for="ownerform-birthdate">Data urodzenia</label>
+                        <div id="ownerform-birthdate-kvdate" class="input-group  date">
+                            <input type="text" id="ownerform-birthdate" class="form-control js-datepicker" name="date_of_birth" value="{{ form.date_of_birth.value|default:'' }}" placeholder="dd.mm.rrrr">
+                            <span class="input-group-addon kv-date-calendar" title="Wybierz datę">
+                                <i class="glyphicon glyphicon-calendar"></i>
+                            </span>
+                        </div>
+                        <div class="help-block">{{ form.date_of_birth.errors }}</div>
+                    </div>
+                </div>
+                <div class="col-xs-12 col-sm-6">
+                    <div class="form-group field-ownerform-note">
+                        <label class="control-label" for="ownerform-note">O właścicielu (notatki)</label>
+                        <textarea id="ownerform-note" class="form-control" name="notes" rows="10" style="height: 256px">{{ form.notes.value|default:'' }}</textarea>
+
+                        <div class="help-block">{{ form.notes.errors }}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-12 col-md-6">
+                    <h2 class="page-header">Dane kontaktowe</h2>
+                    <div class="form-group field-ownerform-phone">
+                        <label class="control-label" for="ownerform-phone">Telefon</label>
+                        <input type="text" id="ownerform-phone" class="form-control" name="phone_number" value="{{ form.phone_number.value|default:'' }}">
+
+                        <div class="help-block">{{ form.phone_number.errors }}</div>
+                    </div>
+                    <div class="form-group field-ownerform-viber">
+                        <label class="control-label" for="ownerform-viber">Viber</label>
+                        <input type="text" id="ownerform-viber" class="form-control" name="viber" value="{{ form.viber.value|default:'' }}">
+
+                        <div class="help-block">{{ form.viber.errors }}</div>
+                    </div>
+                    <div class="form-group field-ownerform-telegram">
+                        <label class="control-label" for="ownerform-telegram">Telegram</label>
+                        <input type="text" id="ownerform-telegram" class="form-control" name="telegram" value="{{ form.telegram.value|default:'' }}">
+                        <div class="help-block">{{ form.telegram.errors }}</div>
+                    </div>
+                    <div class="form-group field-ownerform-email required">
+                        <label class="control-label" for="ownerform-email">E-mail (login)</label>
+                        <input type="text" id="ownerform-email" class="form-control" name="email" value="{{ form.email.value|default:'' }}" aria-required="true">
+                        <div class="help-block">{{ form.email.errors }}</div>
+                    </div>
+                </div>
+                <div class="col-xs-12 col-md-6">
+                    <h2 class="page-header">Zmień hasło</h2>
+                    <div class="form-group field-ownerform-password1">
+                        <label class="control-label" for="ownerform-password1">Hasło</label>
+
+                        <div class="input-group">
+                            <input type="password" id="ownerform-password1" class="form-control pass-value" name="password1" maxlength="255">
+
+                            <span class="input-group-btn">
+                                <button class="btn btn-default" type="button" id="generatePassBtn">
+                                    Generuj
+                                </button>
+                                <button type="button" class="btn btn-primary" id="showPass">
+                                    <i class="fa fa-eye" aria-hidden="true"></i>
+                                </button>
+                            </span>
+                        </div>
+
+                        <div class="help-block"></div>
+                    </div>
+                    <div class="form-group field-ownerform-password2">
+                        <label class="control-label" for="ownerform-password2">Powtórz hasło</label>
+                        <input type="password" id="ownerform-password2" class="form-control pass-value" name="password2" maxlength="255">
+
+                        <div class="help-block"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-12 text-right">
+                    <a href="{% url 'users:owner_list' %}" class="btn btn-default">Anuluj</a>
+                    <button type="submit" class="btn btn-success">Zapisz</button>
+                </div>
+            </div>
+
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    $('#generatePassBtn').on('click', function() {
+        var pass = Math.random().toString(36).slice(-8);
+        $('.pass-value').val(pass);
+
+        $('#ownerform-password1').attr('type', 'text');
+        $('#showPass i').removeClass('fa-eye').addClass('fa-eye-slash');
+    });
+
+    $('#showPass').on('click', function() {
+        var passInput = $('#ownerform-password1');
+        var icon = $(this).find('i');
+
+        if (passInput.attr('type') === 'password') {
+            passInput.attr('type', 'text');
+            icon.removeClass('fa-eye').addClass('fa-eye-slash');
+        } else {
+            passInput.attr('type', 'password');
+            icon.removeClass('fa-eye-slash').addClass('fa-eye');
+        }
+    });
+});
+</script>
+{% endblock %}

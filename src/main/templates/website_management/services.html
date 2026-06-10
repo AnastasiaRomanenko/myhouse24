@@ -1,0 +1,175 @@
+{% extends 'admin_panel/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="row">
+    <div class="col-xs-12">
+        <div class="box">
+            <div class="box-header with-border">
+                <h3 class="box-title">Edycja strony "Usługi"</h3>
+            </div>
+            <div class="box-body">
+                <form id="w0" action="{% url 'main:services_update' %}" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    {{ form.non_field_errors }}
+
+                    <div class="row near-img">
+                        <div class="col-xs-12">
+                            <h3 class="page-header">Usługi</h3>
+                        </div>
+                        {{ service_formset.management_form }}
+                        {{ service_formset.non_form_errors }}
+                        <div id="form-websiteservice-rows">
+                            {% for service_form in service_formset %}
+                                <div class="col-md-4 form-websiteservice">
+                                    {% for hidden in service_form.hidden_fields %}{{ hidden }}{% endfor %}
+                                    {{ service_form.non_field_errors }}
+                                    <h4>
+                                        Usługa {{ forloop.counter }}
+                                        <a href="#" class="pull-right text-red form-row-remove-btn" title="Usuń">
+                                            <i class="fa fa-trash"></i>
+                                        </a>
+                                    </h4>
+
+                                    {% if service_form.instance.image %}
+                                        <img src="{{ service_form.instance.image.url }}" width="360" height="200" alt="{{ service_form.instance.title }}" class="margin-bottom-15">
+                                    {% else %}
+                                        <img src="{% static 'assets/empty_placeholder.jpeg' %}" width="360" height="200" alt="" class="margin-bottom-15">
+                                    {% endif %}
+
+                                    <div class="form-group">
+                                        <label>Zalecany rozmiar: (650x300)</label>
+                                        {{ service_form.image }}
+                                        <span class="text-danger">{{ service_form.image.errors }}</span>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Nazwa usługi</label>
+                                        {{ service_form.title }}
+                                        <span class="text-danger">{{ service_form.title.errors }}</span>
+                                    </div>
+
+                                    <div class="form-group margin-bottom-30">
+                                        <label>Opis usługi</label>
+                                        {{ service_form.description }}
+                                        <span class="text-danger">{{ service_form.description.errors }}</span>
+                                    </div>
+
+                                    {% if service_form.DELETE %}
+                                        <div class="hidden">{{ service_form.DELETE }}</div>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h3 class="page-header">Ustawienia SEO</h3>
+                            <div class="form-group">
+                                <label class="control-label">Nagłówek</label>
+                                {{ seo_block.title }}
+                                <span class="text-danger">{{ seo_block.title.errors }}</span>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label">Opis</label>
+                                {{ seo_block.description }}
+                                <span class="text-danger">{{ seo_block.description.errors }}</span>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label">Słowa kluczowe</label>
+                                {{ seo_block.keywords }}
+                                <span class="text-danger">{{ seo_block.keywords.errors }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-xs-12 text-center">
+                            <div class="form-group">
+                                <a href="{% url 'main:services_update' %}" class="btn btn-default">Anuluj</a>
+                                <button type="button" class="btn btn-success bg-green-active form-row-add-websiteservice-btn">
+                                    <i class="fa fa-plus"></i> Dodaj usługę
+                                </button>
+                                <button type="submit" class="btn btn-success">Zapisz</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="empty-service-form" style="display: none;">
+                        <div class="col-md-4 form-websiteservice">
+                            {% for hidden in service_formset.empty_form.hidden_fields %}{{ hidden }}{% endfor %}
+                            <h4>
+                                Usługa
+                                <a href="#" class="pull-right text-red form-row-remove-btn" title="Usuń">
+                                    <i class="fa fa-trash"></i>
+                                </a>
+                            </h4>
+                            <img src="{% static 'assets/empty_placeholder.jpeg' %}" width="360" height="200" alt="" class="margin-bottom-15">
+                            <div class="form-group">
+                                <label>Zalecany rozmiar: (650x300)</label>
+                                {{ service_formset.empty_form.image }}
+                            </div>
+                            <div class="form-group">
+                                <label>Nazwa usługi</label>
+                                {{ service_formset.empty_form.title }}
+                            </div>
+                            <div class="form-group margin-bottom-30">
+                                <label>Opis usługi</label>
+                                {{ service_formset.empty_form.description }}
+                            </div>
+                            {% if service_formset.empty_form.DELETE %}
+                                <div class="hidden">{{ service_formset.empty_form.DELETE }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+jQuery(function ($) {
+    function initEditors($scope) {
+        $scope.find("textarea.compose-textarea").not('#empty-service-form textarea').wysihtml5({
+            locale: 'ru-RU',
+            toolbar: {
+                "font-styles": true,
+                "emphasis": true,
+                "lists": true,
+                "html": false,
+                "link": false,
+                "image": false,
+                "color": false,
+                "blockquote": false,
+                "fa": true,
+                "size": 'none'
+            }
+        });
+    }
+
+    initEditors($(document));
+
+    $('.form-row-add-websiteservice-btn').on('click', function (e) {
+        e.preventDefault();
+        var totalFormsInput = $('#id_services-TOTAL_FORMS');
+        var index = parseInt(totalFormsInput.val(), 10);
+        var html = $('#empty-service-form').html().replace(/__prefix__/g, index);
+        $('#form-websiteservice-rows').append(html);
+        totalFormsInput.val(index + 1);
+        initEditors($('#form-websiteservice-rows .form-websiteservice').last());
+    });
+
+    $(document).on('click', '.form-row-remove-btn', function (e) {
+        e.preventDefault();
+        if (!confirm('Usuń?')) return;
+        var $row = $(this).closest('.form-websiteservice');
+        $row.find('input[type="checkbox"][name$="-DELETE"]').prop('checked', true);
+        $row.hide();
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,102 @@
+{% extends 'crm/base.html' %}
+{% load static %}
+
+
+{% block content %}
+<div class="box">
+    <div class="box-body">
+        <form id="w0" action="{% url 'crm:request_create' %}" method="post">
+            {% csrf_token %}
+
+            <div class="modal-body">
+                <div class="form-group field-masterrequestform-type">
+                    <label class="control-label" for="masterrequestform-type">Typ specjalisty</label>
+                    <select id="masterrequestform-type" class="form-control" name="master_type">
+                        <option value="">Wybierz...</option>
+                        <option value="plumber">Hydraulik</option>
+                        <option value="electrician">Elektryk</option>
+                        <option value="locksmith">Ślusarz</option>
+                        <option value="any" selected>Dowolny specjalista</option>
+                    </select>
+                    <div class="help-block text-danger">{{ form.master_type.errors }}</div>
+                </div>
+
+                <div class="form-group field-masterrequestform-flat_id required">
+                    <label class="control-label" for="masterrequestform-flat_id">Mieszkanie</label>
+                    <select id="masterrequestform-flat_id" class="form-control" name="flat" aria-required="true" required>
+                        <option value="">Wybierz...</option>
+                        {% for flat in user_flats %}
+                            <option value="{{ flat.id }}" {% if request.GET.flat_id == flat.id|stringformat:'s' %}selected{% endif %}>
+                                {{ flat.house.title }}, m.{{ flat.number }}
+                            </option>
+                        {% empty %}
+                            <option value="" disabled>Nie masz dostępnych mieszkań</option>
+                        {% endfor %}
+                    </select>
+                    <div class="help-block text-danger">{{ form.flat.errors }}</div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group field-masterrequestform-date_request required">
+                            <label class="control-label" for="masterrequestform-date_request">Data prac</label>
+                            <div class="input-group date">
+                                <input type="text" id="masterrequestform-date_request" class="form-control" name="date_request" value="{% now 'd.m.Y' %}" required>
+                                <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+                            </div>
+                            <div class="help-block text-danger">{{ form.date_request.errors }}</div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <div class="form-group field-masterrequestform-time_request">
+                            <label class="control-label" for="masterrequestform-time_request">Godzina prac</label>
+                            <div class="input-group bootstrap-timepicker">
+                                <input type="text" id="masterrequestform-time_request" class="form-control" name="time_request" value="{% now 'H:i' %}">
+                                <div class="input-group-addon">
+                                    <i class="fa fa-clock-o"></i>
+                                </div>
+                            </div>
+                            <div class="help-block text-danger">{{ form.time_request.errors }}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group field-masterrequestform-description required">
+                    <label class="control-label" for="masterrequestform-description">Opis</label>
+                    <textarea id="masterrequestform-description" class="form-control" name="description" rows="5" placeholder="Opisz problem" aria-required="true" required></textarea>
+                    <div class="help-block text-danger">{{ form.description.errors }}</div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-success">Wyślij zgłoszenie</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<link href="{% static 'cabinet/plugins/timepicker/bootstrap-timepicker.min.css' %}" rel="stylesheet">
+<script src="{% static 'cabinet/plugins/timepicker/bootstrap-timepicker.min.js' %}"></script>
+
+<script>
+$(function () {
+    // Inicjalizacja wyboru daty
+    $('#masterrequestform-date_request').datepicker({
+        format: 'dd.mm.yyyy',
+        autoclose: true,
+        language: 'ru',
+        startDate: '0d'
+    });
+
+    // Inicjalizacja wyboru czasu
+    $('#masterrequestform-time_request').timepicker({
+        showInputs: false,
+        showMeridian: false,
+        minuteStep: 5
+    });
+});
+</script>
+{% endblock %}

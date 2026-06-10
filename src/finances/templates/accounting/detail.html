@@ -1,0 +1,107 @@
+{% extends 'admin_panel/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="row">
+    <div class="col-xs-12 col-md-7 col-lg-6">
+        <div class="page-header-spec">
+            <div class="form-group">
+                <div class="input-group date">
+                    <div class="input-group-addon">№</div>
+                    <div class="form-control pull-right">{{ transaction.random_number }}</div>
+                </div>
+            </div>
+            <span class="label-mid">z dnia</span>
+            <div class="form-group">
+                <div class="input-group date">
+                    <div class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></div>
+                    <div class="form-control pull-right">{{ transaction.created_at|date:"d.m.Y" }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="box">
+    <div class="box-header with-border">
+        <h3 class="box-title">{% if transaction.type == 'expense' %}Zestawienie wydatków{% else %}Zestawienie przychodów{% endif %}</h3>
+        <div class="box-tools">
+            <a href="{% url 'finances:accounting_update' transaction.id %}" class="btn btn-primary btn-sm">
+                <span class="hidden-xs">Edytuj zestawienie</span><i class="fa fa-pencil visible-xs" aria-hidden="true"></i>
+            </a>
+            <form method="post" action="{% url 'finances:accounting_delete' transaction.id %}" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-default btn-sm" onclick="return confirm('Czy na pewno chcesz usunąć ten element?');">
+                    <span class="hidden-xs">Usuń</span><i class="fa fa-trash visible-xs" aria-hidden="true"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+    <div class="box-body">
+        <table class="table table-bordered table-striped table-view">
+            <tbody>
+                <tr>
+                    <td>Status</td>
+                    <td>
+                        {% if transaction.completed %}
+                            <small class="label label-success">Zaksięgowano</small>
+                        {% else %}
+                            <small class="label label-default">Nie zaksięgowano</small>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% if transaction.type == 'income' %}
+                <tr>
+                    <td>Właściciel mieszkania</td>
+                    <td>
+                        {% if transaction.owner %}
+                            {{ transaction.owner.get_full_name|default:transaction.owner.email }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <td>Konto osobiste</td>
+                    <td>
+                        {% if transaction.bank_book %}
+                            <a href="{% url 'finances:bank_books_detail' transaction.bank_book.id %}">{{ transaction.bank_book.random_number }}</a>
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endif %}
+                <tr>
+                    <td>Pozycja</td>
+                    <td>{{ transaction.payment_item.name|default:"-" }}</td>
+                </tr>
+                <tr>
+                    <td>Menedżer</td>
+                    <td>
+                        {% if transaction.manager %}
+                            {{ transaction.manager.get_full_name|default:transaction.manager.email }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <td>Kwota</td>
+                    <td>
+                        {% if transaction.type == 'expense' %}
+                            <span class="text-red">-{{ transaction.amount }}</span>
+                        {% else %}
+                            <span class="text-green">{{ transaction.amount }}</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <td>Komentarz</td>
+                    <td>{{ transaction.comment|default:"" }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

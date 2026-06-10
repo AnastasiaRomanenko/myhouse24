@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head><meta charset="UTF-8"><title>Rachunek nr{{ receipt.random_number }}</title></head>
+<body>
+
+<div class="header-row">
+    <div>
+        <h2>Rachunek do zapłaty nr{{ receipt.random_number }}</h2>
+        <span style="color:#666;">z dnia {{ receipt.date_from|date:"d.m.Y" }}</span>
+    </div>
+    <div class="header-badges">
+        {% if receipt.completed %}
+            <span class="status-badge badge-success">Zaksięgowano</span>
+        {% else %}
+            <span class="status-badge badge-default">Nie zaksięgowano</span>
+        {% endif %}
+        &nbsp;
+        {% if receipt.status == 'paid' %}
+            <span class="status-badge badge-success">{{ receipt.get_status_display }}</span>
+        {% elif receipt.status == 'partially paid' %}
+            <span class="status-badge badge-warning">{{ receipt.get_status_display }}</span>
+        {% else %}
+            <span class="status-badge badge-danger">{{ receipt.get_status_display }}</span>
+        {% endif %}
+    </div>
+</div>
+
+<table class="meta-table">
+    <tr>
+        <td>Okres:</td>
+        <td>{{ receipt.period_from|date:"d.m.Y" }} — {{ receipt.period_to|date:"d.m.Y" }}</td>
+    </tr>
+    <tr>
+        <td>Właściciel:</td>
+        <td>{% if owner %}{{ owner.get_full_name|default:owner.email }}{% else %}—{% endif %}</td>
+    </tr>
+    <tr>
+        <td>Konto osobiste:</td>
+        <td>{% if receipt.bank_book %}{{ receipt.bank_book.random_number }}{% else %}—{% endif %}</td>
+    </tr>
+    <tr>
+        <td>Telefon:</td>
+        <td>{% if owner and owner.phone_number %}{{ owner.phone_number }}{% else %}—{% endif %}</td>
+    </tr>
+    <tr>
+        <td>Budynek:</td>
+        <td>{% if receipt.flat and receipt.flat.house %}{{ receipt.flat.house.title }}{% else %}—{% endif %}</td>
+    </tr>
+    <tr>
+        <td>Mieszkanie:</td>
+        <td>{% if receipt.flat %}{{ receipt.flat.number }}{% else %}—{% endif %}</td>
+    </tr>
+    <tr>
+        <td>Sekcja:</td>
+        <td>{% if receipt.flat and receipt.flat.section %}{{ receipt.flat.section.title }}{% else %}—{% endif %}</td>
+    </tr>
+    <tr>
+        <td>Taryfa:</td>
+        <td>{% if receipt.tariff %}{{ receipt.tariff.title }}{% else %}—{% endif %}</td>
+    </tr>
+</table>
+
+<table class="services-table">
+    <thead>
+        <tr>
+            <th style="width:32px;">#</th>
+            <th>Usługa</th>
+            <th>Ilość</th>
+            <th>Jedn. miary</th>
+            <th>Cena za jedn., zł</th>
+            <th>Wartość, zł</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for line in lines %}
+        <tr>
+            <td style="text-align:center;">{{ forloop.counter }}</td>
+            <td style="text-align:left;">{{ line.service.title }}</td>
+            <td>{{ line.amount }}</td>
+            <td>{% if line.service.unit_of_measurement %}{{ line.service.unit_of_measurement.title }}{% else %}—{% endif %}</td>
+            <td>{{ line.price|floatformat:2 }}</td>
+            <td>{% widthratio line.price 1 line.amount %}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="6" style="text-align:center; color:#999;">Brak usług</td></tr>
+        {% endfor %}
+    </tbody>
+    <tfoot>
+        <tr class="total-row">
+            <td colspan="5" style="text-align:right; border:1px solid #bbb; padding:5px 7px;">Razem:</td>
+            <td style="border:1px solid #bbb; padding:5px 7px;">{{ total|floatformat:2 }} zł</td>
+        </tr>
+    </tfoot>
+</table>
+
+</body>
+</html>

@@ -1,0 +1,70 @@
+{% extends 'admin_panel/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="box">
+    <div class="box-header with-border">
+        <h3 class="box-title">Lista szablonów</h3>
+    </div>
+    <div class="box-body">
+
+        {% if templates %}
+        <table class="table table-bordered table-striped">
+            <tbody>
+                {% for tpl in templates %}
+                <tr>
+                    <td>
+                        <strong>{{ tpl.name }}</strong>
+                        {% if tpl.is_default %}<small class="label label-success" style="margin-left:8px;">domyślny</small>{% endif %}
+                    </td>
+                    <td style="width:420px; white-space:nowrap;">
+                        <a href="{% url 'settings:receipt_template_download' tpl.pk %}" class="text-primary">
+                            <i class="fa fa-download"></i> Pobierz szablon
+                        </a>
+                        &nbsp;&nbsp;
+                        {% if not tpl.is_default %}
+                        <form method="post" action="{% url 'settings:receipt_template_set_default' tpl.pk %}" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-link" style="padding:0;">
+                                Ustaw jako domyślny
+                            </button>
+                        </form>
+                        &nbsp;&nbsp;
+                        {% endif %}
+                        <form method="post" action="{% url 'settings:receipt_template_delete' tpl.pk %}" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-link text-danger" style="padding:0;"
+                                    onclick="return confirm('Usuń szablon «{{ tpl.name }}»?');">
+                                <i class="fa fa-trash"></i> Usuń szablon
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p class="text-muted">Brak szablonów.</p>
+        {% endif %}
+
+        <hr>
+
+        <h4>Wgraj niestandardowy szablon</h4>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="form-group">
+                <label>Plik (.xlsm)</label>
+                <input type="file" name="file" accept=".xlsm,.xlsx" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label>Nazwa</label>
+                <input type="text" name="name" class="form-control" placeholder="Nazwa szablonu" required>
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">Zapisz</button>
+                <a href="{% url 'finances:payment_receipts_list' %}" class="btn btn-default">Anuluj</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
